@@ -41,14 +41,12 @@ export default function PageComponent({
     }
   }, [drapingImages.best]);
 
-  if (!report) return null;
-
   const { 
       season, headline, description, characteristics, 
       palette, makeup, makeup_recommendations, styling, 
       worst_colors, virtual_draping_prompts,
       celebrities, fashion_guide, hair_color_recommendations
-  } = report;
+  } = report || {};
 
   const handleGenerateDraping = async () => {
     if (!sessionId || !virtual_draping_prompts) return;
@@ -99,6 +97,8 @@ export default function PageComponent({
           handleGenerateDraping();
       }
   }, [sessionId]); // Run once when sessionId is available
+
+  if (!report) return null;
 
       return (
 
@@ -398,9 +398,7 @@ export default function PageComponent({
                         </div>
 
                         <p className="text-center mt-6 font-serif italic text-gray-600">
-
-                            "Notice how your skin looks clearer and your eyes brighter."
-
+                            &quot;Notice how your skin looks clearer and your eyes brighter.&quot;
                         </p>
 
                     </div>
@@ -611,13 +609,9 @@ export default function PageComponent({
                         
 
                         <div className="bg-[#FFFBF7] p-6 rounded-xl border border-primary/10 mb-8">
-
                             <p className="text-lg text-[#1A1A2E] font-medium leading-relaxed italic">
-
-                                "{makeup_recommendations?.summary}"
-
+                                &quot;{makeup_recommendations?.summary}&quot;
                             </p>
-
                         </div>
 
     

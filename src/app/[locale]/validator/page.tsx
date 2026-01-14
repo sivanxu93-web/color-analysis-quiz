@@ -20,7 +20,7 @@ export default function ValidatorPage({
                AI Style Validator <span className="text-primary">Coming Soon</span>
             </h1>
             <p className="text-lg md:text-xl text-text-secondary leading-relaxed mb-10 max-w-2xl mx-auto">
-               We are building a smart tool that will help you instantly check if a clothing item matches your seasonal color profile. Just upload a photo of the garment, and our AI will tell you if it's a "Match" or a "Clash".
+               We are building a smart tool that will help you instantly check if a clothing item matches your seasonal color profile. Just upload a photo of the garment, and our AI will tell you if it&apos;s a &quot;Match&quot; or a &quot;Clash&quot;.
             </p>
             
             <div className="p-8 bg-white rounded-2xl shadow-lg border border-gray-100 max-w-2xl mx-auto mb-10">
@@ -32,11 +32,11 @@ export default function ValidatorPage({
                     </li>
                     <li className="flex items-start">
                         <span className="flex-shrink-0 h-6 w-6 flex items-center justify-center rounded-full bg-green-100 text-green-600 mr-3">✓</span>
-                        <span className="text-text-secondary"><strong>Personalized Feedback:</strong> "This Emerald Green top harmonizes perfectly with your Deep Winter palette."</span>
+                        <span className="text-text-secondary"><strong>Personalized Feedback:</strong> &quot;This Emerald Green top harmonizes perfectly with your Deep Winter palette.&quot;</span>
                     </li>
                     <li className="flex items-start">
                         <span className="flex-shrink-0 h-6 w-6 flex items-center justify-center rounded-full bg-green-100 text-green-600 mr-3">✓</span>
-                        <span className="text-text-secondary"><strong>Outfit Advice:</strong> Get tips on how to style it if it's not a perfect match.</span>
+                        <span className="text-text-secondary"><strong>Outfit Advice:</strong> Get tips on how to style it if it&apos;s not a perfect match.</span>
                     </li>
                 </ul>
             </div>
