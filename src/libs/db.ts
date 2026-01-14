@@ -1,21 +1,32 @@
 import {Pool} from 'pg'
 
-let globalPool: Pool
+// Use globalThis to maintain the pool across hot reloads in development
+const globalForDb = globalThis as unknown as {
+  conn: Pool | undefined
+}
 
 export function getDb() {
-  if (!globalPool) {
+  if (!globalForDb.conn) {
     const connectionString = process.env.POSTGRES_URL || process.env.DATABASE_URL;
-    // console.log("connectionString", connectionString);
+    // console.log("Connecting to DB:", connectionString?.split('@')[1]); // Log host only for debug
 
-    // 如果使用的是 Supabase 等托管 Postgres，一般需要开启 SSL。
-    // 这里根据连接串中是否包含 'supabase.co' 简单判断，自动开启 SSL，
-    // 本地 Postgres（例如 127.0.0.1）不会受影响。
-    const useSSL = connectionString?.includes('supabase.co');
+    // 自动判断是否需要 SSL：如果不是本地连接 (localhost/127.0.0.1)，则默认开启 SSL
+    const isLocal = connectionString?.includes('localhost') || connectionString?.includes('127.0.0.1');
+    const useSSL = !isLocal;
 
-    globalPool = new Pool({
+    globalForDb.conn = new Pool({
       connectionString,
       ssl: useSSL ? {rejectUnauthorized: false} : undefined,
+      max: 10, // Set a reasonable max connection limit
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 60000, // 60s timeout for slow VPN connections
+      keepAlive: true,
     });
+
+    globalForDb.conn.on('error', (err, client) => {
+      console.error('Unexpected error on idle client', err)
+      // process.exit(-1) // Do not exit, let it reconnect
+    })
   }
-  return globalPool;
+  return globalForDb.conn;
 }

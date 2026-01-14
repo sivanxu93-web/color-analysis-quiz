@@ -1,7 +1,7 @@
 'use client'
 import Header from '~/components/Header';
 import Footer from '~/components/Footer';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { getLinkHref } from '~/configs/buildLink';
 import { useCommonContext } from '~/context/common-context';
@@ -13,7 +13,7 @@ export default function PageComponent({
   locale: string;
   colorLabText: any;
 }) {
-  const { userData } = useCommonContext();
+  const { userData, setShowLoginModal } = useCommonContext();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
@@ -101,9 +101,17 @@ export default function PageComponent({
 
       setSessionData({ sessionId, publicUrl });
       
-      // 4. Run Analysis Directly (No Login Required)
-      const userEmail = userData?.email || "";
-      runAnalysis(sessionId, publicUrl, userEmail);
+      // LOGIN CHECK - Post Upload
+      if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
+          // Save pending session
+          localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
+          setAnalyzing(false); // Stop spinner so user can see login modal
+          setShowLoginModal(true);
+          return;
+      }
+      
+      // 4. Run Analysis Directly
+      runAnalysis(sessionId, publicUrl, userData?.email || "");
 
     } catch (error) {
       console.error(error);
@@ -112,6 +120,29 @@ export default function PageComponent({
       setStep(0);
     }
   };
+
+  // Resume analysis after login
+  useEffect(() => {
+      const storedSession = localStorage.getItem('color_lab_pending_session');
+      if (userData?.email && storedSession) {
+          try {
+              const { sessionId, publicUrl } = JSON.parse(storedSession);
+              // Restore UI state
+              setPreviewUrl(publicUrl); 
+              setAnalyzing(true);
+              setStep(3);
+              
+              // Run Analysis
+              runAnalysis(sessionId, publicUrl, userData.email);
+              
+              // Clear storage
+              localStorage.removeItem('color_lab_pending_session');
+          } catch (e) {
+              console.error("Failed to parse pending session", e);
+              localStorage.removeItem('color_lab_pending_session');
+          }
+      }
+  }, [userData?.email]);
 
   return (
     <>

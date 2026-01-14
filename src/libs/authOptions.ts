@@ -12,7 +12,10 @@ export const authOptions: NextAuthOptions = {
   providers: [
     GoogleProvider({
       clientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_SECRET_ID!
+      clientSecret: process.env.GOOGLE_SECRET_ID!,
+      httpOptions: {
+        timeout: 10000,
+      }
     }),
     // connect with google api internally
     CredentialsProvider({
