@@ -1,0 +1,197 @@
+{
+  "FileDesc": {
+    "lang": "en",
+    "language": "English",
+    "languageInChineseSimple": "英语"
+  },
+  "IndexPageText": {
+    "title": "Color Analysis Quiz | Personal Color Analysis AI",
+    "description": "Discover your perfect colors with AI. Professional seasonal color analysis in seconds.",
+    "h1Text": "Wear Your True Colors",
+    "descriptionBelowH1Text": "Stop guessing. Start glowing. Discover the palette that harmonizes with your unique beauty."
+  },
+  "CommonText": {
+    "loadingText": "Analyzing...",
+    "generateText": "Curating...",
+    "placeholderText": "Upload or describe...",
+    "buttonText": "Analyze",
+    "footerDescText": "Your personal AI color consultant.",
+    "timesLeft": "You have",
+    "timesRight": "credits left",
+    "download": "Download Report",
+    "result": "Your Analysis",
+    "moreWorks": "My Reports",
+    "generateNew": "New Analysis",
+    "displayPublic": "display public",
+    "similarText": "similar",
+    "prompt": "input prompt",
+    "revised": "revised prompt",
+    "exploreMore": "More Styles",
+    "keyword": "style",
+    "searchButtonText": "Explore"
+  },
+  "MenuText": {
+    "header0": "Color Analysis",
+    "header1": "Style Validator",
+    "header2": "My Reports",
+    "header3": "Pricing",
+    "footerLegal": "Legal",
+    "footerLegal0": "Privacy Policy",
+    "footerLegal1": "Terms & Conditions",
+    "footerSupport": "Support",
+    "footerSupport0": "Pricing",
+    "footerSupport1": "Contact Us"
+  },
+  "AuthText": {
+    "loginText": "Log in",
+    "loginModalDesc": "Please log in to save your personal color reports",
+    "loginModalButtonText": "Login with Google",
+    "logoutModalDesc": "Are you sure you want to log out?",
+    "confirmButtonText": "Confirm",
+    "cancelButtonText": "Cancel"
+  },
+  "PricingText": {
+    "title": "Pricing",
+    "description": "Unlock your full potential with professional color analysis.",
+    "h1Text": "Simple, Transparent Pricing",
+    "basic": "Basic Report",
+    "essential": "Full Analysis",
+    "growth": "Style Master",
+    "buyText": "Get Started",
+    "popularText": "Best Value",
+    "creditsText": "Style Credits",
+    "creditText": "Credits",
+    "free": "Free",
+    "free0": "Free Analysis",
+    "freeText": "Basic Plan",
+    "freeIntro0": "Basic Season Determination",
+    "freeIntro1": "Limited Color Palette",
+    "freeIntro2": "Standard Quality",
+    "subscriptionIntro0": "Detailed 5-Dimension Analysis",
+    "subscriptionIntro1": "Full 30+ Color Palette",
+    "subscriptionIntro2": "Personalized Style Advice",
+    "subscriptionIntro3": "Access to Style Validator",
+    "subscriptionIntro4": "High Priority Processing",
+    "monthText": "report",
+    "monthlyText": "one-time payment",
+    "annualText": "bundle",
+    "annuallyText": "save 20%",
+    "annuallySaveText": "save 20%"
+  },
+  "PrivacyPolicyText": {
+    "title": "Privacy Policy",
+    "description": "How we handle your data and photos.",
+    "h1Text": "Privacy Policy",
+    "detailText": "## 1. Introduction\n\nWelcome to Color Analysis Quiz ('we', 'our', or 'us'). We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclosure, and safeguard your information when you use our AI Seasonal Color Analysis application.\n\n## 2. Information We Collect\n\nWe collect information that you provide directly to us:\n- **Facial Images:** Photos you upload for color analysis.\n- **Contact Information:** Your email address (if provided for report delivery).\n- **Usage Data:** Information about how you interact with our service.\n\n## 3. How We Use Your Information\n\n### 3.1 Image Processing (Biometric Data)\nWe use your uploaded photos EXCLUSIVELY to:\n- Analyze your skin tone, eye color, and hair color features.\n- Generate visualization images (Virtual Draping) showing different colors on your photo.\n\n**We do NOT use your photos to train public AI models or for any facial recognition surveillance purposes.**\n\n### 3.2 Service Delivery\n- To provide the seasonal color report.\n- To send you your results via email.\n\n## 4. Data Storage & Retention\n\n- **Photos:** Uploaded images are stored securely in our cloud storage (Cloudflare R2) for the duration of your session to allow for analysis and report generation. We implement retention policies to periodically delete old session data.\n- **Reports:** Your analysis results (text data) may be stored to allow you to access your report later.\n\n## 5. Third-Party Services\n\nWe use trusted third-party providers to operate our service:\n- **AI Processing:** Google Gemini (for image analysis and generation).\n- **Hosting:** Vercel / AWS.\n- **Storage:** Cloudflare R2.\n\n## 6. Your Rights\n\nYou have the right to request the deletion of your data at any time by contacting our support team."
+  },
+  "TermsOfServiceText": {
+    "title": "Terms of Service",
+    "description": "Rules for using Color Analysis Quiz.",
+    "h1Text": "Terms of Service",
+    "detailText": "## 1. Acceptance of Terms\n\nBy accessing and using Color Analysis Quiz, you agree to be bound by these Terms of Service. If you do not agree, please do not use our service.\n\n## 2. Description of Service\n\nColor Analysis Quiz provides AI-powered personal color analysis and virtual draping services. Users upload a photo to receive a seasonal color report and visualization images.\n\n## 3. User Responsibilities\n\nYou agree that:\n- You own the rights to the photos you upload, or have explicit permission from the subject.\n- You will not upload content that is illegal, offensive, pornographic, or violates the rights of others.\n- You are at least 13 years of age.\n\n## 4. AI Disclaimer\n\n**The analysis and images provided are generated by Artificial Intelligence.** While we strive for accuracy, AI interpretations of color seasons are subjective and may not always be 100% accurate or align with a human consultant's opinion. The results are for entertainment and informational purposes only.\n\n## 5. Refund Policy\n\nDue to the digital nature of our product (immediate access to analysis and server/GPU costs incurred), purchases are generally non-refundable once the analysis has been performed. If you encounter a technical error, please contact support.\n\n## 6. Intellectual Property\n\n- **Your Content:** You retain ownership of your uploaded photos.\n- **Our Content:** The website design, code, logos, and generated reports (excluding your likeness) are owned by Color Analysis Quiz.\n\n## 7. Limitation of Liability\n\nColor Analysis Quiz shall not be liable for any indirect, incidental, or consequential damages resulting from your use of the service."
+  },
+  "WorksText": {
+    "title": "My Reports",
+    "description": "View your saved color analysis reports.",
+    "h1Text": "My Reports",
+    "descriptionBelowH1Text": "Your personal color journey archive.",
+    "descText": "No reports found.",
+    "toContinue": "to start your first analysis."
+  },
+  "ExploreText": {
+    "title": "Discover Style Inspiration",
+    "description": "Browse style guides and color palettes.",
+    "h1Text": "Discover Styles",
+    "descriptionBelowH1Text": "Inspiration for your wardrobe.",
+    "pageText": "Page %pageNumber%",
+    "h2Text": "Discover Our Collection of Style Guides"
+  },
+  "DetailText": {
+    "title": "%prompt% Style Guide",
+    "description": "Discover the %prompt% style guide.",
+    "h1Text": "%prompt% Style Guide",
+    "descriptionBelowH1Text": "Discover the %prompt% style guide.",
+    "numberText": "#%detailId%",
+    "h2Text": "%prompt% Collection"
+  },
+  "SearchText": {
+    "title": "Search Styles",
+    "description": "Search style guides.",
+    "h1Text": "Search Styles",
+    "h2Text": "Search Our Collection",
+    "titleSearch": "Search %prompt% Styles",
+    "h2TextSearch": "Search Results for %prompt%"
+  },
+  "QuestionText": {
+    "detailText": ""
+  },
+  "ColorLab": {
+    "Landing": {
+      "title": "Free AI Color Analysis Quiz | Find Your Season in 3 Seconds",
+      "description": "Take the #1 accurate Color Analysis Quiz. Upload a photo to instantly discover your seasonal color palette (Spring, Summer, Autumn, Winter) for free.",
+      "h1": "Free AI Color Analysis Quiz",
+      "h2": "How Our Seasonal Color Analysis Quiz Works",
+      "h2_2": "Why Choose an AI Color Analysis Over a Stylist?",
+      "uploadBtn": "Take the Quiz",
+      "feature1Title": "AI Virtual Draping",
+      "feature1Desc": "Don't just read about it—see it. Our AI simulates high-fashion draping on your actual photo to prove which colors make you glow.",
+      "feature2Title": "Professional Color Palette",
+      "feature2Desc": "Get a curated 'Power Palette' for your wardrobe, makeup, and hair. Based on 12-season color theory used by celebrity stylists.",
+      "feature3Title": "Style Validator",
+      "feature3Desc": "Never buy the wrong shade again. Upload any clothing item to check if it matches your seasonal profile instantly.",
+      "howItWorks": "3 Steps to Your Best Self",
+      "step1": "Upload Selfie",
+      "step1Desc": "Use natural lighting for the most accurate skin tone detection.",
+      "step2": "AI Analysis",
+      "step2Desc": "We analyze your skin, eyes, and hair contrast to determine your season.",
+      "step3": "Visual Reveal",
+      "step3Desc": "See the before/after difference and unlock your full style guide.",
+      "seoContent": {
+        "title": "Everything You Need to Know About Personal Color Analysis",
+        "section1Title": "What is a Color Analysis Quiz?",
+        "section1Body": "A color analysis quiz is a tool designed to identify your personal color season—Spring, Summer, Autumn, or Winter. Based on the 12-season color theory, it analyzes the undertones of your skin (warm, cool, or neutral), the contrast of your features, and the intensity of your eye and hair color. While traditional analysis requires an in-person appointment with a stylist, our **AI Color Analysis Quiz** uses advanced computer vision to perform this assessment in seconds, offering a fast, free, and accurate alternative.",
+        "section2Title": "How to Do Your Own Color Analysis?",
+        "section2Body": "If you want to try a DIY approach before using our AI, here are the basics: 1. **Vein Test:** Look at the veins on your wrist. Green veins suggest a Warm undertone; blue/purple veins suggest Cool. 2. **Jewelry Test:** Does silver (Cool) or gold (Warm) make your skin glow? 3. **Contrast:** Do you have a high contrast between your hair and skin (like Snow White) or low contrast? Combining these factors helps pinpoint your season. However, human bias often leads to incorrect results—which is why our objective **AI Color Analysis** is often more reliable.",
+        "section3Title": "Korean Color Analysis Trend",
+        "section3Body": "Korean Personal Color Analysis has exploded in popularity thanks to K-pop idols and social media. It places a heavy emphasis on skin clarity and brightness. Our tool incorporates these modern K-beauty standards, helping you find colors that not only match your season but also enhance your natural complexion, giving you that 'glass skin' effect."
+      }
+    },
+    "Analysis": {
+      "title": "Upload Your Photo",
+      "description": "Our AI Stylist is ready. For the most precise analysis, please use a photo with good lighting and no heavy filters.",
+      "uploadTitle": "Drop Image Here",
+      "uploadDesc": "Supports JPG, PNG, WEBP. Max 5MB.",
+      "analyzing": "Analyzing features...",
+      "loadingTitle": "Scanning Beauty Profile...",
+      "step1": "Detecting skin undertones...",
+      "uploading": "Processing image...",
+      "step2": "Calculating contrast levels...",
+      "step3": "Generating Visual Proof...",
+      "privacyNote": "🔒 Your privacy is our priority. Photos are processed securely."
+    },
+    "Report": {
+      "title": "Your Seasonal Color Analysis",
+      "subtitle": "Based on your unique features",
+      "yourSeason": "You are a",
+      "paletteTitle": "Your Power Palette",
+      "paletteDesc": "These colors harmonize with your natural undertones, making your skin look clearer and your eyes brighter.",
+      "scoresTitle": "Feature Analysis",
+      "avoidTitle": "Colors to Avoid",
+      "avoidDesc": "These shades may clash with your undertones, causing you to look tired or washed out. Keep them away from your face.",
+      "saveBtn": "Save to Photos",
+      "checkOutfitBtn": "Check an Outfit",
+      "analyzeAgain": "Analyze Another Photo",
+      "tip": "Tip:"
+    },
+    "Validator": {
+      "title": "Style Validator",
+      "subtitle": "Will this look good on me?",
+      "uploadTitle": "Upload Clothing Item",
+      "uploadDesc": "Take a photo of the garment in good lighting.",
+      "analyzing": "Consulting your style profile...",
+      "resultMatch": "It's a Match! ✨",
+      "resultClash": "Not your best shade. 🛑",
+      "reasoning": "Why?"
+    }
+  }
+}

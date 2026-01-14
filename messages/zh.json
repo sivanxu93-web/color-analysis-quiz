@@ -1,0 +1,197 @@
+{
+  "FileDesc": {
+    "lang": "en",
+    "language": "简体中文",
+    "languageInChineseSimple": "简体中文"
+  },
+  "IndexPageText": {
+    "title": "Color Analysis Quiz | AI 个人色彩分析",
+    "description": "AI 智能分析你的季节色彩，找到最适合你的颜色。",
+    "h1Text": "穿出你的真我色彩",
+    "descriptionBelowH1Text": "不再纠结穿什么。探索与你独特气质完美契合的专属色盘。"
+  },
+  "CommonText": {
+    "loadingText": "分析中...",
+    "generateText": "生成中...",
+    "placeholderText": "上传或描述...",
+    "buttonText": "立即分析",
+    "footerDescText": "你的 AI 专属色彩顾问。",
+    "timesLeft": "剩余",
+    "timesRight": "次机会",
+    "download": "下载报告",
+    "result": "分析结果",
+    "moreWorks": "我的报告",
+    "generateNew": "重新分析",
+    "displayPublic": "公开展示",
+    "similarText": "相似",
+    "prompt": "输入",
+    "revised": "优化后",
+    "exploreMore": "更多风格",
+    "keyword": "风格",
+    "searchButtonText": "探索"
+  },
+  "MenuText": {
+    "header0": "色彩分析",
+    "header1": "风格验证器",
+    "header2": "我的报告",
+    "header3": "价格",
+    "footerLegal": "法律条款",
+    "footerLegal0": "隐私政策",
+    "footerLegal1": "服务条款",
+    "footerSupport": "支持",
+    "footerSupport0": "价格",
+    "footerSupport1": "联系我们"
+  },
+  "AuthText": {
+    "loginText": "登录",
+    "loginModalDesc": "请登录以保存您的色彩报告",
+    "loginModalButtonText": "使用 Google 登录",
+    "logoutModalDesc": "您确定要退出登录吗？",
+    "confirmButtonText": "确认",
+    "cancelButtonText": "取消"
+  },
+  "PricingText": {
+    "title": "价格",
+    "description": "通过专业的色彩分析释放您的潜力。",
+    "h1Text": "简单透明的定价",
+    "basic": "基础报告",
+    "essential": "完整分析",
+    "growth": "风格大师",
+    "buyText": "立即开始",
+    "popularText": "最受欢迎",
+    "creditsText": "风格点数",
+    "creditText": "点数",
+    "free": "免费",
+    "free0": "免费分析",
+    "freeText": "基础计划",
+    "freeIntro0": "基础季节判定",
+    "freeIntro1": "有限的色盘",
+    "freeIntro2": "标准画质",
+    "subscriptionIntro0": "详细的五维分析",
+    "subscriptionIntro1": "完整的 30+ 专属色盘",
+    "subscriptionIntro2": "个性化风格建议",
+    "subscriptionIntro3": "使用风格验证器",
+    "subscriptionIntro4": "优先处理",
+    "monthText": "份报告",
+    "monthlyText": "一次性付费",
+    "annualText": "套餐",
+    "annuallyText": "省 20%",
+    "annuallySaveText": "省 20%"
+  },
+  "PrivacyPolicyText": {
+    "title": "隐私政策 title",
+    "description": "隐私政策description",
+    "h1Text": "隐私政策 H1",
+    "detailText": "隐私政策详情 markdown 文本"
+  },
+  "TermsOfServiceText": {
+    "title": "服务条款 title",
+    "description": "服务条款description",
+    "h1Text": "服务条款 H1",
+    "detailText": "服务条款详情 markdown 文本"
+  },
+  "WorksText": {
+    "title": "我的报告",
+    "description": "查看您保存的色彩分析报告。",
+    "h1Text": "我的报告",
+    "descriptionBelowH1Text": "您的个人色彩旅程档案。",
+    "descText": "暂无报告。",
+    "toContinue": "开始您的第一次分析。"
+  },
+  "ExploreText": {
+    "title": "发现风格灵感",
+    "description": "浏览风格指南和色彩搭配。",
+    "h1Text": "发现风格",
+    "descriptionBelowH1Text": "为您提供衣橱灵感。",
+    "pageText": "第 %pageNumber% 页",
+    "h2Text": "发现我们的风格指南系列"
+  },
+  "DetailText": {
+    "title": "%prompt% 风格指南",
+    "description": "发现 %prompt% 风格指南。",
+    "h1Text": "%prompt% 风格指南",
+    "descriptionBelowH1Text": "发现 %prompt% 风格指南。",
+    "numberText": "#%detailId%",
+    "h2Text": "%prompt% 系列"
+  },
+  "SearchText": {
+    "title": "搜索风格",
+    "description": "搜索风格指南。",
+    "h1Text": "搜索风格",
+    "h2Text": "搜索我们的精选系列",
+    "titleSearch": "搜索 %prompt% 风格",
+    "h2TextSearch": "搜索结果 %prompt%"
+  },
+  "QuestionText": {
+    "detailText": ""
+  },
+  "ColorLab": {
+    "Landing": {
+      "title": "免费 AI 季节色彩分析 | 发现你的专属调色板",
+      "description": "别再瞎猜什么颜色适合你了。让 AI 揭示你的完美季节色彩，瞬间提升你的格调。",
+      "h1": "用 AI 焕发你的光彩",
+      "h2": "重塑专业色彩分析。找到点亮你自然美感的色彩。",
+      "h2_2": "为什么选择 AI 色彩分析而不是造型师？",
+      "uploadBtn": "发现我的季节 (免费)",
+      "feature1Title": "精准分析",
+      "feature1Desc": "超越基础滤镜。我们的高级 AI 经过 10,000+ 专业色彩咨询案例训练，精准分析你的肤色基调、眼睛对比度和发色强度。",
+      "feature2Title": "专属调色板",
+      "feature2Desc": "为你定制的色彩集合，提升气色，让你看起来精神焕发、充满自信。",
+      "feature3Title": "风格验证器",
+      "feature3Desc": "不再买错颜色。上传任何衣物，根据你的季节获取即时反馈。",
+      "howItWorks": "变美三部曲",
+      "step1": "上传素颜照",
+      "step1Desc": "在自然光下拍摄一张自拍。无需化妆即可获得最佳效果。",
+      "step2": "AI 深度分析",
+      "step2Desc": "AI 智能分析你的面部特征，确定你的季节色彩类型。",
+      "step3": "获取变美档案",
+      "step3Desc": "立即获取你的专属色盘和风格建议。",
+      "seoContent": {
+        "title": "关于个人色彩分析的一切",
+        "section1Title": "什么是色彩分析测试？",
+        "section1Body": "色彩分析测试是一种旨在识别你的个人色彩季节——春、夏、秋或冬的工具。它基于十二季型色彩理论，分析你的肤色基调（暖调、冷调或中性）、五官的对比度以及眼睛和头发颜色的强度。传统的分析需要与造型师进行面对面的预约，而我们的 **AI 色彩分析测试** 使用先进的计算机视觉在几秒钟内完成这项评估，提供了一种快速、免费且准确的替代方案。",
+        "section2Title": "如何自测色彩季节？",
+        "section2Body": "如果你想在尝试 AI 之前先自己动手，这里有一些基础方法：1. **血管测试：** 在自然光下观察手腕内侧的血管。绿色血管暗示暖调（春/秋）；蓝色/紫色血管暗示冷调（夏/冬）。2. **饰品测试：** 银色（冷调）还是金色（暖调）让你看起来气色更好？3. **对比度：** 你的头发和皮肤之间有强烈的对比（如白雪公主）还是柔和的过渡？结合这些因素有助于确定你的季节。然而，人类的偏见往往导致结果不准确——这就是为什么客观的 **AI 色彩分析** 通常更可靠的原因。",
+        "section3Title": "韩系个人色彩分析趋势",
+        "section3Body": "得益于 K-pop 偶像和社交媒体，韩系个人色彩分析（Personal Color Analysis）变得非常流行。它非常强调皮肤的透明感和亮度。我们的工具融合了这些现代韩系审美标准，帮助你找到不仅符合你的季节，还能提升你自然肤色、打造“水光肌”效果的颜色。"
+      }
+    },
+    "Analysis": {
+      "title": "开始你的色彩诊断",
+      "description": "几秒钟内发现你的完美色彩。我们的 AI 分析你的独特特征，为你创建个性化的风格指南。",
+      "uploadTitle": "上传一张正面照片",
+      "uploadDesc": "为了结果更准确，请尽量在自然光下拍摄，避免浓妆和滤镜哦。",
+      "analyzing": "正在生成你的色彩档案...",
+      "loadingTitle": "正在分析美学特征...",
+      "step1": "分析皮肤冷暖调...",
+      "uploading": "正在上传至安全云端...",
+      "step2": "识别五官对比度...",
+      "step3": "匹配季节模型...",
+      "privacyNote": "🔒 您的照片将安全处理并自动删除。"
+    },
+    "Report": {
+      "title": "你的季节色彩分析",
+      "subtitle": "基于你的独特特征分析",
+      "yourSeason": "你的季节是",
+      "paletteTitle": "你的能量色盘",
+      "paletteDesc": "这是你的专属光彩光谱。这些颜色在科学上与你的特征相协调，能最大程度地修饰瑕疵，提升光泽感。",
+      "scoresTitle": "特征分析",
+      "avoidTitle": "需避开的颜色",
+      "avoidDesc": "这些颜色可能会让你的肤色显得暗沉或苍白。请尽量少穿或避免靠近面部。",
+      "saveBtn": "保存到相册",
+      "checkOutfitBtn": "检查穿搭",
+      "analyzeAgain": "分析另一张照片",
+      "tip": "提示："
+    },
+    "Validator": {
+      "title": "风格验证器",
+      "subtitle": "这件衣服适合我吗？",
+      "uploadTitle": "上传衣物照片",
+      "uploadDesc": "请在光线充足处拍摄衣物。",
+      "analyzing": "正在咨询你的风格档案...",
+      "resultMatch": "完美匹配！✨",
+      "resultClash": "不太适合哦。🛑",
+      "reasoning": "为什么？"
+    }
+  }
+}
