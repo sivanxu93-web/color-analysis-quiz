@@ -11,7 +11,8 @@ export function getDb() {
       process.env.POSTGRES_URL || process.env.DATABASE_URL;
     
     if (!connectionString) {
-        console.error("CRITICAL: DATABASE URL IS NOT DEFINED!");
+        console.error("CRITICAL ERROR: POSTGRES_URL or DATABASE_URL is not defined in environment variables.");
+        throw new Error("Database connection string is missing. Please check your .env or Vercel project settings.");
     } else {
         console.log("DB Connecting to:", connectionString.split('@')[1] || 'Hidden Host');
     }
