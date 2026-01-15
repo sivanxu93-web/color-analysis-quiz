@@ -7,7 +7,7 @@ export async function GET(
   {params}: { params: { locale: string } },
 ) {
   const {locale} = params;
-  const sessionId = req.nextUrl.searchParams.get("sessionId");
+  const sessionId = req.nextUrl?.searchParams?.get("sessionId");
   if (!sessionId) {
     return Response.json(
       {message: "sessionId is required"},
