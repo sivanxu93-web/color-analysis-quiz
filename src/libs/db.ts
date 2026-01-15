@@ -23,14 +23,36 @@ export function getDb() {
       connectionString?.includes("127.0.0.1");
     const useSSL = !isLocal;
 
-    globalForDb.conn = new Pool({
-      connectionString,
-      ssl: useSSL ? { rejectUnauthorized: false } : undefined,
-      max: 2, // Force low concurrency for stability check
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 60000, // 60s timeout for slow VPN connections
-      keepAlive: true,
-    });
+    let poolConfig: any = {
+        connectionString,
+        ssl: useSSL ? { rejectUnauthorized: false } : undefined,
+        max: 2,
+        idleTimeoutMillis: 30000,
+        connectionTimeoutMillis: 60000,
+        keepAlive: true,
+    };
+
+    try {
+        // Workaround for pg-connection-string crash: Parse manually using URL API
+        const url = new URL(connectionString);
+        poolConfig = {
+            user: decodeURIComponent(url.username),
+            password: decodeURIComponent(url.password),
+            host: url.hostname,
+            port: parseInt(url.port || '5432'),
+            database: url.pathname.slice(1), // Remove leading '/'
+            ssl: useSSL ? { rejectUnauthorized: false } : undefined,
+            max: 2,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 60000,
+            keepAlive: true,
+        };
+        console.log("Manual URL parsing successful. Bypassing pg-connection-string.");
+    } catch (e) {
+        console.error("Manual URL parsing failed, using connectionString directly.", e);
+    }
+
+    globalForDb.conn = new Pool(poolConfig);
 
     globalForDb.conn.on("error", (err, client) => {
       console.error("Unexpected error on idle client", err);
