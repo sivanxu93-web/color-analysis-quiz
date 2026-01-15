@@ -7,6 +7,7 @@ import { locales } from '~/i18n/config';
 import { CommonProvider } from '~/context/common-context';
 import { NextAuthProvider } from '~/context/next-auth-context';
 import { getAuthText, getCommonText, getMenuText, getPricingText } from "~/i18n/languageText";
+import { Metadata } from 'next';
 
 // Font Setup: Inter for Body, Playfair Display for Headings
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -19,6 +20,53 @@ type Props = {
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  
+  return {
+    metadataBase: new URL(baseUrl),
+    title: {
+      default: 'Color Analysis Quiz | Discover Your Seasonal Palette with AI',
+      template: '%s | Color Analysis Quiz'
+    },
+    description: 'Free AI personal color analysis. Upload your photo to find your seasonal color palette (Spring, Summer, Autumn, Winter) and get style advice.',
+    keywords: ['color analysis', 'seasonal color analysis', 'personal color analysis', 'ai color analysis', 'virtual draping'],
+    openGraph: {
+      type: 'website',
+      siteName: 'Color Analysis Quiz',
+      title: 'Free AI Color Analysis Quiz',
+      description: 'Discover your seasonal color palette instantly with AI.',
+      images: [
+        {
+          url: '/seasonal_color_analysis.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Seasonal Color Analysis AI',
+        }
+      ],
+      locale: locale
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Free AI Color Analysis Quiz',
+      description: 'Discover your seasonal color palette instantly with AI.',
+      images: ['/seasonal_color_analysis.jpg'],
+    },
+    alternates: {
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        'en': `${baseUrl}/en`,
+        'zh': `${baseUrl}/zh`,
+      }
+    },
+    icons: {
+      icon: '/favicon.ico',
+      shortcut: '/appicon.svg',
+      apple: '/appicon.svg',
+    }
+  };
 }
 
 export default async function LocaleLayout({

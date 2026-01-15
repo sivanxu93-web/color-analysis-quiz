@@ -19,13 +19,21 @@ function classNames(...classes) {
   return classes.filter(Boolean).join(' ')
 }
 
+interface PageComponentProps {
+  locale: string;
+  indexText: any;
+  questionText: any;
+  resultInfoListInit: any;
+  searchParams?: any;
+}
+
 const PageComponent = ({
                          locale,
                          indexText,
                          questionText,
                          resultInfoListInit,
                          searchParams = {},
-                       }) => {
+                       }: PageComponentProps) => {
   const router = useRouter();
   const [pagePath] = useState("");
 
