@@ -92,14 +92,8 @@ export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
 
-    // Check IP Limit (e.g., 5 per 24 hours)
-    const allowed = await checkIpLimit(ip, 5, 24);
-    if (!allowed) {
-      return NextResponse.json(
-        { error: "Daily limit reached for this IP" },
-        { status: 429 }
-      );
-    }
+    // REMOVED: IP Limit Check
+    // const allowed = await checkIpLimit(ip, 5, 24);
 
     let body;
     try {
@@ -117,6 +111,47 @@ export async function POST(req: NextRequest) {
     }
 
     const db = getDb();
+
+    // CREDIT CHECK SYSTEM
+    if (!email) {
+         return NextResponse.json({ error: "Please login to continue." }, { status: 401 });
+    }
+
+    // 1. Get User ID
+    const userRes = await db.query("select user_id from user_info where email = $1", [email]);
+    if (userRes.rows.length === 0) {
+        return NextResponse.json({ error: "User not found. Please login again." }, { status: 401 });
+    }
+    const userId = userRes.rows[0].user_id;
+
+    // 2. Check Credits
+    const creditRes = await db.query("select available_times from user_available where user_id = $1", [userId]);
+    if (creditRes.rows.length === 0) {
+        // Auto-create credit record if missing (safety net)
+        const freeTimes = Number(process.env.FREE_TIMES || 0);
+        await db.query("insert into user_available(user_id, available_times) values($1, $2)", [userId, freeTimes]);
+        
+        // Log the bonus
+        if (freeTimes > 0) {
+            await db.query("insert into credit_logs(user_id, amount, type, description) values($1, $2, 'bonus', 'Beta test free credits')", [userId, freeTimes]);
+        }
+
+        // Re-check? Or just assume freeTimes > 0 if env set.
+        if (freeTimes <= 0) {
+             return NextResponse.json({ error: "Insufficient credits." }, { status: 402 });
+        }
+    } else {
+        const credits = creditRes.rows[0].available_times;
+        if (credits <= 0) {
+             return NextResponse.json({ error: "Insufficient credits. Please upgrade." }, { status: 402 });
+        }
+    }
+
+    // 3. Deduct Credit (Optimistic deduction)
+    await db.query("update user_available set available_times = available_times - 1 where user_id = $1", [userId]);
+    // Log the usage
+    await db.query("insert into credit_logs(user_id, amount, type, description) values($1, -1, 'usage', $2)", [userId, `AI Analysis: ${sessionId}`]);
+
 
     // If email is provided (from the lead magnet modal), save it!
     if (email) {

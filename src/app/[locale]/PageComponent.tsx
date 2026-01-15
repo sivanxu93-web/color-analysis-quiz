@@ -24,7 +24,7 @@ const PageComponent = ({
                          indexText,
                          questionText,
                          resultInfoListInit,
-                         searchParams,
+                         searchParams = {},
                        }) => {
   const router = useRouter();
   const [pagePath] = useState("");
@@ -207,7 +207,7 @@ const PageComponent = ({
   }, intervalLatest);
 
   const hasAnyKey = (obj) => {
-    return Object.keys(obj).length > 0;
+    return obj && Object.keys(obj).length > 0;
   }
 
   return (

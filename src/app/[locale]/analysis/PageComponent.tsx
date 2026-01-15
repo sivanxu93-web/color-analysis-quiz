@@ -47,6 +47,13 @@ export default function PageComponent({
         })
       });
 
+      if (analyzeRes.status === 402) {
+          alert("Beta Limit Reached: You have used your free analysis credit. Stay tuned for full release!");
+          setAnalyzing(false);
+          setStep(0);
+          return;
+      }
+
       if (!analyzeRes.ok) throw new Error("Analysis failed");
       
       const { reportId } = await analyzeRes.json();

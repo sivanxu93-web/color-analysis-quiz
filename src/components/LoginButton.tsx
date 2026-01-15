@@ -1,9 +1,10 @@
 'use client'
 import React, {useState} from 'react'
-import {useRouter} from 'next/navigation'
+import {useRouter, useParams} from 'next/navigation'
 import {whiteLoadingSvg} from './svg';
 import {useCommonContext} from '~/context/common-context';
 import {useSession} from "next-auth/react";
+import {getLinkHref} from "~/configs/buildLink";
 
 const LoginButton = ({
                        buttonType = 0,
@@ -11,6 +12,9 @@ const LoginButton = ({
                      }) => {
 
   const router = useRouter();
+  const params = useParams();
+  const locale = params?.locale as string || 'en';
+  
   const {data: session, status} = useSession();
 
   const {
@@ -42,8 +46,8 @@ const LoginButton = ({
     }
   }
 
-  async function logout() {
-    setShowLogoutModal(true);
+  async function goToProfile() {
+    router.push(getLinkHref(locale, 'profile'));
   }
 
   return (
@@ -78,10 +82,11 @@ const LoginButton = ({
           <>
             {
               <button
-                className="my-auto mx-auto mr-4 mt-1 inline-flex w-full justify-center gap-x-1.5 rounded-md text-sm font-semibold"
-                onClick={logout}
+                className="my-auto mx-auto mr-4 mt-1 inline-flex w-full justify-center gap-x-1.5 rounded-full text-sm font-semibold hover:ring-2 hover:ring-primary transition-all p-0.5 border border-transparent"
+                onClick={goToProfile}
+                title="Go to Profile"
               >
-                <img className="h-8 w-auto rounded-full" src={userData.image} alt=""/>
+                <img className="h-9 w-9 rounded-full object-cover" src={userData.image || 'https://www.gravatar.com/avatar/?d=mp'} alt="Profile"/>
               </button>
             }
           </>
