@@ -28,11 +28,6 @@ export const authOptions: NextAuthOptions = {
       },
       // @ts-ignore
       authorize: async (credentials) => {
-        // These next few lines are simply the recommended way to use the Google Auth Javascript API as seen in the Google Auth docs
-        // What is going to happen is that t he Google One Tap UI will make an API call to Google and return a token associated with the user account
-        // This token is then passed to the authorize function and used to retrieve the customer information (payload).
-        // If this doesn't make sense yet, come back to it after having seen the custom hook.
-
         const token = credentials!.credential;
         const ticket = await googleAuthClient.verifyIdToken({
           idToken: token,
@@ -48,21 +43,27 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Email not available");
         }
         const user = {email, name, image}
-        const headerAll = headers();
-        const userIp = headerAll.get("x-forwarded-for");
-        await checkAndSaveUser(user.name!, user.email, user.image!, userIp);
+        
+        try {
+            await checkAndSaveUser(user.name!, user.email, user.image!, 'unknown');
+        } catch (e) {
+            console.error("Authorize DB Error:", e);
+        }
         return user
       }
     })
   ],
   secret: process.env.NEXTAUTH_SECRET,
-  debug: false,
+  debug: true, // Enable debug
   callbacks: {
     async signIn({user, account, profile, email, credentials}) {
-      const headerAll = headers();
-      const userIp = headerAll.get("x-forwarded-for");
-      await checkAndSaveUser(user.name!, user.email!, user.image!, userIp);
-      return true
+      try {
+          await checkAndSaveUser(user.name!, user.email!, user.image!, 'unknown');
+          return true;
+      } catch (e) {
+          console.error("SignIn DB Error:", e);
+          return false;
+      }
     },
     async redirect({url, baseUrl}) {
       // Allows relative callback URLs
