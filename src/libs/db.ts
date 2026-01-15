@@ -9,7 +9,12 @@ export function getDb() {
   if (!globalForDb.conn) {
     const connectionString =
       process.env.POSTGRES_URL || process.env.DATABASE_URL;
-    // console.log("Connecting to DB:", connectionString?.split('@')[1]); // Log host only for debug
+    
+    if (!connectionString) {
+        console.error("CRITICAL: DATABASE URL IS NOT DEFINED!");
+    } else {
+        console.log("DB Connecting to:", connectionString.split('@')[1] || 'Hidden Host');
+    }
 
     // 自动判断是否需要 SSL：如果不是本地连接 (localhost/127.0.0.1)，则默认开启 SSL
     const isLocal =
@@ -20,7 +25,7 @@ export function getDb() {
     globalForDb.conn = new Pool({
       connectionString,
       ssl: useSSL ? { rejectUnauthorized: false } : undefined,
-      max: 10,
+      max: 2, // Force low concurrency for stability check
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 60000, // 60s timeout for slow VPN connections
       keepAlive: true,
