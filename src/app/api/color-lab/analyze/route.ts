@@ -161,7 +161,7 @@ export async function POST(req: NextRequest) {
       ]);
       // Also add to waitlist for marketing
       await db.query(
-        "insert into color_lab_waitlist(email, locale, interest) values($1, $2, $3)",
+        "insert into color_lab_waitlist(email, locale, interest) values($1, $2, $3) ON CONFLICT (email) DO NOTHING",
         [email, "en", "color-lab-report"]
       );
     }
