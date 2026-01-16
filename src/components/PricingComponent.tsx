@@ -3,8 +3,6 @@ import React from 'react';
 import Link from 'next/link';
 import { useCommonContext } from "~/context/common-context";
 import { useParams } from 'next/navigation';
-import { getStripe } from '~/libs/stripeClient';
-import { colorLabPrice } from '~/configs/stripeConfig';
 
 export default function Pricing({
   redirectUrl,
@@ -27,11 +25,6 @@ export default function Pricing({
     // Already logged in? Go to analysis to use the free credit.
     window.location.href = `/${locale}/analysis`;
   };
-
-  /* 
-  // STRIPE LOGIC (Disabled for Beta)
-  const handleCheckout = async (e: React.MouseEvent) => { ... }
-  */
 
   return (
     <section className="bg-[#FFFBF7] py-24 sm:py-32">

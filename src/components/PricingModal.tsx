@@ -1,53 +1,73 @@
-import {Fragment, useRef, useState} from 'react'
-import {Dialog, Transition} from '@headlessui/react'
-import Pricing from "~/components/PricingComponent";
+import React from 'react';
+import BaseModal from './BaseModal';
 import {useCommonContext} from "~/context/common-context";
+import {useParams} from 'next/navigation';
 
 export default function PricingModal({
                                        locale,
                                        page
                                      }) {
 
-  const [redirectUrl] = useState(`${locale}/${page}`);
+  const {showPricingModal, setShowPricingModal, userData, setShowLoginModal} = useCommonContext();
+  const params = useParams();
+  const currentLocale = params?.locale || 'en';
 
-  const cancelButtonRef = useRef(null)
-  const {showPricingModal, setShowPricingModal} = useCommonContext();
+  const handleBetaAccess = (e) => {
+    e.preventDefault();
+    if (!userData?.user_id) {
+        setShowPricingModal(false);
+        // Small delay to allow one modal to close before another opens (animation smoothness)
+        setTimeout(() => setShowLoginModal(true), 300);
+        return;
+    }
+    // If logged in, go to analysis (or profile)
+    window.location.href = `/${currentLocale}/analysis`;
+  };
 
   return (
-    <Transition.Root show={showPricingModal} as={Fragment}>
-      <Dialog as="div" className="relative z-40" initialFocus={cancelButtonRef} onClose={setShowPricingModal} onClick={() => setShowPricingModal(true)}>
-        <Transition.Child
-          as={Fragment}
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"/>
-        </Transition.Child>
-
-        <div className="fixed inset-0 z-30 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <Transition.Child
-              as={Fragment}
-              enter="ease-out duration-300"
-              enterFrom="opacity-0 translate-y-4"
-              enterTo="opacity-100 translate-y-0"
-              leave="ease-in duration-200"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 translate-y-4"
-            >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl">
-                <Pricing
-                  redirectUrl={redirectUrl}
-                />
-              </Dialog.Panel>
-            </Transition.Child>
-          </div>
+    <BaseModal 
+      isOpen={showPricingModal} 
+      onClose={() => setShowPricingModal(false)}
+      title="Unlock Full Analysis"
+      icon={<span className="text-4xl">🚀</span>}
+    >
+        <div className="text-center mt-2">
+            <div className="bg-gradient-to-br from-indigo-50 via-[#FFFBF7] to-white p-6 rounded-2xl border border-indigo-100 shadow-sm mb-6 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-indigo-100 rounded-full blur-2xl -mr-10 -mt-10"></div>
+                
+                <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-3 border border-indigo-200 rounded-full inline-block px-3 py-1 bg-white/50">
+                    Beta Exclusive
+                </p>
+                
+                <div className="flex items-baseline justify-center gap-3 mb-6">
+                    <span className="text-5xl font-serif font-bold text-[#1A1A2E]">FREE</span>
+                    <span className="text-lg text-gray-400 line-through decoration-gray-300 decoration-2">$19.90</span>
+                </div>
+                
+                <ul className="text-left space-y-3 text-sm text-gray-600 mb-8 px-2">
+                    <li className="flex items-start gap-3">
+                        <span className="text-green-500 text-lg">✓</span>
+                        <span><strong>Virtual Draping</strong> (Try-on)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-green-500 text-lg">✓</span>
+                        <span><strong>Full Seasonal Report</strong> (30+ pages)</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                        <span className="text-green-500 text-lg">✓</span>
+                        <span><strong>Makeup & Style Guide</strong></span>
+                    </li>
+                </ul>
+                
+                <button
+                    onClick={handleBetaAccess}
+                    className="w-full rounded-full bg-[#1A1A2E] px-6 py-4 text-base font-bold text-white shadow-xl hover:bg-primary hover:shadow-2xl hover:-translate-y-0.5 transition-all duration-300"
+                >
+                    {userData?.user_id ? "Start Analysis Now" : "Login to Claim Offer"}
+                </button>
+            </div>
+            <p className="text-xs text-gray-400">Limited time offer. No credit card required.</p>
         </div>
-      </Dialog>
-    </Transition.Root>
+    </BaseModal>
   )
 }

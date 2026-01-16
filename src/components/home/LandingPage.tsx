@@ -4,6 +4,7 @@ import Footer from '~/components/Footer';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
 import { useCommonContext } from '~/context/common-context';
+import { useState, useEffect } from 'react';
 
 export default function PageComponent({
   locale,
@@ -12,6 +13,16 @@ export default function PageComponent({
   locale: string;
   colorLabText: any;
 }) {
+  const [featuredReports, setFeaturedReports] = useState<any[]>([]);
+
+  useEffect(() => {
+      fetch('/api/color-lab/featured')
+          .then(res => res.json())
+          .then(data => {
+              if (data.success) setFeaturedReports(data.data);
+          })
+          .catch(err => console.error(err));
+  }, []);
 
   return (
     <>
@@ -25,25 +36,25 @@ export default function PageComponent({
                 <div className="absolute top-1/2 right-0 w-64 h-64 bg-accent-sage/30 rounded-full blur-3xl"></div>
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-24 sm:py-32 flex flex-col md:flex-row items-center gap-12">
-                <div className="flex-1 text-center md:text-left">
+            <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-16 sm:py-32 flex flex-col md:flex-row items-center gap-12">
+                <div className="flex-1 text-center md:text-left w-full">
                     <span className="inline-block py-1 px-3 rounded-full bg-primary-light/50 text-primary text-sm font-semibold tracking-wide mb-6">
                         ✨ #1 AI Color Analysis Tool
                     </span>
-                    <h1 className="font-serif text-5xl md:text-7xl font-bold text-text-primary leading-tight mb-6">
+                    <h1 className="font-serif text-4xl md:text-7xl font-bold text-text-primary leading-tight mb-6">
                        {colorLabText.Landing.h1}
                     </h1>
-                    <p className="text-lg md:text-xl text-text-secondary leading-relaxed mb-10 max-w-2xl">
+                    <p className="text-lg md:text-xl text-text-secondary leading-relaxed mb-10 max-w-2xl mx-auto md:mx-0">
                        {colorLabText.Landing.description}
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start w-full">
                         <Link
                             href={getLinkHref(locale, 'analysis')}
-                            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-primary-hover transition-all transform hover:-translate-y-1"
+                            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-primary-hover transition-all transform hover:-translate-y-1 w-full sm:w-auto"
                         >
                             {colorLabText.Landing.uploadBtn}
                         </Link>
-                        <a href="#how-it-works" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all">
+                        <a href="#how-it-works" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto">
                             Learn More
                         </a>
                     </div>
@@ -58,7 +69,7 @@ export default function PageComponent({
                 </div>
                 
                 {/* Hero Image / Visual */}
-                <div className="flex-1 relative">
+                <div className="flex-1 relative w-full">
                     <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
                         <img 
                             src="/seasonal_color_analysis.jpg" 
@@ -71,10 +82,10 @@ export default function PageComponent({
          </section>
 
          {/* Logos */}
-         <section className="w-full py-10 bg-white border-b border-gray-100">
+         <section className="w-full py-10 bg-white border-b border-gray-100 overflow-hidden">
              <div className="max-w-7xl mx-auto px-6 text-center">
                  <p className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-6">As seen in</p>
-                 <div className="flex justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                 <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
                      <span className="text-xl font-serif font-bold">VOGUE</span>
                      <span className="text-xl font-serif font-bold">ELLE</span>
                      <span className="text-xl font-serif font-bold">InStyle</span>
@@ -82,6 +93,53 @@ export default function PageComponent({
                  </div>
              </div>
          </section>
+
+         {/* Featured Reports */}
+         {featuredReports.length > 0 && (
+            <section className="w-full py-20 bg-[#FFFBF7]">
+                <div className="max-w-7xl mx-auto px-6 lg:px-8">
+                    <div className="text-center mb-12">
+                        <span className="text-primary font-bold tracking-widest uppercase text-xs">Samples</span>
+                        <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#1A1A2E] mt-2 mb-4">See Real Results</h2>
+                        <p className="text-gray-500 max-w-2xl mx-auto">Explore sample analysis reports generated by our AI. See exactly what you get.</p>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {featuredReports.map((report) => (
+                            <Link 
+                                key={report.session_id} 
+                                href={getLinkHref(locale, `report/${report.session_id}`)}
+                                className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1"
+                            >
+                                <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
+                                    {report.image_url ? (
+                                        <img src={report.image_url} alt={report.season} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-gray-300">No Image</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                        <h3 className="text-2xl font-serif font-bold leading-tight">
+                                            {report.season}
+                                        </h3>
+                                        <div className="inline-block mt-2 px-2 py-0.5 border border-white/30 rounded text-[10px] font-bold uppercase tracking-widest bg-black/20 backdrop-blur-sm">
+                                            Featured Sample
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="p-5">
+                                    <p className="text-sm text-gray-500 line-clamp-2 italic">
+                                        &quot;{report.headline}&quot;
+                                    </p>
+                                    <p className="mt-4 text-primary text-sm font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                                        View Full Report →
+                                    </p>
+                                </div>
+                            </Link>
+                        ))}
+                    </div>
+                </div>
+            </section>
+         )}
 
          {/* How It Works */}
          <section id="how-it-works" className="py-24 sm:py-32 w-full bg-background-paper">

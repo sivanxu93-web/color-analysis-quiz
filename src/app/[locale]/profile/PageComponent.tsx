@@ -70,33 +70,33 @@ export default function PageComponent({
   return (
     <>
       <Header locale={locale} page={'profile'} />
-      <main className="min-h-screen bg-[#FFFBF7] py-20 px-4">
-         <div className="max-w-6xl mx-auto space-y-12">
+      <main className="min-h-screen bg-[#FFFBF7] py-12 md:py-20 px-4">
+         <div className="max-w-6xl mx-auto space-y-8 md:space-y-12">
             
             {/* User Profile Card */}
-            <div className="bg-white rounded-[2rem] p-8 md:p-12 shadow-sm border border-[#E8E1D9] flex flex-col md:flex-row items-center md:items-start gap-8">
+            <div className="bg-white rounded-[2rem] p-6 md:p-12 shadow-sm border border-[#E8E1D9] flex flex-col md:flex-row items-center md:items-start gap-6 md:gap-8">
                 <div className="relative group">
                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl group-hover:blur-2xl transition-all"></div>
                     {userData?.image ? (
-                        <img src={userData.image} alt="User" className="relative w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover" />
+                        <img src={userData.image} alt="User" className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg object-cover" />
                     ) : (
-                        <div className="relative w-32 h-32 rounded-full border-4 border-white shadow-lg bg-gray-100 flex items-center justify-center text-4xl">👤</div>
+                        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-lg bg-gray-100 flex items-center justify-center text-4xl">👤</div>
                     )}
                 </div>
                 
-                <div className="flex-1 text-center md:text-left space-y-4">
-                    <h1 className="text-3xl font-serif font-bold text-[#1A1A2E]">
+                <div className="flex-1 text-center md:text-left space-y-4 w-full">
+                    <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#1A1A2E]">
                         Hello, {userData?.name || 'Guest'}
                     </h1>
-                    <p className="text-gray-500">{userData?.email}</p>
+                    <p className="text-gray-500 text-sm md:text-base">{userData?.email}</p>
                     
-                    <div className="flex flex-wrap gap-4 justify-center md:justify-start pt-2">
-                        <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold">
+                    <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start pt-2 w-full">
+                        <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold text-sm md:text-base">
                             💎 {credits !== null ? credits : '-'} Credits Available
                         </div>
                         <button 
                             onClick={() => setShowLogoutModal(true)}
-                            className="px-6 py-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-red-500 transition-colors text-sm font-medium"
+                            className="px-6 py-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-red-500 transition-colors text-sm font-medium w-full md:w-auto"
                         >
                             Log Out
                         </button>
