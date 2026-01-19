@@ -4,6 +4,7 @@ import Footer from '~/components/Footer';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
 import { useState, useEffect } from 'react';
+import { sendGAEvent } from '@next/third-parties/google';
 
 export default function PageComponent({
   locale,
@@ -31,6 +32,12 @@ export default function PageComponent({
     "Finding your perfect power colors...",
     "Consulting the AI stylist...",
   ];
+
+  useEffect(() => {
+      if (report?.season) {
+          sendGAEvent('event', 'view_report', { season: report.season });
+      }
+  }, [report]);
 
   useEffect(() => {
     if (!drapingImages.best) {
@@ -114,7 +121,7 @@ export default function PageComponent({
 
                                 {/* Sticky Nav */}
 
-                                <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#FFFBF7]/95 backdrop-blur-md border-b border-[#E8E1D9] py-3 overflow-x-auto no-scrollbar shadow-sm transition-all">
+                                <nav className="sticky top-[65px] lg:top-[70px] z-40 bg-[#FFFBF7]/95 backdrop-blur-md border-b border-[#E8E1D9] py-3 overflow-x-auto no-scrollbar shadow-sm transition-all">
 
                                     <div className="max-w-6xl mx-auto px-4 flex justify-start md:justify-center gap-6 md:gap-10 min-w-max">
 

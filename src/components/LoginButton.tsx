@@ -5,6 +5,7 @@ import {whiteLoadingSvg} from './svg';
 import {useCommonContext} from '~/context/common-context';
 import {useSession} from "next-auth/react";
 import {getLinkHref} from "~/configs/buildLink";
+import { sendGAEvent } from '@next/third-parties/google';
 
 const LoginButton = ({
                        buttonType = 0,
@@ -27,6 +28,7 @@ const LoginButton = ({
 
   async function login(event) {
     event.preventDefault();
+    sendGAEvent('event', 'login_click', { method: 'google' });
     setLoading(true)
     let _userData;
     if (userData == null || Object.keys(userData).length == 0) {

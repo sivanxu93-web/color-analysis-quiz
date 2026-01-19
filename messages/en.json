@@ -43,8 +43,8 @@
     "footerSupport1": "Contact Us"
   },
   "AuthText": {
-    "loginText": "Log in",
-    "loginModalDesc": "Please log in to save your personal color reports",
+    "loginText": "Login",
+    "loginModalDesc": "Please login to save your personal color reports",
     "loginModalButtonText": "Login with Google",
     "logoutModalDesc": "Are you sure you want to log out?",
     "confirmButtonText": "Confirm",

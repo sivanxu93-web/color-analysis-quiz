@@ -2,6 +2,7 @@ import React from 'react';
 import BaseModal from './BaseModal';
 import {useCommonContext} from "~/context/common-context";
 import {useParams} from 'next/navigation';
+import { sendGAEvent } from '@next/third-parties/google';
 
 export default function PricingModal({
                                        locale,
@@ -14,6 +15,12 @@ export default function PricingModal({
 
   const handleBetaAccess = (e) => {
     e.preventDefault();
+    
+    sendGAEvent('event', 'purchase_attempt', { 
+        item: 'beta_access', 
+        status: userData?.user_id ? 'logged_in' : 'guest' 
+    });
+
     if (!userData?.user_id) {
         setShowPricingModal(false);
         // Small delay to allow one modal to close before another opens (animation smoothness)

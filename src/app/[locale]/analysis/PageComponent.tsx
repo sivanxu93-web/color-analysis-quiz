@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getLinkHref } from '~/configs/buildLink';
 import { useCommonContext } from '~/context/common-context';
 import BaseModal from '~/components/BaseModal';
+import { sendGAEvent } from '@next/third-parties/google';
 
 export default function PageComponent({
   locale,
@@ -121,6 +122,9 @@ export default function PageComponent({
       
       const { reportId } = await analyzeRes.json();
 
+      // Track successful analysis completion
+      sendGAEvent('event', 'complete_analysis', { reportId });
+
       router.push(getLinkHref(locale, `report/${reportId}`));
 
     } catch (error) {
@@ -149,6 +153,7 @@ export default function PageComponent({
         // Ah, in previous turns I removed the early check. I will keep it removed.
     }
 
+    sendGAEvent('event', 'start_analysis', { method: 'upload' });
     setAnalyzing(true);
     setStep(1); 
 
