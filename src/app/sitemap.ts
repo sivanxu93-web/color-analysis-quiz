@@ -19,8 +19,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   routes.forEach(route => {
     locales.forEach(locale => {
+      // For default locale (en), we don't include the prefix because localePrefix is 'as-needed'
+      const url = locale === 'en' 
+        ? `${baseUrl}${route}` 
+        : `${baseUrl}/${locale}${route}`;
+
       sitemapEntry.push({
-        url: `${baseUrl}/${locale}${route}`,
+        url: url,
         lastModified: new Date(),
         changeFrequency: route === '' ? 'daily' : 'weekly',
         priority: route === '' ? 1 : 0.8,
