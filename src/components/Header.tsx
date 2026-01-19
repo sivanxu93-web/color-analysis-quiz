@@ -112,6 +112,7 @@ export default function Header({
 
         {/* Desktop Right - Login/Lang */}
         <div className="hidden lg:flex lg:flex-1 lg:justify-end lg:gap-4 items-center">
+             {/* Language Switcher Hidden
              <Menu as="div" className="relative inline-block text-left">
               <Menu.Button className="flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-primary transition-colors">
                 <GlobeAltIcon className="w-4 h-4" />
@@ -143,6 +144,7 @@ export default function Header({
                 </Menu.Items>
               </Transition>
             </Menu>
+            */}
             
             {process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN != '0' && (
                <div className="ml-4">
@@ -207,6 +209,7 @@ export default function Header({
                 </Link>
               </div>
               <div className="py-6 space-y-4">
+                 {/* Language Switcher Hidden
                  <div className="flex items-center justify-between px-4">
                     <span className="text-sm font-medium text-gray-500">Language</span>
                     <div className="flex gap-3">
@@ -222,6 +225,7 @@ export default function Header({
                         ))}
                     </div>
                  </div>
+                 */}
                  {process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN != '0' && (
                      <div className="pt-2">
                         <LoginButton buttonType={userData.email ? 1 : 0} loginText={authText.loginText} />
