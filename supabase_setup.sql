@@ -166,3 +166,7 @@ create table if not exists credit_logs
 );
 comment on table credit_logs is 'Transaction logs for user credits';
 create index if not exists idx_credit_logs_user_id on credit_logs(user_id);
+-- Feedback columns
+ALTER TABLE color_lab_reports ADD COLUMN IF NOT EXISTS rating varchar(10);
+ALTER TABLE color_lab_reports ADD COLUMN IF NOT EXISTS feedback_comment text;
+

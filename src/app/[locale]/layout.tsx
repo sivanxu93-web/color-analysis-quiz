@@ -9,6 +9,7 @@ import { NextAuthProvider } from '~/context/next-auth-context';
 import { getAuthText, getCommonText, getMenuText, getPricingText } from "~/i18n/languageText";
 import { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
+import MicrosoftClarity from '~/components/MicrosoftClarity';
 
 // Font Setup: Inter for Body, Playfair Display for Headings
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -103,6 +104,7 @@ export default async function LocaleLayout({
           </CommonProvider>
         </NextAuthProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID || ""} />
+        <MicrosoftClarity />
       </body>
     </html>
   );

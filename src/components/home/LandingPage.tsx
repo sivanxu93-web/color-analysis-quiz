@@ -14,19 +14,31 @@ export default function PageComponent({
   colorLabText: any;
 }) {
   const [featuredReports, setFeaturedReports] = useState<any[]>([]);
+  const [reportCount, setReportCount] = useState(3500);
+  const [userAvatars, setUserAvatars] = useState<string[]>([]);
 
   useEffect(() => {
+      // Fetch Featured Reports
       fetch('/api/color-lab/featured')
           .then(res => res.json())
           .then(data => {
               if (data.success) setFeaturedReports(data.data);
           })
           .catch(err => console.error(err));
+
+      // Fetch Stats
+      fetch('/api/color-lab/stats')
+          .then(res => res.json())
+          .then(data => {
+              if (data.count) setReportCount(prev => prev + data.count);
+              if (data.avatars && data.avatars.length > 0) setUserAvatars(data.avatars);
+          })
+          .catch(err => console.error(err));
   }, []);
 
   return (
     <>
-      <Header locale={locale} page={'home'} />
+      <Header locale={locale} page={''} />
       <main className="flex min-h-screen flex-col items-center">
          
          {/* Hero Section */}
@@ -60,11 +72,19 @@ export default function PageComponent({
                     </div>
                     <div className="mt-8 flex items-center justify-center md:justify-start gap-4 text-sm text-text-secondary">
                         <div className="flex -space-x-2">
-                            <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64" alt=""/>
-                            <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64&h=64" alt=""/>
-                            <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=64&h=64" alt=""/>
+                            {userAvatars.length > 0 ? (
+                                userAvatars.slice(0, 3).map((src, i) => (
+                                    <img key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src={src} alt="User"/>
+                                ))
+                            ) : (
+                                <>
+                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64" alt=""/>
+                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64&h=64" alt=""/>
+                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=64&h=64" alt=""/>
+                                </>
+                            )}
                         </div>
-                        <p>Trusted by 350k+ beauties</p>
+                        <p>Trusted by {reportCount.toLocaleString()}+ beauties</p>
                     </div>
                 </div>
                 

@@ -24,6 +24,32 @@ export default function PageComponent({
   const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
   const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  
+  // Feedback State
+  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>('idle');
+  const [feedbackComment, setFeedbackComment] = useState('');
+
+  const handleFeedback = async (rating: 'good' | 'bad') => {
+      setFeedbackStatus(rating);
+      if (rating === 'good') {
+          try {
+            await fetch('/api/color-lab/feedback', {
+                method: 'POST',
+                body: JSON.stringify({ sessionId, rating: 'good' })
+            });
+          } catch(e) { console.error(e) }
+      }
+  };
+
+  const submitComment = async () => {
+      try {
+        await fetch('/api/color-lab/feedback', {
+            method: 'POST',
+            body: JSON.stringify({ sessionId, rating: 'bad', comment: feedbackComment })
+        });
+      } catch(e) { console.error(e) }
+      setFeedbackStatus('submitted');
+  };
 
   const LOADING_TIPS = [
     "Analyzing your skin undertones...",
@@ -1435,7 +1461,65 @@ export default function PageComponent({
 
           
 
-                          {/* CTA */}
+                          {/* Feedback Section */}
+                <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 text-center">
+                    <h3 className="text-xl font-serif font-bold text-[#1A1A2E] mb-6">Was this analysis helpful?</h3>
+                    
+                    {feedbackStatus === 'idle' && (
+                        <div className="flex justify-center gap-8">
+                            <button 
+                                onClick={() => handleFeedback('good')} 
+                                className="group flex flex-col items-center gap-2 transition-transform hover:scale-110"
+                            >
+                                <span className="text-4xl bg-green-50 p-4 rounded-full border border-green-100 group-hover:bg-green-100 transition-colors">👍</span>
+                                <span className="text-xs font-bold text-gray-400 group-hover:text-green-600">Yes</span>
+                            </button>
+                            <button 
+                                onClick={() => handleFeedback('bad')} 
+                                className="group flex flex-col items-center gap-2 transition-transform hover:scale-110"
+                            >
+                                <span className="text-4xl bg-red-50 p-4 rounded-full border border-red-100 group-hover:bg-red-100 transition-colors">👎</span>
+                                <span className="text-xs font-bold text-gray-400 group-hover:text-red-600">No</span>
+                            </button>
+                        </div>
+                    )}
+
+                    {feedbackStatus === 'good' && (
+                        <div className="animate-fade-in py-4">
+                            <p className="text-green-600 font-bold text-2xl mb-2">Thank you! ✨</p>
+                            <p className="text-gray-500">We&apos;re glad you liked your results.</p>
+                        </div>
+                    )}
+
+                    {feedbackStatus === 'bad' && (
+                        <div className="animate-fade-in text-left max-w-md mx-auto">
+                            <p className="text-gray-700 font-medium mb-3 text-center">We&apos;re sorry to hear that. How can we improve?</p>
+                            <textarea 
+                                className="w-full p-4 border border-gray-200 rounded-2xl mb-4 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none"
+                                placeholder="E.g., Skin tone analysis was off, Colors don't match..."
+                                rows={3}
+                                value={feedbackComment}
+                                onChange={(e) => setFeedbackComment(e.target.value)}
+                            />
+                            <div className="text-center">
+                                <button 
+                                    onClick={submitComment}
+                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-md"
+                                >
+                                    Submit Feedback
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    {feedbackStatus === 'submitted' && (
+                        <div className="py-4">
+                            <p className="text-gray-500 font-medium">Thank you for your feedback! We&apos;ll use it to improve our AI.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* CTA */}
 
                           <div className="text-center py-16 border-t border-gray-200/50 mt-8">
 
