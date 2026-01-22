@@ -14,7 +14,7 @@ export default function PageComponent({
   colorLabText: any;
 }) {
   const [featuredReports, setFeaturedReports] = useState<any[]>([]);
-  const [reportCount, setReportCount] = useState(3500);
+  const [reportCount, setReportCount] = useState(0);
   const [userAvatars, setUserAvatars] = useState<string[]>([]);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function PageComponent({
       fetch('/api/color-lab/stats')
           .then(res => res.json())
           .then(data => {
-              if (data.count) setReportCount(prev => prev + data.count);
+              if (data.count) setReportCount(data.count);
               if (data.avatars && data.avatars.length > 0) setUserAvatars(data.avatars);
           })
           .catch(err => console.error(err));
@@ -84,7 +84,7 @@ export default function PageComponent({
                                 </>
                             )}
                         </div>
-                        <p>Trusted by {reportCount.toLocaleString()}+ beauties</p>
+                        <p>Trusted by {reportCount.toLocaleString()} beauties</p>
                     </div>
                 </div>
                 

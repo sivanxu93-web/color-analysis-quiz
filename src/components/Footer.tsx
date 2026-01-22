@@ -60,6 +60,12 @@ export default function Footer({
             <p className="text-sm text-gray-400">
               {commonText.footerDescText}
             </p>
+            <div className="flex flex-col gap-1 text-sm text-gray-400">
+                <span className="font-semibold text-white">Need Help?</span>
+                <a href="mailto:support@coloranalysisquiz.app" className="hover:text-primary transition-colors">
+                    support@coloranalysisquiz.app
+                </a>
+            </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
@@ -111,14 +117,6 @@ export default function Footer({
                       :
                       null
                   }
-                  <li>
-                    <a
-                      href="mailto:support@coloranalysisquiz.app"
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                    >
-                      Contact: support@coloranalysisquiz.app
-                    </a>
-                  </li>
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">
