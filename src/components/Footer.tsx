@@ -111,6 +111,14 @@ export default function Footer({
                       :
                       null
                   }
+                  <li>
+                    <a
+                      href="mailto:support@coloranalysisquiz.app"
+                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                    >
+                      Contact: support@coloranalysisquiz.app
+                    </a>
+                  </li>
                 </ul>
               </div>
               <div className="mt-10 md:mt-0">

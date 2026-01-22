@@ -101,19 +101,6 @@ export default function PageComponent({
             </div>
          </section>
 
-         {/* Logos */}
-         <section className="w-full py-10 bg-white border-b border-gray-100 overflow-hidden">
-             <div className="max-w-7xl mx-auto px-6 text-center">
-                 <p className="text-sm font-medium text-gray-400 uppercase tracking-widest mb-6">As seen in</p>
-                 <div className="flex flex-wrap justify-center gap-8 md:gap-16 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
-                     <span className="text-xl font-serif font-bold">VOGUE</span>
-                     <span className="text-xl font-serif font-bold">ELLE</span>
-                     <span className="text-xl font-serif font-bold">InStyle</span>
-                     <span className="text-xl font-serif font-bold">COSMOPOLITAN</span>
-                 </div>
-             </div>
-         </section>
-
          {/* Featured Reports */}
          {featuredReports.length > 0 && (
             <section className="w-full py-20 bg-[#FFFBF7]">
