@@ -83,6 +83,18 @@ export default function PageComponent({
     (async () => {
         try {
             const api = await import('@vladmandic/face-api');
+            
+            // Explicitly patch the environment to ensure global objects are recognized
+            // This fixes "Right-hand side of 'instanceof' is not an object" error
+            api.env.monkeyPatch({
+                Canvas: HTMLCanvasElement,
+                Image: HTMLImageElement,
+                ImageData: ImageData,
+                Video: HTMLVideoElement,
+                createCanvasElement: () => document.createElement('canvas'),
+                createImageElement: () => document.createElement('img')
+            });
+
             await api.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
             setFaceApi(api);
         } catch (e) {
@@ -105,8 +117,16 @@ export default function PageComponent({
       // Face Detection Logic
       if (faceApi) {
           try {
-              const img = await faceApi.bufferToImage(file);
+              // Create image element manually to avoid env issues with bufferToImage
+              const img = new Image();
+              img.src = URL.createObjectURL(file);
+              await new Promise((resolve, reject) => {
+                  img.onload = resolve;
+                  img.onerror = reject;
+              });
+              
               const detections = await faceApi.detectAllFaces(img, new faceApi.TinyFaceDetectorOptions());
+
               if (!detections || detections.length === 0) {
                   setAlertState({
                       isOpen: true,

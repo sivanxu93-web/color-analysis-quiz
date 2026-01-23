@@ -317,9 +317,6 @@ export default function PageComponent({
                     ) : (
                         <>
                             <span>Unlock My Report</span>
-                            <span className="bg-white/20 px-3 py-1 rounded text-sm">
-                                {userData?.email ? (process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL ? "$19.90" : "1 Credit") : "Login to View"}
-                            </span>
                         </>
                     )}
                  </button>
