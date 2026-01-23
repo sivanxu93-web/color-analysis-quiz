@@ -83,18 +83,6 @@ export default function PageComponent({
     (async () => {
         try {
             const api = await import('@vladmandic/face-api');
-            
-            // Explicitly patch the environment to ensure global objects are recognized
-            // This fixes "Right-hand side of 'instanceof' is not an object" error
-            api.env.monkeyPatch({
-                Canvas: HTMLCanvasElement,
-                Image: HTMLImageElement,
-                ImageData: ImageData,
-                Video: HTMLVideoElement,
-                createCanvasElement: () => document.createElement('canvas'),
-                createImageElement: () => document.createElement('img')
-            });
-
             await api.nets.tinyFaceDetector.loadFromUri('https://cdn.jsdelivr.net/npm/@vladmandic/face-api/model/');
             setFaceApi(api);
         } catch (e) {
@@ -347,9 +335,11 @@ export default function PageComponent({
       <main className="flex min-h-screen flex-col items-center py-12 md:py-20 px-4 bg-background relative">
         
         <div className="text-center mb-8 md:mb-10">
-            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-text-primary">{colorLabText.Analysis.title}</h1>
+            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-text-primary">
+                <span>{colorLabText.Analysis.title}</span>
+            </h1>
             <p className="text-text-secondary max-w-lg mx-auto text-sm md:text-base">
-                {colorLabText.Analysis.description}
+                <span>{colorLabText.Analysis.description}</span>
             </p>
         </div>
         
@@ -364,8 +354,12 @@ export default function PageComponent({
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
                     </div>
-                    <p className="mt-2 text-base md:text-lg font-medium text-gray-900">{colorLabText.Analysis.uploadTitle}</p>
-                    <p className="mt-1 text-xs md:text-sm text-gray-500">{colorLabText.Analysis.uploadDesc}</p>
+                    <p className="mt-2 text-base md:text-lg font-medium text-gray-900">
+                        <span>{colorLabText.Analysis.uploadTitle}</span>
+                    </p>
+                    <p className="mt-1 text-xs md:text-sm text-gray-500">
+                        <span>{colorLabText.Analysis.uploadDesc}</span>
+                    </p>
                 </div>
             ) : (
                 <div className="relative rounded-xl overflow-hidden shadow-md">
@@ -386,11 +380,13 @@ export default function PageComponent({
                                 <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
                                 <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
                             </div>
-                            <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">{colorLabText.Analysis.loadingTitle}</h3>
+                            <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">
+                                <span>{colorLabText.Analysis.loadingTitle}</span>
+                            </h3>
                             <p className="text-text-secondary animate-pulse">
-                                {step === 1 && colorLabText.Analysis.step1}
-                                {step === 2 && colorLabText.Analysis.uploading}
-                                {step === 3 && colorLabText.Analysis.step3}
+                                {step === 1 && <span>{colorLabText.Analysis.step1}</span>}
+                                {step === 2 && <span>{colorLabText.Analysis.uploading}</span>}
+                                {step === 3 && <span>{colorLabText.Analysis.step3}</span>}
                             </p>
                         </div>
                     )}
@@ -411,12 +407,12 @@ export default function PageComponent({
                     disabled={!selectedFile}
                     className={`mt-6 w-full rounded-full px-6 py-4 text-base font-semibold text-white shadow-lg transition-all transform hover:-translate-y-0.5 ${!selectedFile ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary-hover'}`}
                  >
-                    {colorLabText.Landing.uploadBtn}
+                    <span>{colorLabText.Landing.uploadBtn}</span>
                  </button>
             )}
             
             <p className="mt-6 text-xs text-center text-gray-400">
-                {colorLabText.Analysis.privacyNote}
+                <span>{colorLabText.Analysis.privacyNote}</span>
             </p>
         </div>
 
@@ -434,7 +430,7 @@ export default function PageComponent({
                         onClick={() => { alertState.onConfirm?.(); closeAlert(); }}
                         className="flex-1 w-full bg-[#1A1A2E] text-white py-3 rounded-full font-bold shadow-md hover:bg-black transition-colors"
                     >
-                        {alertState.confirmText || "Continue"}
+                        <span>{alertState.confirmText || "Continue"}</span>
                     </button>
                 )}
                 {alertState.showCancel ? (
@@ -442,7 +438,7 @@ export default function PageComponent({
                         onClick={closeAlert}
                         className="flex-1 w-full bg-white text-gray-600 border border-gray-200 py-3 rounded-full font-bold hover:bg-gray-50 transition-colors"
                     >
-                        Cancel
+                        <span>Cancel</span>
                     </button>
                 ) : (
                     !alertState.onConfirm && (
@@ -450,7 +446,7 @@ export default function PageComponent({
                             onClick={closeAlert}
                             className="w-full bg-[#1A1A2E] text-white py-3 rounded-full font-bold shadow-md"
                         >
-                            Okay
+                            <span>Okay</span>
                         </button>
                     )
                 )}
