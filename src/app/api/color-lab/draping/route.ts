@@ -182,7 +182,6 @@ export async function POST(req: NextRequest) {
     console.log(`Generated image uploaded to: ${publicUrl}`);
 
     // Save to DB for persistence
-    const imageType = type === "best" ? "best_draping" : "worst_draping";
     await db.query(
       "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3) on conflict do nothing",
       [sessionId, publicUrl, imageType]
