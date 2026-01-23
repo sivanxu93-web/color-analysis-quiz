@@ -33,8 +33,24 @@ export async function POST(req: NextRequest) {
 
     // 1. Get User Image from DB
     const db = getDb();
+
+    // CHECK CACHE: Check if draping image already exists
+    const imageType = type === "best" ? "best_draping" : "worst_draping";
+    const existingRes = await db.query(
+      "select url from color_lab_images where session_id = $1 and image_type = $2 limit 1",
+      [sessionId, imageType]
+    );
+
+    if (existingRes.rowCount > 0) {
+      console.log(`Image (${type}) already exists, returning cached URL.`);
+      return NextResponse.json({
+        success: true,
+        imageUrl: existingRes.rows[0].url,
+      });
+    }
+
     const imageRes = await db.query(
-      "select url from color_lab_images where session_id = $1 limit 1",
+      "select url from color_lab_images where session_id = $1 and (image_type = 'user_upload' or image_type is null) limit 1",
       [sessionId]
     );
 
@@ -67,7 +83,7 @@ export async function POST(req: NextRequest) {
     }
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Using gemini-2.5-flash-image-preview which supports image generation
+    // Using gemini-3-pro-image-preview which supports image generation
     const model = genAI.getGenerativeModel({
       model: "gemini-3-pro-image-preview",
     });
@@ -99,30 +115,29 @@ export async function POST(req: NextRequest) {
     Output: Return ONLY the final generated image.`;
 
     console.log(
-      `Calling Gemini (${type}) with prompt length: ${fullPrompt.length}`
+      `Calling Gemini (${type})...`
     );
+    console.time(`Gemini-Gen-${type}`);
 
-    const result = await model.generateContent([
-      fullPrompt,
-      {
-        inlineData: {
-          data: imgBase64,
-          mimeType: imgMimeType,
-        },
-      },
-    ]);
-
-    const response = await result.response;
+    let response;
+    try {
+        const result = await model.generateContent([
+          fullPrompt,
+          {
+            inlineData: {
+              data: imgBase64,
+              mimeType: imgMimeType,
+            },
+          },
+        ]);
+        response = await result.response;
+    } catch (geminiError: any) {
+        console.error("Gemini API Error:", geminiError);
+        throw new Error(`Gemini Generation Failed: ${geminiError.message}`);
+    }
+    console.timeEnd(`Gemini-Gen-${type}`);
 
     // 4. Extract Image from Response
-    // We expect the response to contain an image.
-    // Currently, Google's Generative AI SDK returns images in 'candidates' -> 'content' -> 'parts' -> 'inlineData' (if text-to-image)
-    // Or sometimes it might be just binary if we used a REST endpoint for Imagen.
-    // But via 'generateContent', let's inspect the parts.
-
-    // Note: If the model returns text (describing the image) instead of an image, this will fail.
-    // We will check for inlineData.
-
     const candidates = response.candidates;
     if (!candidates || candidates.length === 0) {
       throw new Error("No candidates returned from Gemini");
@@ -137,27 +152,30 @@ export async function POST(req: NextRequest) {
       generatedImageBuffer = Buffer.from(firstPart.inlineData.data, "base64");
       generatedMimeType = firstPart.inlineData.mimeType || "image/png";
     } else {
-      // Fallback: Check if there's executable code or text that contains a URL?
-      // Or maybe the API failed to generate image.
-      // For the sake of this feature, if we don't get an image, we assume failure.
-      // However, for development safety, let's log what we got.
       console.log(
         "Gemini response did not contain inlineData. Response parts:",
         JSON.stringify(candidates[0].content.parts)
       );
-      throw new Error("Model did not return an image.");
+      throw new Error("Model returned text instead of image. Prompt might be blocked or model failed.");
     }
 
     // 5. Upload to R2
     const fileName = `draping/${sessionId}/${type}_${uuidv4()}.png`;
 
-    await R2.putObject({
-      Bucket: r2Bucket,
-      Key: fileName,
-      Body: generatedImageBuffer,
-      ContentType: generatedMimeType,
-      ACL: "public-read", // or rely on bucket policy
-    }).promise();
+    console.time(`R2-Upload-${type}`);
+    try {
+        await R2.putObject({
+          Bucket: r2Bucket,
+          Key: fileName,
+          Body: generatedImageBuffer,
+          ContentType: generatedMimeType,
+          ACL: "public-read", // or rely on bucket policy
+        }).promise();
+    } catch (r2Error: any) {
+        console.error("R2 Upload Error:", r2Error);
+        throw new Error(`R2 Upload Failed: ${r2Error.message}`);
+    }
+    console.timeEnd(`R2-Upload-${type}`);
 
     const publicUrl = `https://${storageDomain}/${fileName}`;
 

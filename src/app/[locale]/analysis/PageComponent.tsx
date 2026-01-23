@@ -8,6 +8,45 @@ import { useCommonContext } from '~/context/common-context';
 import BaseModal from '~/components/BaseModal';
 import { sendGAEvent } from '@next/third-parties/google';
 
+// Helper for image compression
+const compressImage = (file: File): Promise<{ blob: Blob, width: number, height: number }> => {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return reject(new Error('Canvas context missing'));
+
+            const MAX_SIZE = 1500;
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > MAX_SIZE) {
+                    height *= MAX_SIZE / width;
+                    width = MAX_SIZE;
+                }
+            } else {
+                if (height > MAX_SIZE) {
+                    width *= MAX_SIZE / height;
+                    height = MAX_SIZE;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob((blob) => {
+                if (blob) resolve({ blob, width, height });
+                else reject(new Error('Compression failed'));
+            }, 'image/jpeg', 0.85); // 85% quality JPEG
+        };
+        img.onerror = (e) => reject(e);
+    });
+};
+
 export default function PageComponent({
   locale,
   colorLabText,
@@ -146,11 +185,22 @@ export default function PageComponent({
     if (!selectedFile) return;
 
     if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
-        // Save pending session logic could go here if needed, but LoginModal handles it usually?
-        // Actually, we moved logic to AFTER upload in previous turns.
-        // Let's stick to the latest logic: Upload -> Check Login/Credit -> Analyze
-        // But wait, the previous logic had the login check *inside* startAnalysis but *after* upload?
-        // Ah, in previous turns I removed the early check. I will keep it removed.
+          // Check login logic preserved (simplified here but behaves as before if env is set)
+          // Actually, we must preserve the exact logic or the previous feature breaks.
+          // Since I can't see the exact lines of the hidden part in the prompt, I will assume the previous turn's structure.
+          // But wait, in the previous turn I *added* the logic back.
+          // Let's just be explicit.
+          // Login check logic:
+    }
+    
+    // Explicit Login Check restoration
+    if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
+        // We need to generate session ID first? No, we can't save session if we don't start.
+        // But the previous logic was: Upload -> Save Session -> Show Login.
+        // Wait, if I compress here, I haven't uploaded yet.
+        
+        // Let's keep the logic: Compres -> Create Session -> Get URL -> Upload -> THEN check Login.
+        // This allows us to save the sessionId in localStorage.
     }
 
     sendGAEvent('event', 'start_analysis', { method: 'upload' });
@@ -158,6 +208,20 @@ export default function PageComponent({
     setStep(1); 
 
     try {
+      // 0. Compress Image
+      let uploadBody: Blob | File = selectedFile;
+      let uploadContentType = selectedFile.type;
+      let uploadFilename = selectedFile.name;
+
+      try {
+          const compressed = await compressImage(selectedFile);
+          uploadBody = compressed.blob;
+          uploadContentType = 'image/jpeg';
+          uploadFilename = selectedFile.name.replace(/\.[^/.]+$/, "") + ".jpg";
+      } catch (e) {
+          console.warn("Compression skipped:", e);
+      }
+
       // 1. Create Session
       const sessionRes = await fetch('/api/color-lab/session', { 
         method: 'POST',
@@ -172,8 +236,8 @@ export default function PageComponent({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            filename: selectedFile.name,
-            contentType: selectedFile.type,
+            filename: uploadFilename,
+            contentType: uploadContentType,
             sessionId
         })
       });
@@ -185,13 +249,13 @@ export default function PageComponent({
       // 3. Upload File to R2
       await fetch(uploadUrl, {
         method: 'PUT',
-        body: selectedFile,
-        headers: { 'Content-Type': selectedFile.type }
+        body: uploadBody,
+        headers: { 'Content-Type': uploadContentType }
       });
 
       setSessionData({ sessionId, publicUrl });
       
-      // LOGIN CHECK - Post Upload (Restored from previous turn logic)
+      // LOGIN CHECK - Post Upload
       if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
           localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
           setAnalyzing(false); 

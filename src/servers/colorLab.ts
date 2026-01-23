@@ -62,14 +62,20 @@ export const getColorLabReport = async (
   sessionId: string,
 ): Promise<{ 
     report: ColorLabReport; 
+    rating?: string;
+    ownerEmail?: string;
     imageUrl: string | null;
     drapingImages: { best: string | null; worst: string | null };
 } | null> => {
   const db = getDb();
   
-  // 1. Get Report Payload
+  // 1. Get Report Payload, Rating AND Owner Email
   const reportRes = await db.query(
-    `select payload from color_lab_reports where session_id=$1 limit 1`,
+    `SELECT r.payload, r.rating, s.email as owner_email
+     FROM color_lab_reports r
+     JOIN color_lab_sessions s ON r.session_id = s.id
+     WHERE r.session_id = $1
+     LIMIT 1`,
     [sessionId],
   );
   if (reportRes.rows.length <= 0) {
@@ -98,6 +104,8 @@ export const getColorLabReport = async (
 
   return {
     report: reportRes.rows[0].payload as ColorLabReport,
+    rating: reportRes.rows[0].rating,
+    ownerEmail: reportRes.rows[0].owner_email,
     imageUrl: userImageUrl,
     drapingImages: {
         best: bestDraping,

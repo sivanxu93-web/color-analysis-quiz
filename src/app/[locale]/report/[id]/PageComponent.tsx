@@ -12,7 +12,9 @@ export default function PageComponent({
   userImage,
   colorLabText,
   sessionId,
-  drapingImages: initialDrapingImages 
+  drapingImages: initialDrapingImages,
+  rating,
+  isOwner = false
 }: {
   locale: string;
   report: any; 
@@ -20,44 +22,45 @@ export default function PageComponent({
   colorLabText: any;
   sessionId?: string;
   drapingImages?: { best: string | null; worst: string | null };
+  rating?: string;
+  isOwner?: boolean;
 }) {
   const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
   const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
+  const [drapingError, setDrapingError] = useState<string | null>(null);
   
   // Feedback State
-  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>('idle');
+  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
   const [feedbackComment, setFeedbackComment] = useState('');
+  const [isMainFeedbackVisible, setIsMainFeedbackVisible] = useState(false);
+  const [hasSeenContent, setHasSeenContent] = useState(false);
 
-  const handleFeedback = async (rating: 'good' | 'bad') => {
-      setFeedbackStatus(rating);
-      if (rating === 'good') {
-          try {
-            await fetch('/api/color-lab/feedback', {
-                method: 'POST',
-                body: JSON.stringify({ sessionId, rating: 'good' })
-            });
-          } catch(e) { console.error(e) }
-      }
-  };
-
-  const submitComment = async () => {
-      try {
-        await fetch('/api/color-lab/feedback', {
-            method: 'POST',
-            body: JSON.stringify({ sessionId, rating: 'bad', comment: feedbackComment })
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+            if (entry.target.id === 'main-feedback') {
+                setIsMainFeedbackVisible(entry.isIntersecting);
+            }
+            if (entry.target.id === 'palette' && entry.isIntersecting) {
+                setHasSeenContent(true);
+            }
         });
-      } catch(e) { console.error(e) }
-      setFeedbackStatus('submitted');
-  };
+      },
+      { threshold: 0.1 }
+    );
+    
+    const mainFeedback = document.getElementById('main-feedback');
+    const palette = document.getElementById('palette');
+    
+    if (mainFeedback) observer.observe(mainFeedback);
+    if (palette) observer.observe(palette);
 
-  const LOADING_TIPS = [
-    "Analyzing your skin undertones...",
-    "Matching with 12-season color theory...",
-    "Simulating fabric reflections...",
-    "Finding your perfect power colors...",
-    "Consulting the AI stylist...",
-  ];
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
       if (report?.season) {
@@ -66,13 +69,13 @@ export default function PageComponent({
   }, [report]);
 
   useEffect(() => {
-    if (!drapingImages.best) {
+    if (!drapingImages.best && !drapingError) {
       const interval = setInterval(() => {
         setCurrentTipIndex((prev) => (prev + 1) % LOADING_TIPS.length);
       }, 2500);
       return () => clearInterval(interval);
     }
-  }, [drapingImages.best]);
+  }, [drapingImages.best, drapingError]);
 
   const { 
       season, headline, description, characteristics, 
@@ -84,6 +87,7 @@ export default function PageComponent({
   const handleGenerateDraping = async () => {
     if (!sessionId || !virtual_draping_prompts) return;
     setIsGeneratingDraping(true);
+    setDrapingError(null);
     
     try {
         const [bestRes, worstRes] = await Promise.all([
@@ -109,6 +113,10 @@ export default function PageComponent({
             })
         ]);
 
+        if (!bestRes.ok || !worstRes.ok) {
+            throw new Error("AI Service is busy");
+        }
+
         const bestData = await bestRes.json();
         const worstData = await worstRes.json();
 
@@ -119,6 +127,7 @@ export default function PageComponent({
 
     } catch (error) {
         console.error("Failed to generate draping images", error);
+        setDrapingError("Our AI stylist is currently in high demand. Please try again.");
     } finally {
         setIsGeneratingDraping(false);
     }
@@ -126,7 +135,7 @@ export default function PageComponent({
 
   // Auto-generate on mount if images are missing
   useEffect(() => {
-      if (!drapingImages.best && !isGeneratingDraping && sessionId) {
+      if (!drapingImages.best && !isGeneratingDraping && sessionId && !drapingError) {
           handleGenerateDraping();
       }
   }, [sessionId]); // Run once when sessionId is available
@@ -649,63 +658,343 @@ export default function PageComponent({
 
           
 
-                          {!drapingImages.best && (
-
-                              <div className="relative w-full max-w-3xl mx-auto aspect-[16/9] md:aspect-[2/1] bg-white/50 rounded-3xl border border-gray-100/50 flex flex-col items-center justify-center overflow-hidden my-12 shadow-sm backdrop-blur-sm">
-
-                                  
-
-                                  <div className="relative z-10 text-center px-6 w-full max-w-md">
-
-                                      <div className="w-12 h-12 border-2 border-primary/10 border-t-primary rounded-full animate-spin mx-auto mb-6"></div>
-
-                                      <h4 className="text-xl font-serif font-bold text-gray-900 mb-3 tracking-tight">AI Stylist at Work</h4>
-
-                                      
-
-                                      {/* Animated Text */}
-
-                                      <p className="text-sm text-gray-500 font-medium animate-pulse min-h-[20px] transition-all duration-500 flex items-center justify-center gap-2 mb-4">
-
-                                          <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></span>
-
-                                          {LOADING_TIPS[currentTipIndex]}
-
-                                      </p>
+                                          {!drapingImages.best && !drapingError && (
 
           
 
-                                      {/* Fake Progress Bar */}
+              
 
-                                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          
 
-                                          <div className="h-full bg-primary rounded-full animate-[progress_15s_ease-out_forwards] w-0"></div>
+                                              <div className="relative w-full max-w-3xl mx-auto aspect-[16/9] md:aspect-[2/1] bg-white/50 rounded-3xl border border-gray-100/50 flex flex-col items-center justify-center overflow-hidden my-12 shadow-sm backdrop-blur-sm">
 
-                                      </div>
+          
 
-                                      <style jsx>{`
+              
 
-                                          @keyframes progress {
+          
 
-                                              0% { width: 0%; }
+                                                  
 
-                                              20% { width: 30%; }
+          
 
-                                              50% { width: 60%; }
+              
 
-                                              80% { width: 85%; }
+          
 
-                                              100% { width: 92%; }
+                                                  <div className="relative z-10 text-center px-6 w-full max-w-md">
 
-                                          }
+          
 
-                                      `}</style>
+              
 
-                                  </div>
+          
 
-                              </div>
+                                                      <div className="w-12 h-12 border-2 border-primary/10 border-t-primary rounded-full animate-spin mx-auto mb-6"></div>
 
-                          )}
+          
+
+              
+
+          
+
+                                                      <h4 className="text-xl font-serif font-bold text-gray-900 mb-3 tracking-tight">AI Stylist at Work</h4>
+
+          
+
+              
+
+          
+
+                                                      
+
+          
+
+              
+
+          
+
+                                                      {/* Animated Text */}
+
+          
+
+              
+
+          
+
+                                                      <p className="text-sm text-gray-500 font-medium animate-pulse min-h-[20px] transition-all duration-500 flex items-center justify-center gap-2 mb-4">
+
+          
+
+              
+
+          
+
+                                                          <span className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></span>
+
+          
+
+              
+
+          
+
+                                                          {LOADING_TIPS[currentTipIndex]}
+
+          
+
+              
+
+          
+
+                                                      </p>
+
+          
+
+              
+
+          
+
+                          
+
+          
+
+              
+
+          
+
+                                                      {/* Fake Progress Bar */}
+
+          
+
+              
+
+          
+
+                                                      <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+
+          
+
+              
+
+          
+
+                                                          <div className="h-full bg-primary rounded-full animate-[progress_15s_ease-out_forwards] w-0"></div>
+
+          
+
+              
+
+          
+
+                                                      </div>
+
+          
+
+              
+
+          
+
+                                                      <style jsx>{`
+
+          
+
+              
+
+          
+
+                                                          @keyframes progress {
+
+          
+
+              
+
+          
+
+                                                              0% { width: 0%; }
+
+          
+
+              
+
+          
+
+                                                              20% { width: 30%; }
+
+          
+
+              
+
+          
+
+                                                              50% { width: 60%; }
+
+          
+
+              
+
+          
+
+                                                              80% { width: 85%; }
+
+          
+
+              
+
+          
+
+                                                              100% { width: 92%; }
+
+          
+
+              
+
+          
+
+                                                          }
+
+          
+
+              
+
+          
+
+                                                      `}</style>
+
+          
+
+              
+
+          
+
+                                                  </div>
+
+          
+
+              
+
+          
+
+                                              </div>
+
+          
+
+              
+
+          
+
+                                          )}
+
+          
+
+              
+
+          
+
+                          
+
+          
+
+              
+
+          
+
+                                          {!drapingImages.best && drapingError && (
+
+          
+
+              
+
+          
+
+                                              <div className="relative w-full max-w-3xl mx-auto py-12 px-6 flex flex-col items-center justify-center text-center bg-red-50/50 rounded-3xl border border-red-100 my-12">
+
+          
+
+              
+
+          
+
+                                                  <div className="text-4xl mb-4">⚠️</div>
+
+          
+
+              
+
+          
+
+                                                  <h4 className="text-xl font-serif font-bold text-gray-900 mb-2">Generation Paused</h4>
+
+          
+
+              
+
+          
+
+                                                  <p className="text-sm text-gray-500 mb-6 max-w-md">{drapingError}</p>
+
+          
+
+              
+
+          
+
+                                                  <button 
+
+          
+
+              
+
+          
+
+                                                      onClick={handleGenerateDraping}
+
+          
+
+              
+
+          
+
+                                                      className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+
+          
+
+              
+
+          
+
+                                                  >
+
+          
+
+              
+
+          
+
+                                                      Try Again
+
+          
+
+              
+
+          
+
+                                                  </button>
+
+          
+
+              
+
+          
+
+                                              </div>
+
+          
+
+              
+
+          
+
+                                          )}
 
           
 
@@ -1461,8 +1750,9 @@ export default function PageComponent({
 
           
 
-                          {/* Feedback Section */}
-                <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 text-center">
+                          {/* Feedback Section - Only for Owner */}
+                {isOwner && (
+                <div id="main-feedback" className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 text-center">
                     <h3 className="text-xl font-serif font-bold text-[#1A1A2E] mb-6">Was this analysis helpful?</h3>
                     
                     {feedbackStatus === 'idle' && (
@@ -1513,11 +1803,31 @@ export default function PageComponent({
                     )}
 
                     {feedbackStatus === 'submitted' && (
-                        <div className="py-4">
-                            <p className="text-gray-500 font-medium">Thank you for your feedback! We&apos;ll use it to improve our AI.</p>
+                        <div className="py-6 animate-fade-in">
+                            <p className="text-gray-500 font-medium mb-4">Thank you for your feedback!</p>
+                            <div className="flex flex-col sm:flex-row justify-center gap-4">
+                                <a 
+                                    href={`https://twitter.com/intent/tweet?text=I%20just%20found%20out%20my%20seasonal%20color%20is%20${report?.season || 'amazing'}!%20Discover%20yours:&url=https://coloranalysisquiz.app`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="bg-black text-white px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                                >
+                                    <span>Share on 𝕏</span>
+                                </a>
+                                <button 
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        alert("Link copied!");
+                                    }}
+                                    className="bg-gray-100 text-gray-700 px-6 py-2 rounded-full text-sm font-bold hover:bg-gray-200 transition-colors shadow-sm"
+                                >
+                                    Copy Link
+                                </button>
+                            </div>
                         </div>
                     )}
                 </div>
+                )}
 
                 {/* CTA */}
 
@@ -1551,6 +1861,28 @@ export default function PageComponent({
 
                     <Footer locale={locale} page={'report'} />
 
+                    {/* Sticky Bottom Feedback Bar */}
+                    {isOwner && feedbackStatus === 'idle' && !isMainFeedbackVisible && hasSeenContent && drapingImages.best && (
+                        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up transition-transform duration-500">
+                            <div className="max-w-xl mx-auto flex items-center justify-between">
+                                <span className="text-sm font-bold text-[#1A1A2E] mr-2">Was this helpful?</span>
+                                <div className="flex gap-3">
+                                    <button 
+                                        onClick={() => handleFeedback('good')} 
+                                        className="flex items-center gap-1.5 px-5 py-2.5 bg-[#1A1A2E] text-white rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-sm"
+                                    >
+                                        <span>👍</span> Yes
+                                    </button>
+                                    <button 
+                                        onClick={() => handleFeedback('bad')} 
+                                        className="flex items-center gap-1.5 px-5 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-full font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm"
+                                    >
+                                        <span>👎</span> No
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                   </>
 
                 )
