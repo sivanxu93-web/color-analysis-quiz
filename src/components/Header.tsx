@@ -193,7 +193,7 @@ export default function Header({
                  {
                   userData.email ?
                     <Link
-                      href={getLinkHref(locale, 'analysis')}
+                      href={getLinkHref(locale, 'profile')}
                       className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
                       onClick={() => setMobileMenuOpen(false)}
                     >
