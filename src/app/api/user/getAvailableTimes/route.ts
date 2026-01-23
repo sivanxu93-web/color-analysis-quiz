@@ -28,6 +28,16 @@ export const GET = async (req: Request) => {
 
     if (origin.length !== 0) {
       result.available_times = origin[0].available_times;
+    } else {
+      // Lazy init: If user exists but no credit record, give free times
+      const freeTimes = Number(process.env.FREE_TIMES || 0);
+      await db.query("insert into user_available(user_id, available_times) values($1, $2)", [userId, freeTimes]);
+      result.available_times = freeTimes;
+      
+      // Optional: Log bonus
+      if (freeTimes > 0) {
+         await db.query("insert into credit_logs(user_id, amount, type, description) values($1, $2, 'bonus', 'Beta test free credits (Profile View)')", [userId, freeTimes]);
+      }
     }
   }
   return Response.json(result);

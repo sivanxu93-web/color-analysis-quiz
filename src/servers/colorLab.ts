@@ -61,7 +61,7 @@ export const saveColorLabReport = async (
 export const getColorLabReport = async (
   sessionId: string,
 ): Promise<{ 
-    report: ColorLabReport; 
+    report: ColorLabReport | null; 
     rating?: string;
     ownerEmail?: string;
     imageUrl: string | null;
@@ -69,18 +69,21 @@ export const getColorLabReport = async (
 } | null> => {
   const db = getDb();
   
-  // 1. Get Report Payload, Rating AND Owner Email
-  const reportRes = await db.query(
-    `SELECT r.payload, r.rating, s.email as owner_email
-     FROM color_lab_reports r
-     JOIN color_lab_sessions s ON r.session_id = s.id
-     WHERE r.session_id = $1
+  // 1. Get Session & Report (Left Join to allow missing report)
+  const sessionRes = await db.query(
+    `SELECT s.email as owner_email, r.payload, r.rating
+     FROM color_lab_sessions s
+     LEFT JOIN color_lab_reports r ON s.id = r.session_id
+     WHERE s.id = $1
      LIMIT 1`,
     [sessionId],
   );
-  if (reportRes.rows.length <= 0) {
-    return null;
+
+  if (sessionRes.rows.length === 0) {
+    return null; // Session invalid
   }
+
+  const sessionRow = sessionRes.rows[0];
 
   // 2. Get All Images
   const imagesRes = await db.query(
@@ -103,9 +106,9 @@ export const getColorLabReport = async (
   });
 
   return {
-    report: reportRes.rows[0].payload as ColorLabReport,
-    rating: reportRes.rows[0].rating,
-    ownerEmail: reportRes.rows[0].owner_email,
+    report: sessionRow.payload as ColorLabReport | null,
+    rating: sessionRow.rating,
+    ownerEmail: sessionRow.owner_email,
     imageUrl: userImageUrl,
     drapingImages: {
         best: bestDraping,

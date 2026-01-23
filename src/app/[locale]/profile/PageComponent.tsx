@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
 import { useRouter } from 'next/navigation';
 
+import { useSession } from "next-auth/react";
+
 export default function PageComponent({
   locale,
   colorLabText,
@@ -15,28 +17,23 @@ export default function PageComponent({
   colorLabText: any;
 }) {
   const { userData, setShowLoginModal, setShowLogoutModal } = useCommonContext();
+  const { status } = useSession();
   const [history, setHistory] = useState<any[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    // If user is definitely not logged in (and checking is done), redirect or show modal
-    if (!userData?.email && process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0') {
-       // Wait a bit for auth to settle
-       const timer = setTimeout(() => {
-           if (!userData?.email) {
-               router.push(getLinkHref(locale, ''));
-           }
-       }, 1000);
-       return () => clearTimeout(timer);
+    // Only redirect if explicitly unauthenticated
+    if (status === 'unauthenticated' && process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0') {
+        router.push(getLinkHref(locale, ''));
     }
 
-    if (userData?.email) {
+    if (status === 'authenticated' && userData?.user_id) {
         fetchHistory();
         fetchCredits();
     }
-  }, [userData?.email]);
+  }, [status, userData?.user_id]);
 
   const fetchHistory = async () => {
     try {

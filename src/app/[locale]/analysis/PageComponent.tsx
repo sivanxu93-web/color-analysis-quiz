@@ -144,16 +144,11 @@ export default function PageComponent({
       });
 
       if (analyzeRes.status === 402) {
-          setAlertState({
-              isOpen: true,
-              title: "Beta Limit Reached",
-              message: "You have used your free analysis credit. Stay tuned for the full release!",
-              type: 'info',
-              showCancel: false,
-              confirmText: "Got it"
-          });
-          setAnalyzing(false);
-          setStep(0);
+          // Save session to resume after payment/upgrade
+          localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl: imageUrl }));
+          
+          // Redirect to Report Page (Teaser Mode) for upsell
+          router.push(getLinkHref(locale, `report/${sessionId}`));
           return;
       }
 
@@ -255,7 +250,7 @@ export default function PageComponent({
 
       setSessionData({ sessionId, publicUrl });
       
-      // LOGIN CHECK - Post Upload
+      // LOGIN CHECK
       if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
           localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
           setAnalyzing(false); 
@@ -263,17 +258,45 @@ export default function PageComponent({
           return;
       }
       
-      // 4. Run Analysis Directly
-      runAnalysis(sessionId, publicUrl, userData?.email || "");
+      // Try to analyze immediately
+      try {
+          const analyzeRes = await fetch('/api/color-lab/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                sessionId: sessionId, 
+                imageUrl: publicUrl,
+                email: userData.email 
+            })
+          });
+
+          if (analyzeRes.ok) {
+              // Success! Credit deducted. Go to Full Report.
+              const { reportId } = await analyzeRes.json();
+              // Track successful analysis completion
+              sendGAEvent('event', 'complete_analysis', { reportId });
+              router.push(getLinkHref(locale, `report/${reportId}`));
+          } else if (analyzeRes.status === 402) {
+              // Insufficient Credits. Go to Teaser Page to upsell.
+              // Save session so they can resume later easily
+              localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
+              router.push(getLinkHref(locale, `report/${sessionId}`));
+          } else {
+              throw new Error("Analysis failed");
+          }
+      } catch (e) {
+          throw e; // Handled by outer catch
+      }
 
     } catch (error) {
       console.error(error);
       setAlertState({
           isOpen: true,
-          title: "Upload Failed",
-          message: "Something went wrong during upload. Please try again.",
-          type: 'error',
-          showCancel: false
+          title: "AI Stylist Busy",
+          message: "Our AI Stylist is currently experiencing high demand. Please try again in a moment.",
+          type: 'warning',
+          showCancel: false,
+          confirmText: "Okay"
       });
       setAnalyzing(false);
       setStep(0);

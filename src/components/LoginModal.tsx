@@ -64,7 +64,8 @@ const LoginModal = ({
                     Save Your Results
                   </Dialog.Title>
                   
-                  {/* Promotional Offer Card */}
+                  {/* Promotional Offer Card - Only show in Beta (Free) Mode */}
+                  {!process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL && (
                   <div className="my-5 w-full rounded-2xl bg-gradient-to-br from-orange-50 to-[#FFFBF7] p-5 border border-orange-100 shadow-sm relative overflow-hidden group">
                       <div className="absolute top-0 right-0 w-16 h-16 bg-orange-100 rounded-full blur-2xl -mr-8 -mt-8"></div>
                       
@@ -83,6 +84,7 @@ const LoginModal = ({
                           </p>
                       </div>
                   </div>
+                  )}
 
                   <p className="text-sm text-gray-500 mb-6 leading-relaxed max-w-[260px]">
                     {loginModalDesc || "Sign in to secure this offer and save your results permanently."}

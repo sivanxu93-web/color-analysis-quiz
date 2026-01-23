@@ -21,7 +21,7 @@ export async function GET() {
       FROM color_lab_reports r
       WHERE r.is_featured = true
       ORDER BY r.created_at DESC
-      LIMIT 6
+      LIMIT 8
     `;
 
     const result = await db.query(query);
