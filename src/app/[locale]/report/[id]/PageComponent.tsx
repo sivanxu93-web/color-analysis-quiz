@@ -422,12 +422,12 @@ export default function PageComponent({
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto opacity-50">
                     <div className="relative bg-white p-3 shadow-xl rounded-2xl">
                         <div className="w-full rounded-xl overflow-hidden bg-gray-50">
-                            <img src={userImage || ''} className="w-full h-auto max-h-[700px] object-contain mx-auto" />
+                            <img src={userImage || ''} alt="Mock Draping Best" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
                         </div>
                     </div>
                     <div className="relative bg-white p-3 shadow-xl rounded-2xl">
                         <div className="w-full rounded-xl overflow-hidden bg-gray-50">
-                            <img src={userImage || ''} className="w-full h-auto max-h-[700px] object-contain mx-auto" />
+                            <img src={userImage || ''} alt="Mock Draping Worst" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
                         </div>
                     </div>
                  </div>

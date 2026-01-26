@@ -33,12 +33,12 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
       default: 'Color Analysis Quiz | Discover Your Seasonal Palette with AI',
       template: '%s | Color Analysis Quiz'
     },
-    description: 'Free AI personal color analysis. Upload your photo to find your seasonal color palette (Spring, Summer, Autumn, Winter) and get style advice.',
+    description: 'Professional AI personal color analysis. Upload your photo to find your seasonal color palette (Spring, Summer, Autumn, Winter) and get style advice.',
     keywords: ['color analysis', 'seasonal color analysis', 'personal color analysis', 'ai color analysis', 'virtual draping'],
     openGraph: {
       type: 'website',
       siteName: 'Color Analysis Quiz',
-      title: 'Free AI Color Analysis Quiz',
+      title: 'AI Color Analysis Quiz',
       description: 'Discover your seasonal color palette instantly with AI.',
       images: [
         {
@@ -52,7 +52,7 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
     },
     twitter: {
       card: 'summary_large_image',
-      title: 'Free AI Color Analysis Quiz',
+      title: 'AI Color Analysis Quiz',
       description: 'Discover your seasonal color palette instantly with AI.',
       images: ['/seasonal_color_analysis.jpg'],
     },

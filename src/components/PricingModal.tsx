@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import BaseModal from './BaseModal';
 import {useCommonContext} from "~/context/common-context";
@@ -14,8 +15,6 @@ export default function PricingModal({
   const currentLocale = params?.locale || 'en';
 
   const handleCreemCheckout = (plan: 'single' | 'pack') => {
-    // e.preventDefault(); // Called from onClick, manual preventDefault if needed
-    
     sendGAEvent('event', 'purchase_attempt', { 
         item: plan === 'pack' ? 'style_pack' : 'single_report', 
         status: userData?.user_id ? 'logged_in' : 'guest' 
@@ -37,8 +36,7 @@ export default function PricingModal({
         url.searchParams.set('metadata[user_id]', userData.user_id); 
         window.location.href = url.toString();
     } else {
-        // Fallback or Alert
-        alert("Checkout configuration missing for this plan.");
+        alert("Checkout configuration missing.");
     }
   };
 
@@ -70,45 +68,54 @@ export default function PricingModal({
                     </button>
                 </div>
             ) : (
-                // Paid UI - Dual Cards
+                // Paid UI - Stacked Cards for Modal
                 <div className="space-y-4">
-                    {/* Pack Option (Best Value) */}
-                    <div 
-                        onClick={() => handleCreemCheckout('pack')}
-                        className="relative bg-gradient-to-r from-[#1A1A2E] to-[#2a2a4a] text-white p-5 rounded-2xl border-2 border-transparent hover:border-primary/50 cursor-pointer shadow-lg transform hover:-translate-y-1 transition-all group text-left flex justify-between items-center"
-                    >
-                        <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg rounded-tr-lg uppercase tracking-wider">
+                    
+                    {/* Pack Plan (Highlighted) */}
+                    <div className="relative rounded-2xl p-6 ring-1 ring-gray-200 bg-[#1A1A2E] text-white shadow-xl text-left overflow-hidden group hover:scale-[1.02] transition-transform">
+                        <div className="absolute top-0 right-0 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg uppercase tracking-wider">
                             Best Value
                         </div>
-                        <div>
-                            <h4 className="text-lg font-bold flex items-center gap-2">
-                                Style Pack <span className="text-xl">✨</span>
-                            </h4>
-                            <p className="text-gray-300 text-xs mt-1">3 Analyses (Share with family!)</p>
+                        <h3 className="text-lg font-bold">Style Pack</h3>
+                        <div className="flex items-baseline gap-2 mt-1">
+                            <span className="text-3xl font-serif font-bold">$9.90</span>
+                            <span className="text-sm text-gray-400 line-through">$29.90</span>
                         </div>
-                        <div className="text-right">
-                            <span className="block text-2xl font-serif font-bold">$29.90</span>
-                            <span className="text-xs text-gray-400 line-through">$59.70</span>
-                        </div>
+                        <ul className="mt-4 space-y-2 text-sm text-gray-300">
+                            <li className="flex gap-2"><span>★</span> 3 Full Analyses</li>
+                            <li className="flex gap-2"><span>★</span> Shareable & Test Photos</li>
+                        </ul>
+                        <button
+                            onClick={() => handleCreemCheckout('pack')}
+                            className="mt-6 w-full rounded-full bg-primary px-4 py-3 text-sm font-bold text-white shadow-lg hover:bg-primary-hover animate-pulse"
+                        >
+                            Get 3 Credits
+                        </button>
                     </div>
 
-                    {/* Single Option */}
-                    <div 
-                        onClick={() => handleCreemCheckout('single')}
-                        className="bg-white p-5 rounded-2xl border border-gray-200 hover:border-gray-400 cursor-pointer shadow-sm hover:shadow-md transition-all text-left flex justify-between items-center"
-                    >
-                        <div>
-                            <h4 className="text-lg font-bold text-gray-900">Single Report</h4>
-                            <p className="text-gray-500 text-xs mt-1">1 Full Color Analysis</p>
+                    {/* Single Plan */}
+                    <div className="rounded-2xl p-6 ring-1 ring-gray-200 bg-white text-left hover:shadow-md transition-shadow">
+                        <h3 className="text-lg font-bold text-gray-900">Single Report</h3>
+                        <div className="flex items-baseline gap-2 mt-1">
+                            <span className="text-3xl font-serif font-bold text-gray-900">$4.90</span>
+                            <span className="text-sm text-gray-400 line-through">$19.90</span>
                         </div>
-                        <div className="text-right">
-                            <span className="block text-2xl font-serif font-bold text-gray-900">$19.90</span>
-                        </div>
+                        <ul className="mt-4 space-y-2 text-sm text-gray-600">
+                            <li className="flex gap-2"><span className="text-indigo-500">✓</span> 1 Full Analysis</li>
+                            <li className="flex gap-2"><span className="text-indigo-500">✓</span> Virtual Draping & Makeup</li>
+                        </ul>
+                        <button
+                            onClick={() => handleCreemCheckout('single')}
+                            className="mt-6 w-full rounded-full bg-indigo-50 px-4 py-3 text-sm font-bold text-indigo-600 hover:bg-indigo-100"
+                        >
+                            Unlock Report
+                        </button>
                     </div>
-                    
-                    <p className="text-xs text-gray-400 pt-2">Secure payment via Creem • 100% Satisfaction Guarantee</p>
+
                 </div>
             )}
+            
+            <p className="text-xs text-gray-400 mt-4">Secure payment via Creem • 100% Satisfaction Guarantee</p>
         </div>
     </BaseModal>
   )

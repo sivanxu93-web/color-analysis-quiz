@@ -218,13 +218,13 @@ export default function PageComponent({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "WebApplication",
-                "name": "Free AI Color Analysis Quiz",
+                "name": "AI Color Analysis Quiz",
                 "url": "https://coloranalysisquiz.app",
                 "applicationCategory": "LifestyleApplication",
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "0",
+                  "price": "4.90",
                   "priceCurrency": "USD"
                 }
               })
@@ -238,24 +238,24 @@ export default function PageComponent({
                 "@type": "FAQPage",
                 "mainEntity": [{
                   "@type": "Question",
-                  "name": "Is this color analysis quiz free?",
+                  "name": "How does the Color Analysis Quiz work?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Yes, our AI color analysis quiz is completely free to start. You can upload your photo and get your seasonal results instantly."
+                    "text": "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report."
                   }
                 }, {
                   "@type": "Question",
                   "name": "How accurate is AI color analysis?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Our AI is trained on professional color theory and thousands of verified seasonal profiles, making it highly accurate and objective compared to human bias."
+                    "text": "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias."
                   }
                 }, {
                   "@type": "Question",
-                  "name": "Do I need to sign up?",
+                  "name": "Is the analysis free?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "You can take the quiz without signing up. We only ask for login if you wish to save your detailed report for future reference."
+                    "text": "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a small one-time fee."
                   }
                 }]
               })
