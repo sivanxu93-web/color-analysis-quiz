@@ -63,6 +63,7 @@ export default function PageComponent({
   
   // Face API State
   const [faceApi, setFaceApi] = useState<any>(null);
+  const [isCheckingFace, setIsCheckingFace] = useState(false);
   
   // Custom Dialog State
   const [alertState, setAlertState] = useState<{
@@ -102,37 +103,70 @@ export default function PageComponent({
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // Face Detection Logic
-      if (faceApi) {
-          try {
-              // Create image element manually to avoid env issues with bufferToImage
-              const img = new Image();
-              img.src = URL.createObjectURL(file);
-              await new Promise((resolve, reject) => {
-                  img.onload = resolve;
-                  img.onerror = reject;
-              });
-              
-              const detections = await faceApi.detectAllFaces(img, new faceApi.TinyFaceDetectorOptions());
-
-              if (!detections || detections.length === 0) {
-                  setAlertState({
-                      isOpen: true,
-                      title: "No Face Detected",
-                      message: "We couldn't detect a clear face in this photo. The analysis might fail or be inaccurate. Do you want to continue?",
-                      type: 'warning',
-                      showCancel: true,
-                      confirmText: "Continue Anyway",
-                      onConfirm: () => processFile(file)
-                  });
-                  if (event.target) event.target.value = ''; // Reset input
-                  return;
-              }
-          } catch (e) {
-              console.error("Face detection error", e);
-          }
-      }
+      // 1. Immediately show preview
       processFile(file);
+
+      // 2. Run Face Detection Async
+      if (faceApi) {
+          setIsCheckingFace(true);
+          
+          // Use setTimeout to yield to the main thread so UI renders the preview first
+          setTimeout(async () => {
+              try {
+                  const img = new Image();
+                  img.src = URL.createObjectURL(file);
+                  await new Promise((resolve, reject) => {
+                      img.onload = resolve;
+                      img.onerror = reject;
+                  });
+
+                  // Resize for faster detection (Max 600px)
+                  const canvas = document.createElement('canvas');
+                  const ctx = canvas.getContext('2d');
+                  if (ctx) {
+                      const MAX_DETECTION_SIZE = 600;
+                      let width = img.width;
+                      let height = img.height;
+                      
+                      if (width > height) {
+                          if (width > MAX_DETECTION_SIZE) {
+                              height *= MAX_DETECTION_SIZE / width;
+                              width = MAX_DETECTION_SIZE;
+                          }
+                      } else {
+                          if (height > MAX_DETECTION_SIZE) {
+                              width *= MAX_DETECTION_SIZE / height;
+                              height = MAX_DETECTION_SIZE;
+                          }
+                      }
+                      
+                      canvas.width = width;
+                      canvas.height = height;
+                      ctx.drawImage(img, 0, 0, width, height);
+
+                      // Detect on the resized canvas
+                      const detections = await faceApi.detectAllFaces(canvas, new faceApi.TinyFaceDetectorOptions());
+
+                      if (!detections || detections.length === 0) {
+                          setAlertState({
+                              isOpen: true,
+                              title: "No Face Detected",
+                              message: "We couldn't detect a clear face in this photo. The analysis might fail or be inaccurate. Do you want to continue?",
+                              type: 'warning',
+                              showCancel: true,
+                              confirmText: "Continue Anyway",
+                              onConfirm: () => { /* Already processed */ }
+                          });
+                          // Note: We don't clear the file here, we let the user choose to continue or cancel (by closing or re-uploading)
+                      }
+                  }
+              } catch (e) {
+                  console.error("Face detection error", e);
+              } finally {
+                  setIsCheckingFace(false);
+              }
+          }, 100);
+      }
     }
   };
 
@@ -314,6 +348,23 @@ export default function PageComponent({
   // Resume analysis after login (Restored from previous turn)
   useEffect(() => {
       const storedSession = localStorage.getItem('color_lab_pending_session');
+      
+      // Check for payment success redirect
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentSuccess = urlParams.get('payment_success');
+
+      if (paymentSuccess === 'true') {
+          setAlertState({
+              isOpen: true,
+              title: "Payment Successful! 🎉",
+              message: "Thank you! Your analysis is starting now...",
+              type: 'info',
+              showCancel: false
+          });
+          // Clean URL
+          window.history.replaceState({}, '', window.location.pathname);
+      }
+
       if (userData?.email && storedSession) {
           try {
               const { sessionId, publicUrl } = JSON.parse(storedSession);
@@ -366,11 +417,12 @@ export default function PageComponent({
                     <img src={previewUrl} alt="Preview" className="w-full object-cover aspect-[3/4]" />
                     {!analyzing && (
                         <button 
+                            type="button"
                             onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}
-                            className="absolute top-3 right-3 bg-white/80 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-sm backdrop-blur-sm"
+                            className="absolute top-3 right-3 z-10 flex items-center justify-center bg-white/80 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-sm backdrop-blur-sm"
                         >
                             <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
                             </svg>
                         </button>
                     )}
@@ -404,10 +456,10 @@ export default function PageComponent({
             {!analyzing && (
                  <button
                     onClick={startAnalysis}
-                    disabled={!selectedFile}
-                    className={`mt-6 w-full rounded-full px-6 py-4 text-base font-semibold text-white shadow-lg transition-all transform hover:-translate-y-0.5 ${!selectedFile ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary-hover'}`}
+                    disabled={!selectedFile || isCheckingFace}
+                    className={`mt-6 w-full rounded-full px-6 py-4 text-base font-semibold text-white shadow-lg transition-all transform hover:-translate-y-0.5 ${(!selectedFile || isCheckingFace) ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary-hover'}`}
                  >
-                    <span>{colorLabText.Landing.uploadBtn}</span>
+                    <span>{isCheckingFace ? "Checking image..." : colorLabText.Landing.uploadBtn}</span>
                  </button>
             )}
             
