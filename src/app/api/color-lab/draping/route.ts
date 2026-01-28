@@ -143,7 +143,13 @@ export async function POST(req: NextRequest) {
       throw new Error("No candidates returned from Gemini");
     }
 
-    const firstPart = candidates[0].content.parts[0];
+    const content = candidates[0].content;
+    if (!content || !content.parts || content.parts.length === 0) {
+        console.error("Gemini Empty Response:", JSON.stringify(candidates));
+        throw new Error("Gemini returned an empty response (no parts).");
+    }
+
+    const firstPart = content.parts[0];
 
     let generatedImageBuffer: Buffer;
     let generatedMimeType = "image/png"; // Default

@@ -2,11 +2,11 @@ import {NextRequest} from "next/server";
 import {buildMockReport} from "../mockReport";
 import {getColorLabReport, saveColorLabReport} from "~/servers/colorLab";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(
-  req: NextRequest,
-  {params}: { params: { locale: string } },
+  req: NextRequest
 ) {
-  const {locale} = params;
   const sessionId = req.nextUrl?.searchParams?.get("sessionId");
   if (!sessionId) {
     return Response.json(

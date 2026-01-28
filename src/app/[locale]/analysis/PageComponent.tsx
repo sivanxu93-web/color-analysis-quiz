@@ -54,12 +54,11 @@ export default function PageComponent({
   locale: string;
   colorLabText: any;
 }) {
-  const { userData, setShowLoginModal, setShowPricingModal } = useCommonContext();
+  const { userData } = useCommonContext();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [step, setStep] = useState(0); 
-  const [sessionData, setSessionData] = useState<{sessionId: string, publicUrl: string} | null>(null);
   
   // Face API State
   const [faceApi, setFaceApi] = useState<any>(null);
@@ -74,6 +73,7 @@ export default function PageComponent({
       onConfirm?: () => void;
       confirmText?: string;
       showCancel?: boolean;
+      onCancel?: () => void;
   }>({ isOpen: false, title: '', message: '', type: 'info' });
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -155,7 +155,12 @@ export default function PageComponent({
                               type: 'warning',
                               showCancel: true,
                               confirmText: "Continue Anyway",
-                              onConfirm: () => { /* Already processed */ }
+                              onConfirm: () => { /* Already processed */ },
+                              onCancel: () => {
+                                  setSelectedFile(null);
+                                  setPreviewUrl(null);
+                                  if (fileInputRef.current) fileInputRef.current.value = '';
+                              }
                           });
                           // Note: We don't clear the file here, we let the user choose to continue or cancel (by closing or re-uploading)
                       }
@@ -170,77 +175,11 @@ export default function PageComponent({
     }
   };
 
-  const runAnalysis = async (sessionId: string, imageUrl: string, email: string) => {
-    setAnalyzing(true);
-    setStep(3);
-
-    try {
-      const analyzeRes = await fetch('/api/color-lab/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            sessionId: sessionId, 
-            imageUrl: imageUrl,
-            email: email 
-        })
-      });
-
-      if (analyzeRes.status === 402) {
-          // Save session to resume after payment/upgrade
-          localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl: imageUrl }));
-          
-          // Redirect to Report Page (Teaser Mode) for upsell
-          router.push(getLinkHref(locale, `report/${sessionId}`));
-          return;
-      }
-
-      if (!analyzeRes.ok) throw new Error("Analysis failed");
-      
-      const { reportId } = await analyzeRes.json();
-
-      // Track successful analysis completion
-      sendGAEvent('event', 'complete_analysis', { reportId });
-
-      router.push(getLinkHref(locale, `report/${reportId}`));
-
-    } catch (error) {
-        console.error(error);
-        setAlertState({
-            isOpen: true,
-            title: "Analysis Failed",
-            message: "Something went wrong during the analysis. Please try again.",
-            type: 'error',
-            showCancel: false
-        });
-        setAnalyzing(false);
-        setStep(0);
-    }
-  };
-
-  // Step 1: Upload Image & Prepare Session
+  // Step 1: Upload Image & Redirect to Report Page (Draft Mode)
   const startAnalysis = async () => {
     if (!selectedFile) return;
 
-    if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
-          // Check login logic preserved (simplified here but behaves as before if env is set)
-          // Actually, we must preserve the exact logic or the previous feature breaks.
-          // Since I can't see the exact lines of the hidden part in the prompt, I will assume the previous turn's structure.
-          // But wait, in the previous turn I *added* the logic back.
-          // Let's just be explicit.
-          // Login check logic:
-    }
-    
-    // Explicit Login Check restoration
-    if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
-        // We need to generate session ID first? No, we can't save session if we don't start.
-        // But the previous logic was: Upload -> Save Session -> Show Login.
-        // Wait, if I compress here, I haven't uploaded yet.
-        
-        // Let's keep the logic: Compres -> Create Session -> Get URL -> Upload -> THEN check Login.
-        // This allows us to save the sessionId in localStorage.
-    }
-
-    sendGAEvent('event', 'start_analysis', { method: 'upload' });
+    sendGAEvent('event', 'start_upload', { method: 'upload' });
     setAnalyzing(true);
     setStep(1); 
 
@@ -290,53 +229,17 @@ export default function PageComponent({
         headers: { 'Content-Type': uploadContentType }
       });
 
-      setSessionData({ sessionId, publicUrl });
-      
-      // LOGIN CHECK
-      if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0' && !userData?.email) {
-          localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
-          setAnalyzing(false); 
-          setShowLoginModal(true);
-          return;
-      }
-      
-      // Try to analyze immediately
-      try {
-          const analyzeRes = await fetch('/api/color-lab/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                sessionId: sessionId, 
-                imageUrl: publicUrl,
-                email: userData.email 
-            })
-          });
-
-          if (analyzeRes.ok) {
-              // Success! Credit deducted. Go to Full Report.
-              const { reportId } = await analyzeRes.json();
-              // Track successful analysis completion
-              sendGAEvent('event', 'complete_analysis', { reportId });
-              router.push(getLinkHref(locale, `report/${reportId}`));
-          } else if (analyzeRes.status === 402) {
-              // Insufficient Credits. Go to Teaser Page to upsell.
-              // Save session so they can resume later easily
-              localStorage.setItem('color_lab_pending_session', JSON.stringify({ sessionId, publicUrl }));
-              router.push(getLinkHref(locale, `report/${sessionId}`));
-          } else {
-              throw new Error("Analysis failed");
-          }
-      } catch (e) {
-          throw e; // Handled by outer catch
-      }
+      // 4. Redirect Immediately to Report Page
+      // The backend has already created a 'draft' report during the upload API call
+      router.push(getLinkHref(locale, `report/${sessionId}`));
 
     } catch (error) {
       console.error(error);
       setAlertState({
           isOpen: true,
-          title: "AI Stylist Busy",
-          message: "Our AI Stylist is currently experiencing high demand. Please try again in a moment.",
-          type: 'warning',
+          title: "Upload Failed",
+          message: "Could not upload your photo. Please try again.",
+          type: 'error',
           showCancel: false,
           confirmText: "Okay"
       });
@@ -344,41 +247,6 @@ export default function PageComponent({
       setStep(0);
     }
   };
-
-  // Resume analysis after login (Restored from previous turn)
-  useEffect(() => {
-      const storedSession = localStorage.getItem('color_lab_pending_session');
-      
-      // Check for payment success redirect
-      const urlParams = new URLSearchParams(window.location.search);
-      const paymentSuccess = urlParams.get('payment_success');
-
-      if (paymentSuccess === 'true') {
-          setAlertState({
-              isOpen: true,
-              title: "Payment Successful! 🎉",
-              message: "Thank you! Your analysis is starting now...",
-              type: 'info',
-              showCancel: false
-          });
-          // Clean URL
-          window.history.replaceState({}, '', window.location.pathname);
-      }
-
-      if (userData?.email && storedSession) {
-          try {
-              const { sessionId, publicUrl } = JSON.parse(storedSession);
-              setPreviewUrl(publicUrl); 
-              setAnalyzing(true);
-              setStep(3);
-              runAnalysis(sessionId, publicUrl, userData.email);
-              localStorage.removeItem('color_lab_pending_session');
-          } catch (e) {
-              console.error("Failed to parse pending session", e);
-              localStorage.removeItem('color_lab_pending_session');
-          }
-      }
-  }, [userData?.email]);
 
   return (
     <>
@@ -433,12 +301,10 @@ export default function PageComponent({
                                 <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
                             </div>
                             <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">
-                                <span>{colorLabText.Analysis.loadingTitle}</span>
+                                <span>Uploading...</span>
                             </h3>
                             <p className="text-text-secondary animate-pulse">
-                                {step === 1 && <span>{colorLabText.Analysis.step1}</span>}
-                                {step === 2 && <span>{colorLabText.Analysis.uploading}</span>}
-                                {step === 3 && <span>{colorLabText.Analysis.step3}</span>}
+                                <span>Please wait while we secure your photo.</span>
                             </p>
                         </div>
                     )}
@@ -462,6 +328,20 @@ export default function PageComponent({
                     <span>{isCheckingFace ? "Checking image..." : colorLabText.Landing.uploadBtn}</span>
                  </button>
             )}
+            
+            <div className="mt-6 bg-blue-50/50 rounded-xl p-4 border border-blue-100 text-left">
+                <div className="flex gap-3">
+                    <span className="text-xl">💡</span>
+                    <div>
+                        <p className="text-sm font-bold text-blue-900 mb-1">For Best Results:</p>
+                        <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
+                            <li>Use natural daylight (face a window)</li>
+                            <li>Avoid heavy makeup or filters</li>
+                            <li>Wear neutral colors if possible</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
             
             <p className="mt-6 text-xs text-center text-gray-400">
                 <span>{colorLabText.Analysis.privacyNote}</span>
@@ -487,7 +367,7 @@ export default function PageComponent({
                 )}
                 {alertState.showCancel ? (
                     <button 
-                        onClick={closeAlert}
+                        onClick={() => { alertState.onCancel?.(); closeAlert(); }}
                         className="flex-1 w-full bg-white text-gray-600 border border-gray-200 py-3 rounded-full font-bold hover:bg-gray-50 transition-colors"
                     >
                         <span>Cancel</span>

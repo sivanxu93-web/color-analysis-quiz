@@ -48,13 +48,23 @@ export const checkIpLimit = async (ip: string, limit: number = 5, hours: number 
 
 export const saveColorLabReport = async (
   sessionId: string,
-  season: string,
-  payload: ColorLabReport,
+  season: string | null,
+  payload: ColorLabReport | null,
+  status: string = 'completed',
+  inputImageUrl: string | null = null
 ) => {
   const db = getDb();
   await db.query(
-    "insert into color_lab_reports(session_id, season, payload) values($1,$2,$3) on conflict (session_id) do update set season = excluded.season, payload = excluded.payload, created_at = now()",
-    [sessionId, season, payload],
+    `insert into color_lab_reports(session_id, season, payload, status, input_image_url) 
+     values($1,$2,$3,$4,$5) 
+     on conflict (session_id) 
+     do update set 
+       season = excluded.season, 
+       payload = excluded.payload, 
+       status = excluded.status,
+       input_image_url = COALESCE(excluded.input_image_url, color_lab_reports.input_image_url),
+       created_at = now()`,
+    [sessionId, season, payload, status, inputImageUrl],
   );
 };
 
@@ -62,6 +72,7 @@ export const getColorLabReport = async (
   sessionId: string,
 ): Promise<{ 
     report: ColorLabReport | null; 
+    status: string; // Add status
     rating?: string;
     ownerEmail?: string;
     imageUrl: string | null;
@@ -71,7 +82,7 @@ export const getColorLabReport = async (
   
   // 1. Get Session & Report (Left Join to allow missing report)
   const sessionRes = await db.query(
-    `SELECT s.email as owner_email, r.payload, r.rating
+    `SELECT s.email as owner_email, r.payload, r.rating, r.status, r.input_image_url
      FROM color_lab_sessions s
      LEFT JOIN color_lab_reports r ON s.id = r.session_id
      WHERE s.id = $1
@@ -91,12 +102,12 @@ export const getColorLabReport = async (
     [sessionId]
   );
 
-  let userImageUrl = null;
+  let userImageUrl = sessionRow.input_image_url || null; // Prefer report record
   let bestDraping = null;
   let worstDraping = null;
 
   imagesRes.rows.forEach((row: any) => {
-      if (row.image_type === 'user_upload' || !row.image_type) {
+      if ((row.image_type === 'user_upload' || !row.image_type) && !userImageUrl) {
           userImageUrl = row.url;
       } else if (row.image_type === 'best_draping') {
           bestDraping = row.url;
@@ -107,6 +118,7 @@ export const getColorLabReport = async (
 
   return {
     report: sessionRow.payload as ColorLabReport | null,
+    status: sessionRow.status || (sessionRow.payload ? 'completed' : 'draft'), // Fallback for old records or missing report (virtual draft)
     rating: sessionRow.rating,
     ownerEmail: sessionRow.owner_email,
     imageUrl: userImageUrl,
@@ -115,6 +127,40 @@ export const getColorLabReport = async (
         worst: worstDraping
     }
   };
+};
+
+export const getColorLabReportsByEmail = async (email: string) => {
+  const db = getDb();
+  
+  // Get all sessions for this email, joined with report status
+  // We want to show:
+  // 1. Completed reports (status='completed')
+  // 2. Draft reports (status='draft' or no report record yet but session exists?)
+  // Actually our new flow creates a report record immediately.
+  
+  const query = `
+    SELECT 
+      s.id as session_id,
+      s.created_at,
+      r.status,
+      r.season,
+      r.input_image_url,
+      (SELECT url FROM color_lab_images WHERE session_id = s.id AND (image_type = 'user_upload' OR image_type IS NULL) LIMIT 1) as backup_image_url
+    FROM color_lab_sessions s
+    LEFT JOIN color_lab_reports r ON s.id = r.session_id
+    WHERE s.email = $1
+    ORDER BY s.created_at DESC
+  `;
+  
+  const res = await db.query(query, [email]);
+  
+  return res.rows.map((row: any) => ({
+      sessionId: row.session_id,
+      createdAt: row.created_at,
+      status: row.status || 'draft', // If no report record, it's effectively a draft/created session
+      season: row.season,
+      imageUrl: row.input_image_url || row.backup_image_url
+  }));
 };
 
 export const addToColorLabWaitlist = async (params: {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { R2, r2Bucket } from "~/libs/R2";
 import { v4 as uuidv4 } from 'uuid';
 import { getDb } from "~/libs/db";
+import { saveColorLabReport } from "~/servers/colorLab";
 
 export async function POST(req: NextRequest) {
   try {
@@ -36,6 +37,15 @@ export async function POST(req: NextRequest) {
     await db.query(
         "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
         [sessionId, publicUrl, 'user_upload']
+    );
+
+    // Create Draft Report Immediately
+    await saveColorLabReport(
+        sessionId,
+        null,
+        null,
+        'draft',
+        publicUrl
     );
 
     return NextResponse.json({ uploadUrl, key, publicUrl });

@@ -7,10 +7,12 @@ import { useState, useEffect, useRef } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import { useCommonContext } from '~/context/common-context';
 import { useRouter } from 'next/navigation';
+import PricingModal from '~/components/PricingModal';
 
 export default function PageComponent({
   locale,
   report,
+  status: initialStatus,
   userImage,
   colorLabText,
   sessionId,
@@ -20,6 +22,7 @@ export default function PageComponent({
 }: {
   locale: string;
   report: any; 
+  status: string;
   userImage: string | null;
   colorLabText: any;
   sessionId?: string;
@@ -29,15 +32,13 @@ export default function PageComponent({
 }) {
   const { userData, setShowLoginModal, setShowPricingModal } = useCommonContext();
   const router = useRouter();
-  // const searchParams = useSearchParams(); // Removed
-  // const autoUnlock = searchParams.get('auto') === '1'; // Removed
   
+  const [status, setStatus] = useState(initialStatus);
   const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
   const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [drapingError, setDrapingError] = useState<string | null>(null);
-  const [isUnlocking, setIsUnlocking] = useState(false);
-  // const hasAutoUnlocked = useRef(false); // Removed
+  const [generationError, setGenerationError] = useState<string | null>(null);
   
   // Feedback State
   const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
@@ -53,86 +54,34 @@ export default function PageComponent({
     "Consulting the AI stylist...",
   ];
 
-  // Auto-Unlock removed. Analysis page handles it.
-
+  // Sync status when server props update (after router.refresh)
   useEffect(() => {
-    if (!report) return; // Skip observer if report is null (Teaser mode)
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-            if (entry.target.id === 'main-feedback') {
-                setIsMainFeedbackVisible(entry.isIntersecting);
-            }
-            if (entry.target.id === 'palette' && entry.isIntersecting) {
-                setHasSeenContent(true);
-            }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    
-    const mainFeedback = document.getElementById('main-feedback');
-    const palette = document.getElementById('palette');
-    
-    if (mainFeedback) observer.observe(mainFeedback);
-    if (palette) observer.observe(palette);
+      if (initialStatus && initialStatus !== status) {
+          setStatus(initialStatus);
+      }
+  }, [initialStatus]);
 
-    return () => {
-      observer.disconnect();
-    };
-  }, [report]);
-
+  // 1. Auto-Trigger Generation Logic
   useEffect(() => {
-      if (report?.season) {
-          sendGAEvent('event', 'view_report', { season: report.season });
-      }
-  }, [report]);
+      if (!userData?.email) return;
+      const urlParams = new URLSearchParams(window.location.search);
+      const paymentSuccess = urlParams.get('payment_success');
 
-  useEffect(() => {
-    if (report && !drapingImages.best && !drapingError) {
-      const interval = setInterval(() => {
-        setCurrentTipIndex((prev) => (prev + 1) % LOADING_TIPS.length);
-      }, 2500);
-      return () => clearInterval(interval);
-    }
-  }, [report, drapingImages.best, drapingError]);
+      if (paymentSuccess === 'true') {
+          window.history.replaceState({}, '', window.location.pathname);
+          if (status === 'draft') {
+              triggerGeneration();
+          }
+      } 
+  }, [status, userData?.email]);
 
-  const { 
-      season, headline, description, characteristics, 
-      palette, makeup, makeup_recommendations, styling, 
-      worst_colors, virtual_draping_prompts,
-      celebrities, fashion_guide, hair_color_recommendations
-  } = report || {};
+  const triggerGeneration = async () => {
+      if (!sessionId || !userData?.email) return;
+      
+      setStatus('processing');
+      setGenerationError(null);
+      sendGAEvent('event', 'start_analysis', { sessionId });
 
-  const handleFeedback = async (rating: 'good' | 'bad') => {
-      setFeedbackStatus(rating);
-      if (rating === 'good') {
-          try {
-            await fetch('/api/color-lab/feedback', {
-                method: 'POST',
-                body: JSON.stringify({ sessionId, rating: 'good' })
-            });
-          } catch(e) { console.error(e) }
-      }
-  };
-
-  const submitComment = async () => {
-      try {
-        await fetch('/api/color-lab/feedback', {
-            method: 'POST',
-            body: JSON.stringify({ sessionId, rating: 'bad', comment: feedbackComment })
-        });
-      } catch(e) { console.error(e) }
-      setFeedbackStatus('submitted');
-  };
-
-  const handleUnlock = async (isAuto = false) => {
-      if (!userData?.email) {
-          if (!isAuto) setShowLoginModal(true);
-          return;
-      }
-
-      setIsUnlocking(true);
       try {
           const res = await fetch('/api/color-lab/analyze', {
               method: 'POST',
@@ -145,34 +94,42 @@ export default function PageComponent({
           });
 
           if (res.status === 402) {
-              if (isAuto) {
-                  // If auto-unlock failed due to no credits, just stop spinning.
-                  // User stays on Teaser page and sees "Unlock" button.
-                  setIsUnlocking(false);
-              } else {
-                  // If manual click failed, redirect to pay
-                  router.push(getLinkHref(locale, 'pricing'));
-                  setIsUnlocking(false);
-              }
+              console.log("Not enough credits, opening pricing modal...");
+              setStatus('draft');
+              setShowPricingModal(true);
               return;
           }
 
           if (res.ok) {
-              router.refresh();
+              const data = await res.json();
+              router.refresh(); 
           } else {
-              if (!isAuto) alert("Analysis failed. Please try again.");
-              setIsUnlocking(false);
+              setGenerationError("Analysis failed. Please try again.");
           }
       } catch (e) {
           console.error(e);
-          setIsUnlocking(false);
+          setGenerationError("Connection error. Please check your network.");
       }
   };
 
+  const handleUnlockClick = () => {
+      if (!userData?.user_id) {
+          setShowLoginModal(true);
+      } else {
+          triggerGeneration();
+      }
+  };
+
+  // 2. Draping Logic
+  useEffect(() => {
+      if (status === 'completed' && report && !drapingImages.best && !isGeneratingDraping && sessionId && !drapingError) {
+          handleGenerateDraping();
+      }
+  }, [status, sessionId, report]); 
+
   const handleGenerateDraping = async () => {
-    if (!sessionId || !virtual_draping_prompts) return;
+    if (!sessionId || !report?.virtual_draping_prompts) return;
     setIsGeneratingDraping(true);
-    setDrapingError(null);
     
     try {
         const [bestRes, worstRes] = await Promise.all([
@@ -181,8 +138,8 @@ export default function PageComponent({
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ 
                     sessionId, 
-                    prompt: virtual_draping_prompts.best_color_prompt, 
-                    makeup_prompt: virtual_draping_prompts.best_makeup_prompt,
+                    prompt: report.virtual_draping_prompts.best_color_prompt, 
+                    makeup_prompt: report.virtual_draping_prompts.best_makeup_prompt,
                     type: 'best' 
                 })
             }),
@@ -191,49 +148,49 @@ export default function PageComponent({
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ 
                     sessionId, 
-                    prompt: virtual_draping_prompts.worst_color_prompt, 
-                    makeup_prompt: virtual_draping_prompts.worst_makeup_prompt,
+                    prompt: report.virtual_draping_prompts.worst_color_prompt, 
+                    makeup_prompt: report.virtual_draping_prompts.worst_makeup_prompt,
                     type: 'worst' 
                 })
             })
         ]);
 
-        if (!bestRes.ok || !worstRes.ok) {
-            throw new Error("AI Service is busy");
+        if (bestRes.ok && worstRes.ok) {
+            const bestData = await bestRes.json();
+            const worstData = await worstRes.json();
+            setDrapingImages({
+                best: bestData.imageUrl,
+                worst: worstData.imageUrl
+            });
         }
-
-        const bestData = await bestRes.json();
-        const worstData = await worstRes.json();
-
-        setDrapingImages({
-            best: bestData.imageUrl,
-            worst: worstData.imageUrl
-        });
-
     } catch (error) {
-        console.error("Failed to generate draping images", error);
-        setDrapingError("Our AI stylist is currently in high demand. Please try again.");
+        console.error("Draping error", error);
+        setDrapingError("Failed to generate draping.");
     } finally {
         setIsGeneratingDraping(false);
     }
   };
 
-  // Auto-generate on mount if images are missing
-  useEffect(() => {
-      if (report && !drapingImages.best && !isGeneratingDraping && sessionId && !drapingError) {
-          handleGenerateDraping();
+  const handleFeedback = async (rating: 'good' | 'bad') => {
+      setFeedbackStatus(rating);
+      if (rating === 'good') {
+          try { await fetch('/api/color-lab/feedback', { method: 'POST', body: JSON.stringify({ sessionId, rating: 'good' }) }); } catch(e) {}
       }
-  }, [sessionId, report]); 
+  };
+  const submitComment = async () => {
+      try { await fetch('/api/color-lab/feedback', { method: 'POST', body: JSON.stringify({ sessionId, rating: 'bad', comment: feedbackComment }) }); } catch(e) {}
+      setFeedbackStatus('submitted');
+  };
 
-  // MOCK REPORT for Soft Paywall
+  // MOCK DATA for Draft View
   const MOCK_REPORT = {
       season: "Deep Winter",
       headline: "The Dark Romantic",
       description: "Your primary characteristic is Deep, and your secondary characteristic is Cool. You shine in colors that are dark, vivid, and cool-toned. Your high contrast features require equally high contrast outfits to look your best.",
       characteristics: {
-          skin: "Cool Undertone (Analyzed)",
-          eyes: "High Contrast (Analyzed)",
-          hair: "Deep Tone (Analyzed)"
+          skin: "Cool Undertone",
+          eyes: "High Contrast",
+          hair: "Deep Tone"
       },
       palette: {
           power: [
@@ -251,7 +208,7 @@ export default function PageComponent({
           ]
       },
       styling: {
-          metals: ["Silver", "Platinum", "White Gold"],
+          metals: ["Silver", "Platinum"],
           keywords: ["Dramatic", "Bold", "Sharp"],
       },
       worst_colors: [
@@ -265,28 +222,75 @@ export default function PageComponent({
       celebrities: ["Anne Hathaway", "Kendall Jenner", "Lucy Liu"]
   };
 
-  const isLocked = !report;
+  const isLocked = status === 'draft';
   const displayReport = report || MOCK_REPORT;
-  
-  // Use userImage for mock draping if locked
   const displayDraping = isLocked ? { best: userImage, worst: userImage } : drapingImages;
 
-  // Destructure displayReport properly (moved down here)
   const { 
       season: dSeason, headline: dHeadline, description: dDescription, characteristics: dCharacteristics, 
       palette: dPalette, makeup_recommendations: dMakeup, styling: dStyling, 
       worst_colors: dWorst, celebrities: dCelebs, hair_color_recommendations: dHair
   } = displayReport;
 
+  // Loading View
+  useEffect(() => {
+    if (status === 'processing') {
+      const interval = setInterval(() => {
+        setCurrentTipIndex((prev) => (prev + 1) % LOADING_TIPS.length);
+      }, 2500);
+      return () => clearInterval(interval);
+    }
+  }, [status]);
+
+  if (status === 'processing') {
+      return (
+        <>
+          <Header locale={locale} page={'report'} />
+          <div className="flex min-h-screen flex-col items-center justify-center bg-[#FFFBF7] p-4">
+             <div className="relative w-full max-w-lg aspect-square flex flex-col items-center justify-center">
+                <div className="absolute inset-0 bg-primary/5 rounded-full blur-3xl animate-pulse"></div>
+                <div className="relative z-10 text-center">
+                    {generationError ? (
+                        <>
+                            <div className="text-5xl mb-6 opacity-80">🤔</div>
+                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-3">Stylist Interrupted</h2>
+                            <p className="text-gray-500 font-medium mb-8 max-w-xs mx-auto leading-relaxed">
+                                We hit a small snag connecting to our AI stylist. Don&apos;t worry, your credits are safe.
+                            </p>
+                            <button 
+                                onClick={triggerGeneration}
+                                className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg transform hover:-translate-y-0.5"
+                            >
+                                Resume Analysis
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-8"></div>
+                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">Creating Your Report...</h2>
+                            <p className="text-gray-500 font-medium animate-pulse transition-all duration-500 min-h-[24px]">
+                                {LOADING_TIPS[currentTipIndex]}
+                            </p>
+                        </>
+                    )}
+                </div>
+             </div>
+          </div>
+          <Footer locale={locale} page={'report'} />
+        </>
+      );
+  }
+
   return (
     <>
       <Header locale={locale} page={'report'} />
+      <PricingModal locale={locale} page={'report'} />
 
-      {/* Soft Paywall Overlay */}
+      {/* PAYWALL OVERLAY */}
       {isLocked && (
-         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 h-screen w-screen overflow-hidden">
-             {/* Unlock Card */}
-             <div className="relative bg-white/90 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-white/50 max-w-lg w-full text-center animate-fade-in-up">
+         <div className="fixed inset-0 top-[60px] md:top-[72px] z-40 flex items-center justify-center p-4 w-full overflow-hidden">
+             <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+             <div className="relative bg-white/95 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-white/50 max-w-lg w-full text-center animate-fade-in-up">
                  <div className="relative inline-block mb-8">
                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
                      {userImage ? (
@@ -299,36 +303,28 @@ export default function PageComponent({
                      </div>
                  </div>
 
-                 <h1 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-3">Analysis Complete!</h1>
+                 <h1 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-3">Analysis Ready!</h1>
                  <p className="text-gray-500 mb-8 leading-relaxed">
-                     We have identified your seasonal palette, best colors, and styling recommendations.
+                     Your personalized color season, best matches, and styling guide are ready to be unlocked.
                  </p>
 
                  <button 
-                    onClick={() => handleUnlock(false)}
-                    disabled={isUnlocking}
-                    className="group w-full bg-[#1A1A2E] text-white py-4 rounded-full font-bold text-lg shadow-xl hover:bg-primary transition-all transform hover:-translate-y-1 active:translate-y-0 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                    onClick={handleUnlockClick}
+                    className="group w-full bg-[#1A1A2E] text-white py-4 rounded-full font-bold text-lg shadow-xl hover:bg-primary transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
                  >
-                    {isUnlocking ? (
-                        <>
-                            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                            <span>Unlocking...</span>
-                        </>
-                    ) : (
-                        <>
-                            <span>Unlock My Report</span>
-                        </>
-                    )}
+                    <span>Unlock Full Report</span>
+                    <span className="bg-white/20 px-3 py-0.5 rounded-full text-xs font-medium tracking-wide uppercase">1 Credit</span>
                  </button>
                  
                  <p className="mt-6 text-xs text-gray-400">
-                    Secure & Private • 100% Satisfaction Guarantee
+                    One-time payment • Secure via Creem
                  </p>
              </div>
          </div>
       )}
 
-      <main className={`min-h-screen bg-[#FFFBF7] font-sans text-[#1A1A2E] pb-20 scroll-smooth transition-all duration-1000 ${isLocked ? 'blur-xl opacity-60 pointer-events-none select-none overflow-hidden h-screen' : ''}`}>
+      {/* Main Content (Blurred if Locked) */}
+      <main className={`min-h-screen bg-[#FFFBF7] font-sans text-[#1A1A2E] pb-20 scroll-smooth transition-all duration-1000 ${isLocked ? 'blur-xl opacity-60 pointer-events-none select-none overflow-hidden h-screen fixed w-full' : ''}`}>
 
         {/* Sticky Nav */}
         <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#FFFBF7]/95 backdrop-blur-md border-b border-[#E8E1D9] py-3 overflow-x-auto no-scrollbar shadow-sm transition-all">

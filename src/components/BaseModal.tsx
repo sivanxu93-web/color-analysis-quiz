@@ -9,9 +9,10 @@ interface BaseModalProps {
   title?: string;
   children: ReactNode;
   icon?: ReactNode;
+  maxWidth?: string;
 }
 
-export default function BaseModal({ isOpen, onClose, title, children, icon }: BaseModalProps) {
+export default function BaseModal({ isOpen, onClose, title, children, icon, maxWidth = "sm:max-w-md" }: BaseModalProps) {
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -38,7 +39,7 @@ export default function BaseModal({ isOpen, onClose, title, children, icon }: Ba
               leaveFrom="opacity-100 translate-y-0 sm:scale-100"
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
-              <Dialog.Panel className="relative transform overflow-hidden rounded-[2rem] bg-[#FFFBF7] px-8 py-10 text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-[#E8E1D9]">
+              <Dialog.Panel className={`relative transform overflow-hidden rounded-[2rem] bg-[#FFFBF7] px-8 py-10 text-left shadow-2xl transition-all sm:my-8 sm:w-full ${maxWidth} border border-[#E8E1D9]`}>
                 <div className="absolute right-6 top-6">
                   <button
                     type="button"

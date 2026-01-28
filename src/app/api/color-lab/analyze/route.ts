@@ -6,7 +6,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export const maxDuration = 60; // Allow longer timeout for AI analysis
 
 const SYSTEM_PROMPT = `
-YouYou are a world-renowned Celebrity Fashion Stylist and Color Scientist (think Vogue Editor-in-Chief meets Color Theory Professor). 
+You are a world-renowned Celebrity Fashion Stylist and Color Scientist (think Vogue Editor-in-Chief meets Color Theory Professor). 
 Your task is to provide a life-changing, hyper-personalized Seasonal Color Analysis for the user.
 
 **YOUR GOAL:**
@@ -92,9 +92,6 @@ export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
 
-    // REMOVED: IP Limit Check
-    // const allowed = await checkIpLimit(ip, 5, 24);
-
     let body;
     try {
       body = await req.json();
@@ -155,9 +152,6 @@ export async function POST(req: NextRequest) {
         }
     }
 
-    // 3. Note: Deduct Credit will happen AFTER successful analysis to prevent charging for failures.
-
-
     // If email is provided (from the lead magnet modal), save it!
     if (email) {
       await db.query("update color_lab_sessions set email = $1 where id = $2", [
@@ -172,7 +166,6 @@ export async function POST(req: NextRequest) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    console.log("apiKey", apiKey);
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured");
     }
@@ -193,8 +186,11 @@ export async function POST(req: NextRequest) {
     // Call Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.5-pro",
-      generationConfig: { responseMimeType: "application/json" },
+      model: "gemini-3-pro-preview",
+      generationConfig: { 
+          responseMimeType: "application/json",
+          temperature: 0.0 // Reduce randomness
+      },
     });
 
     const result = await model.generateContent([
@@ -217,8 +213,14 @@ export async function POST(req: NextRequest) {
       throw new Error("Invalid JSON response from AI");
     }
 
-    // Save report to DB
-    await saveColorLabReport(sessionId, analysisResult.season, analysisResult);
+    // Save report to DB with 'completed' status
+    await saveColorLabReport(
+        sessionId, 
+        analysisResult.season, 
+        analysisResult, 
+        'completed', 
+        imageUrl
+    );
 
     // Update session status
     await db.query("update color_lab_sessions set status = $1 where id = $2", [

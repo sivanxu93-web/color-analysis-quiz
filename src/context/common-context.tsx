@@ -1,10 +1,9 @@
 'use client';
-import {createContext, useContext, useState} from "react";
+import {createContext, useContext, useState, useEffect} from "react";
 import {useSession} from "next-auth/react";
-import {useInterval} from "ahooks";
-
 
 const CommonContext = createContext(undefined);
+
 export const CommonProvider = ({
                                  children,
                                  commonText,
@@ -15,32 +14,35 @@ export const CommonProvider = ({
 
   const {data: session, status} = useSession();
   const [userData, setUserData] = useState({});
-  const [intervalUserData, setIntervalUserData] = useState(1000);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showGeneratingModal, setShowGeneratingModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
+  // Sync userData with Session
+  useEffect(() => {
+    // @ts-ignore
+    const sessionUserId = session?.user?.user_id || session?.user?.id;
 
-  useInterval(() => {
-    init();
-  }, intervalUserData);
-
-  async function init() {
-    if (status == 'authenticated') {
-      const userData = {
-        // @ts-ignore
-        user_id: session?.user?.user_id,
+    if (status === 'authenticated' && sessionUserId) {
+      const newUserData = {
+        user_id: sessionUserId,
         name: session?.user?.name,
         email: session?.user?.email,
         image: session?.user?.image,
-      }
-      setUserData(userData);
-      setShowLoginModal(false);
-      setIntervalUserData(undefined);
+      };
+      
+      // Only update if data actually changed to avoid infinite loops (optional but good practice)
+      // For now, just set it.
+      setUserData(newUserData);
+      
+      // Auto-close login modal if it was open
+      if (showLoginModal) setShowLoginModal(false);
+    } else if (status === 'unauthenticated') {
+        setUserData({});
     }
-  }
+  }, [session, status]);
 
   return (
     <CommonContext.Provider

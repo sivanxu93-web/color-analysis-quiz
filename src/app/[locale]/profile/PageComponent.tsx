@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
 import { useRouter } from 'next/navigation';
-
 import { useSession } from "next-auth/react";
 
 export default function PageComponent({
@@ -24,16 +23,15 @@ export default function PageComponent({
   const router = useRouter();
 
   useEffect(() => {
-    // Only redirect if explicitly unauthenticated
     if (status === 'unauthenticated' && process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN !== '0') {
         router.push(getLinkHref(locale, ''));
     }
 
-    if (status === 'authenticated' && userData?.user_id) {
+    if (status === 'authenticated' && userData?.email) {
         fetchHistory();
         fetchCredits();
     }
-  }, [status, userData?.user_id]);
+  }, [status, userData?.email]);
 
   const fetchHistory = async () => {
     try {
@@ -118,38 +116,53 @@ export default function PageComponent({
                     </div>
                 ) : history.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {history.map((item) => (
-                            <Link 
-                                key={item.session_id} 
-                                href={getLinkHref(locale, `report/${item.session_id}`)}
-                                className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1"
-                            >
-                                <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
-                                    {item.image_url ? (
-                                        <img src={item.image_url} alt={item.season} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-gray-300">No Image</div>
-                                    )}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
-                                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                                        <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">
-                                            {new Date(item.created_at).toLocaleDateString()}
-                                        </p>
-                                        <h3 className="text-2xl font-serif font-bold leading-tight">
-                                            {item.season}
-                                        </h3>
+                        {history.map((item) => {
+                            const isDraft = item.status === 'draft';
+                            return (
+                                <Link 
+                                    key={item.sessionId} 
+                                    href={getLinkHref(locale, `report/${item.sessionId}`)}
+                                    className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1 relative"
+                                >
+                                    <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
+                                        {item.imageUrl ? (
+                                            <img src={item.imageUrl} alt="Analysis" className={`w-full h-full object-cover transition-transform duration-700 ${isDraft ? 'blur-sm grayscale group-hover:grayscale-0 group-hover:blur-0' : 'group-hover:scale-105'}`} />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-gray-300">No Image</div>
+                                        )}
+                                        
+                                        <div className={`absolute inset-0 bg-gradient-to-t opacity-60 transition-opacity ${isDraft ? 'from-black/80 to-black/20' : 'from-black/60 to-transparent group-hover:opacity-40'}`}></div>
+                                        
+                                        {isDraft && (
+                                            <div className="absolute inset-0 flex items-center justify-center">
+                                                <div className="bg-white/20 backdrop-blur-md border border-white/30 px-4 py-2 rounded-full text-white font-bold text-sm flex items-center gap-2 shadow-lg">
+                                                    <span>🔒</span> Unlock Report
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                                            <p className="text-xs font-bold uppercase tracking-widest mb-1 opacity-80">
+                                                {new Date(item.createdAt).toLocaleDateString()}
+                                            </p>
+                                            <h3 className="text-2xl font-serif font-bold leading-tight">
+                                                {isDraft ? "Analysis Ready" : (item.season || "Unknown Season")}
+                                            </h3>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="p-4 bg-white">
-                                    <p className="text-sm text-gray-500 line-clamp-2">
-                                        {item.headline || "Check out your personalized color report."}
-                                    </p>
-                                    <p className="mt-3 text-primary text-sm font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                                        View Report →
-                                    </p>
-                                </div>
-                            </Link>
-                        ))}
+                                    <div className="p-4 bg-white">
+                                        <p className="text-sm text-gray-500 line-clamp-2">
+                                            {isDraft 
+                                                ? "Your personalized report is waiting to be unlocked. Click to view results." 
+                                                : "View your full color analysis report and styling guide."}
+                                        </p>
+                                        <p className={`mt-3 text-sm font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 ${isDraft ? 'text-[#1A1A2E]' : 'text-primary'}`}>
+                                            {isDraft ? "Unlock Now →" : "View Report →"}
+                                        </p>
+                                    </div>
+                                </Link>
+                            );
+                        })}
                     </div>
                 ) : (
                     <div className="text-center py-20 bg-white rounded-[2rem] border border-dashed border-gray-200">

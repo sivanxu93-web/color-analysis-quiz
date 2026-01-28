@@ -3,9 +3,7 @@ import {addToColorLabWaitlist} from "~/servers/colorLab";
 
 export async function POST(
   req: NextRequest,
-  {params}: { params: { locale: string } },
 ) {
-  const {locale} = params;
   const body = await req.json().catch(() => ({}));
   const email = typeof body.email === "string" ? body.email.trim() : "";
   const interest =
@@ -22,7 +20,7 @@ export async function POST(
 
   await addToColorLabWaitlist({
     email,
-    locale,
+    locale: 'en', // Default to 'en' or extract from body if needed
     interest: interest || undefined,
     price_range: price_range || undefined,
   });

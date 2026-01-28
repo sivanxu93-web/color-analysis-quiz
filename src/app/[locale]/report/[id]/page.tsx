@@ -32,6 +32,7 @@ export default async function ReportPage({
     <PageComponent 
         locale={locale} 
         report={data.report} 
+        status={data.status || (data.report ? 'completed' : 'draft')} 
         userImage={data.imageUrl}
         drapingImages={data.drapingImages}
         colorLabText={colorLabText} 
