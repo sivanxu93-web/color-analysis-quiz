@@ -6,11 +6,11 @@ export const languages = [
     lang: "en",
     language: "English",
   },
-  {
-    code: "zh-CN",
-    lang: "zh",
-    language: "简体中文",
-  },
+  // {
+  //   code: "zh-CN",
+  //   lang: "zh",
+  //   language: "简体中文",
+  // },
 ];
 
 export const getLanguageByLang = (lang) => {
