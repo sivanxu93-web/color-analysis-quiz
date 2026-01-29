@@ -63,9 +63,19 @@ export default function PageComponent({
       }
   }, [initialStatus]);
 
-  // 1. Auto-Trigger Generation Logic
+  // 1. Auto-Trigger Generation & Session Claim
   useEffect(() => {
       if (!userData?.email) return;
+
+      // Silent Claim: Link this session to the user's email to prevent orphaned data
+      if (sessionId) {
+          fetch('/api/color-lab/session/claim', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ sessionId, email: userData.email })
+          }).catch(err => console.error("Session claim failed", err));
+      }
+
       const urlParams = new URLSearchParams(window.location.search);
       const paymentSuccess = urlParams.get('payment_success');
 
@@ -75,7 +85,7 @@ export default function PageComponent({
               triggerGeneration();
           }
       } 
-  }, [status, userData?.email]);
+  }, [status, userData?.email, sessionId]);
 
   const triggerGeneration = async () => {
       if (!sessionId || !userData?.email) return;

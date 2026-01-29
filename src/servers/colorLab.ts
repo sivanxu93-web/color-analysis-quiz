@@ -51,20 +51,22 @@ export const saveColorLabReport = async (
   season: string | null,
   payload: ColorLabReport | null,
   status: string = 'completed',
-  inputImageUrl: string | null = null
+  inputImageUrl: string | null = null,
+  imageHash: string | null = null
 ) => {
   const db = getDb();
   await db.query(
-    `insert into color_lab_reports(session_id, season, payload, status, input_image_url) 
-     values($1,$2,$3,$4,$5) 
+    `insert into color_lab_reports(session_id, season, payload, status, input_image_url, image_hash) 
+     values($1,$2,$3,$4,$5,$6) 
      on conflict (session_id) 
      do update set 
        season = excluded.season, 
        payload = excluded.payload, 
        status = excluded.status,
        input_image_url = COALESCE(excluded.input_image_url, color_lab_reports.input_image_url),
+       image_hash = COALESCE(excluded.image_hash, color_lab_reports.image_hash),
        created_at = now()`,
-    [sessionId, season, payload, status, inputImageUrl],
+    [sessionId, season, payload, status, inputImageUrl, imageHash],
   );
 };
 

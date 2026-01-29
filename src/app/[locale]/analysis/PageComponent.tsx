@@ -66,6 +66,15 @@ const compressImage = async (file: File): Promise<{ blob: Blob, width: number, h
     });
 };
 
+// Helper for SHA-256 Hash
+const computeSHA256 = async (file: File | Blob): Promise<string> => {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    return hashHex;
+};
+
 export default function PageComponent({
   locale,
   colorLabText,
@@ -78,6 +87,7 @@ export default function PageComponent({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [analyzing, setAnalyzing] = useState(false);
   const [step, setStep] = useState(0); 
+  const [sessionData, setSessionData] = useState<{sessionId: string, publicUrl: string} | null>(null);
   
   // Face API State
   const [faceApi, setFaceApi] = useState<any>(null);
@@ -215,79 +225,93 @@ export default function PageComponent({
     }
   };
 
-  // Step 1: Upload Image & Redirect to Report Page (Draft Mode)
-  const startAnalysis = async () => {
-    if (!selectedFile) return;
-
-    sendGAEvent('event', 'start_upload', { method: 'upload' });
-    setAnalyzing(true);
-    setStep(1); 
-
-    try {
-      // 0. Compress Image
-      let uploadBody: Blob | File = selectedFile;
-      let uploadContentType = selectedFile.type;
-      let uploadFilename = selectedFile.name;
-
+    // Step 1: Upload Image & Redirect to Report Page (Draft Mode)
+    const startAnalysis = async () => {
+      if (!selectedFile) return;
+  
+      sendGAEvent('event', 'start_upload', { method: 'upload' });
+      setAnalyzing(true);
+      setStep(1); 
+  
       try {
-          const compressed = await compressImage(selectedFile);
-          uploadBody = compressed.blob;
-          uploadContentType = 'image/jpeg';
-          uploadFilename = selectedFile.name.replace(/\.[^/.]+$/, "") + ".jpg";
-      } catch (e) {
-          console.warn("Compression skipped:", e);
+        // 0. Compress Image
+        let uploadBody: Blob | File = selectedFile;
+        let uploadContentType = selectedFile.type;
+        let uploadFilename = selectedFile.name;
+  
+        try {
+            const compressed = await compressImage(selectedFile);
+            uploadBody = compressed.blob;
+            uploadContentType = 'image/jpeg';
+            uploadFilename = selectedFile.name.replace(/\.[^/.]+$/, "") + ".jpg";
+        } catch (e) {
+            console.warn("Compression skipped:", e);
+        }
+  
+        // Compute Hash for Deduplication
+        const imageHash = await computeSHA256(uploadBody);
+  
+        // 1. Create Session
+        const sessionRes = await fetch('/api/color-lab/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const { sessionId } = await sessionRes.json();
+        if (!sessionId) throw new Error("Failed to create session");
+  
+        // 2. Get Upload URL (or Check Duplicate)
+        const uploadRes = await fetch('/api/color-lab/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              filename: uploadFilename,
+              contentType: uploadContentType,
+              sessionId,
+              imageHash // Send hash to check for duplicates
+          })
+        });
+        const uploadData = await uploadRes.json();
+        
+        if (uploadData.duplicate) {
+            // HIT! Skip upload
+            console.log("Image duplicate found, skipping upload.");
+            setSessionData({ sessionId, publicUrl: uploadData.publicUrl });
+            router.push(getLinkHref(locale, `report/${sessionId}`));
+            return;
+        }
+  
+        const { uploadUrl, publicUrl } = uploadData;
+        if (!uploadUrl) throw new Error("Failed to get upload URL");
+  
+        setStep(2); 
+  
+        // 3. Upload File to R2 (Only if not duplicate)
+        await fetch(uploadUrl, {
+          method: 'PUT',
+          body: uploadBody,
+          headers: { 'Content-Type': uploadContentType }
+        });
+  
+        setSessionData({ sessionId, publicUrl });
+        
+        // 4. Redirect Immediately to Report Page
+        router.push(getLinkHref(locale, `report/${sessionId}`));
+  
+      } catch (error) {
+        console.error(error);
+        setAlertState({
+            isOpen: true,
+            title: "Upload Failed",
+            message: "Could not upload your photo. Please try again.",
+            type: 'error',
+            showCancel: false,
+            confirmText: "Okay"
+        });
+        setAnalyzing(false);
+        setStep(0);
       }
-
-      // 1. Create Session
-      const sessionRes = await fetch('/api/color-lab/session', { 
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({})
-      });
-      const { sessionId } = await sessionRes.json();
-      if (!sessionId) throw new Error("Failed to create session");
-
-      // 2. Get Upload URL
-      const uploadRes = await fetch('/api/color-lab/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            filename: uploadFilename,
-            contentType: uploadContentType,
-            sessionId
-        })
-      });
-      const { uploadUrl, publicUrl } = await uploadRes.json();
-      if (!uploadUrl) throw new Error("Failed to get upload URL");
-
-      setStep(2); 
-
-      // 3. Upload File to R2
-      await fetch(uploadUrl, {
-        method: 'PUT',
-        body: uploadBody,
-        headers: { 'Content-Type': uploadContentType }
-      });
-
-      // 4. Redirect Immediately to Report Page
-      // The backend has already created a 'draft' report during the upload API call
-      router.push(getLinkHref(locale, `report/${sessionId}`));
-
-    } catch (error) {
-      console.error(error);
-      setAlertState({
-          isOpen: true,
-          title: "Upload Failed",
-          message: "Could not upload your photo. Please try again.",
-          type: 'error',
-          showCancel: false,
-          confirmText: "Okay"
-      });
-      setAnalyzing(false);
-      setStep(0);
-    }
-  };
-
+    };
   return (
     <>
       <Header locale={locale} page={'analysis'} />

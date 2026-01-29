@@ -12,12 +12,57 @@ export async function POST(req: NextRequest) {
     } catch(e) {
         return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const { filename, contentType, sessionId } = body;
+    const { filename, contentType, sessionId, imageHash } = body;
 
     if (!filename || !contentType || !sessionId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
+    const db = getDb();
+
+    // 1. Check for Duplicate / Existing Hash
+    if (imageHash) {
+        const existingRes = await db.query(
+            `SELECT * FROM color_lab_reports 
+             WHERE image_hash = $1 AND status = 'completed' AND payload IS NOT NULL 
+             ORDER BY created_at DESC LIMIT 1`,
+            [imageHash]
+        );
+
+        if (existingRes.rows.length > 0) {
+            const existing = existingRes.rows[0];
+            console.log(`Image Hash Hit! Reusing report from session ${existing.session_id}`);
+
+            // Reuse the existing S3/R2 URL if available
+            const reusedUrl = existing.input_image_url;
+
+            // Clone report to new session
+            await saveColorLabReport(
+                sessionId,
+                existing.season,
+                existing.payload,
+                'completed',
+                reusedUrl,
+                imageHash
+            );
+
+            // Also link the image record if we have a URL
+            if (reusedUrl) {
+                await db.query(
+                    "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
+                    [sessionId, reusedUrl, 'user_upload']
+                );
+            }
+
+            return NextResponse.json({ 
+                duplicate: true, 
+                reportId: sessionId,
+                publicUrl: reusedUrl 
+            });
+        }
+    }
+
+    // 2. No Hit - Proceed to Upload
     const fileExtension = filename.split('.').pop();
     const key = `color-lab/${sessionId}/${uuidv4()}.${fileExtension}`;
 
@@ -29,9 +74,6 @@ export async function POST(req: NextRequest) {
     };
 
     const uploadUrl = await R2.getSignedUrlPromise('putObject', params);
-    
-    // Save image record to DB
-    const db = getDb();
     const publicUrl = `${process.env.NEXT_PUBLIC_STORAGE_URL}/${key}`;
 
     await db.query(
@@ -39,13 +81,14 @@ export async function POST(req: NextRequest) {
         [sessionId, publicUrl, 'user_upload']
     );
 
-    // Create Draft Report Immediately
+    // Create Draft Report Immediately (with Hash)
     await saveColorLabReport(
         sessionId,
         null,
         null,
         'draft',
-        publicUrl
+        publicUrl,
+        imageHash || null
     );
 
     return NextResponse.json({ uploadUrl, key, publicUrl });
