@@ -8,6 +8,7 @@ import { sendGAEvent } from '@next/third-parties/google';
 import { useCommonContext } from '~/context/common-context';
 import { useRouter } from 'next/navigation';
 import PricingModal from '~/components/PricingModal';
+import ColorFan from '~/components/ColorFan';
 
 export default function PageComponent({
   locale,
@@ -39,6 +40,7 @@ export default function PageComponent({
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [drapingError, setDrapingError] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
   
   // Feedback State
   const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
@@ -411,6 +413,26 @@ export default function PageComponent({
                 <span className="text-primary font-bold tracking-widest uppercase text-xs">The Transformation</span>
                 <h2 className="text-4xl font-serif font-bold text-[#1A1A2E]">Virtual Draping</h2>
                 <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+                
+                {/* View Mode Toggle */}
+                {!isLocked && (
+                    <div className="flex justify-center mt-6">
+                        <div className="bg-white p-1 rounded-full border border-gray-200 shadow-sm inline-flex">
+                            <button
+                                onClick={() => setViewMode('draping')}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'draping' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                ✨ AI Try-On
+                            </button>
+                            <button
+                                onClick={() => setViewMode('fan')}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'fan' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                            >
+                                🎨 Color Fan
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Draping: If Locked, show mock images. Else show real or loading */}
@@ -427,7 +449,22 @@ export default function PageComponent({
                         </div>
                     </div>
                  </div>
+            ) : viewMode === 'fan' ? (
+                // Color Fan Mode
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+                    <ColorFan 
+                        imageUrl={userImage} 
+                        colors={dPalette?.power || []} 
+                        title="Best Matches" 
+                    />
+                    <ColorFan 
+                        imageUrl={userImage} 
+                        colors={dWorst || []} 
+                        title="Avoid These" 
+                    />
+                </div>
             ) : (
+                // AI Draping Mode (Existing Logic)
                 <>
                 {!displayDraping.best && !drapingError && (
                     <div className="relative w-full max-w-3xl mx-auto aspect-[16/9] md:aspect-[2/1] bg-white/50 rounded-3xl border border-gray-100/50 flex flex-col items-center justify-center overflow-hidden my-12 shadow-sm backdrop-blur-sm">
@@ -610,6 +647,28 @@ export default function PageComponent({
                             </div>
                         ))}
                     </div>
+
+                    {/* Brand Matches Section */}
+                    {(displayReport.makeup?.lips || displayReport.makeup?.blush || displayReport.makeup?.eyes) && (
+                        <div className="mt-10 pt-8 border-t border-gray-100">
+                            <h4 className="font-serif text-xl font-bold mb-6 text-gray-800">Top Brand Picks</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {[
+                                    ...(displayReport.makeup?.lips || []).map((item: any) => ({ ...item, type: 'Lip' })),
+                                    ...(displayReport.makeup?.blush || []).map((item: any) => ({ ...item, type: 'Blush' })),
+                                    ...(displayReport.makeup?.eyes || []).map((item: any) => ({ ...item, type: 'Eye' }))
+                                ].map((item: any, idx: number) => (
+                                    <div key={idx} className="flex items-center gap-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                        <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm shrink-0" style={{backgroundColor: item.hex}}></div>
+                                        <div className="min-w-0">
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">{item.type} • {item.name}</p>
+                                            <p className="text-sm font-medium text-gray-900 truncate" title={item.brand_hint}>{item.brand_hint}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Styling */}

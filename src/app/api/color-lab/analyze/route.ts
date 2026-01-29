@@ -75,10 +75,10 @@ Return ONLY valid JSON. No markdown formatting. No code blocks.
     {"hex": "#...", "name": "string", "reason": "string (e.g., 'Makes skin look sallow', 'Overpowers delicate features')"}
   ],
   "virtual_draping_prompts": {
-    "best_color_prompt": "string (A detailed prompt for the user wearing their #1 Best Power Color identified in this report. DO NOT invent a new color. Use the specific color name found in your 'palette.power' section. e.g., 'wearing a [Color Name] top'.)",
-    "worst_color_prompt": "string (A detailed prompt for the user wearing their #1 Absolute Worst Color identified in this report. Use the specific color name found in your 'worst_colors' section. e.g., 'wearing a [Color Name] top'.)",
-    "best_makeup_prompt": "string (A specific instruction for makeup that enhances this user's features based on their season. e.g., 'Apply a [Specific Lipstick Color] and a soft [Specific Blush Color] blush. Skin should look luminous.')",
-    "worst_makeup_prompt": "string (A technical instruction for makeup/skin effects that optically clash with the user. Use physical terms like 'emphasize yellow undertones', 'increase contrast of under-eye shadows', 'apply disharmonious cool-toned lipstick'. DO NOT use emotional words like 'tired', 'sad', or 'ugly'.)"
+    "best_color_prompt": "string (A detailed prompt for the user wearing their #1 Best Power Color. e.g., 'wearing a [Color Name] top'.)",
+    "worst_color_prompt": "string (A detailed prompt for the user wearing their #1 Absolute Worst Color. e.g., 'wearing a [Color Name] top'.)",
+    "best_makeup_prompt": "string (Instructions for a harmonious makeup look using the season's palette. Focus on COLOR matching. e.g., 'Apply a sheer [Lipstick Color] tint and a soft [Blush Color] blush that melts into the skin. Keep the look natural and dewy. Do not alter skin texture.')",
+    "worst_makeup_prompt": "string (Instructions for a disharmonious makeup look using clashing colors. e.g., 'Apply a matte [Wrong Lipstick Color] lipstick that looks stark against the skin. Use a [Wrong Blush Color] blush that sits heavily on the face.' CRITICAL: DO NOT instruct to change skin tone, add dark circles, or make the skin look bad. Only the MAKEUP COLORS should be wrong.)"
   }
 }
 

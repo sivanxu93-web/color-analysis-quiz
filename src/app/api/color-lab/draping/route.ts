@@ -19,15 +19,15 @@ export async function POST(req: NextRequest) {
     if (!sessionId || !prompt) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     // Default makeup instructions if not provided by the analyze step
     const defaultMakeup =
       type === "best"
-        ? "Apply an ultra-realistic 'no-makeup' makeup look. Soft, hydrating lip tint in a harmonious shade (e.g., sheer rose or coral). Subtle, blended blush that mimics a natural flush. Skin should look dewy and fresh. NO heavy contouring, NO thick eyeliner."
-        : "Apply a realistic makeup look that is slightly disharmonious. Use a lip color that is too cool/gray or too warm/orange for the skin tone, creating a subtle 'washed out' or 'sallow' effect. The application must still look professional, but the COLOR choice is wrong.";
+        ? "Apply an ultra-realistic, sheer makeup look. Soft, hydrating lip tint in a harmonious shade. Subtle blush that melts into the skin. NO heavy contouring, NO smoothing."
+        : "Apply a makeup look with colors that clash with the skin tone. Use a lip color that is too cool or too warm for the user, creating a disharmonious visual effect. The makeup application is professional, but the SHADE selection is wrong.";
 
     const makeupInstruction = makeup_prompt || defaultMakeup;
 
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const imageType = type === "best" ? "best_draping" : "worst_draping";
     const existingRes = await db.query(
       "select url from color_lab_images where session_id = $1 and image_type = $2 limit 1",
-      [sessionId, imageType]
+      [sessionId, imageType],
     );
 
     if (existingRes.rowCount > 0) {
@@ -51,13 +51,13 @@ export async function POST(req: NextRequest) {
 
     const imageRes = await db.query(
       "select url from color_lab_images where session_id = $1 and (image_type = 'user_upload' or image_type is null) limit 1",
-      [sessionId]
+      [sessionId],
     );
 
     if (imageRes.rowCount === 0) {
       return NextResponse.json(
         { error: "User image not found" },
-        { status: 404 }
+        { status: 404 },
       );
     }
     const userImageUrl = imageRes.rows[0].url;
@@ -98,42 +98,41 @@ export async function POST(req: NextRequest) {
     - Clothing Color: "${prompt}"
     
     STRICT TECHNICAL REQUIREMENTS:
-    1. 📸 REALISM: The output must be indistinguishable from a real photo. Preserve skin texture, pores, and natural lighting.
+    1. 📸 REALISM: The output must be indistinguishable from a real photo. Preserve skin texture, pores, moles, and natural lighting.
     2. 🚫 NO FILTERS: Do not apply smoothing, airbrushing, or 'beauty filters'. Keep it raw and authentic.
-    3. 💄 MAKEUP STYLE: 
-       - The makeup must look like it was applied by a pro makeup artist using sheer, buildable products.
-       - Lips: Sheer, satin finish. Not matte opaque paint.
+    3. 🛑 SKIN TONE LOCK: **CRITICAL: DO NOT LIGHTEN, DARKEN, OR CHANGE THE USER'S SKIN TONE.** The foundation/base skin color must remain 100% identical to the original.
+    4. 💄 MAKEUP STYLE: 
+       - The makeup must sit ON TOP of the skin.
+       - Lips: Sheer, satin finish.
        - Skin: Retain natural highlights and shadows.
-    4. 🖼️ BACKGROUND: STRICTLY PRESERVE the original background.
-    5. 👕 CLOTHING: Keep the original fabric texture (folds, shadows). Only change the hue/saturation.
+    5. 🖼️ BACKGROUND: STRICTLY PRESERVE the original background.
+    6. 👕 CLOTHING: Keep the original fabric texture (folds, shadows). Only change the hue/saturation.
     
     SPECIFIC INSTRUCTIONS:
     - ${makeupInstruction}
        
-    Summary: "Photorealistic edit. Change shirt to ${prompt}. Apply subtle, natural makeup. Keep skin texture."
+    Summary: "Photorealistic edit. Change shirt to ${prompt}. Apply makeup shades as described. DO NOT CHANGE SKIN TONE."
     
     Output: Return ONLY the final generated image.`;
 
-    console.log(
-      `Calling Gemini (${type})...`
-    );
+    console.log(`Calling Gemini (${type})...`);
     console.time(`Gemini-Gen-${type}`);
 
     let response;
     try {
-        const result = await model.generateContent([
-          fullPrompt,
-          {
-            inlineData: {
-              data: imgBase64,
-              mimeType: imgMimeType,
-            },
+      const result = await model.generateContent([
+        fullPrompt,
+        {
+          inlineData: {
+            data: imgBase64,
+            mimeType: imgMimeType,
           },
-        ]);
-        response = await result.response;
+        },
+      ]);
+      response = await result.response;
     } catch (geminiError: any) {
-        console.error("Gemini API Error:", geminiError);
-        throw new Error(`Gemini Generation Failed: ${geminiError.message}`);
+      console.error("Gemini API Error:", geminiError);
+      throw new Error(`Gemini Generation Failed: ${geminiError.message}`);
     }
     console.timeEnd(`Gemini-Gen-${type}`);
 
@@ -145,8 +144,8 @@ export async function POST(req: NextRequest) {
 
     const content = candidates[0].content;
     if (!content || !content.parts || content.parts.length === 0) {
-        console.error("Gemini Empty Response:", JSON.stringify(candidates));
-        throw new Error("Gemini returned an empty response (no parts).");
+      console.error("Gemini Empty Response:", JSON.stringify(candidates));
+      throw new Error("Gemini returned an empty response (no parts).");
     }
 
     const firstPart = content.parts[0];
@@ -160,9 +159,11 @@ export async function POST(req: NextRequest) {
     } else {
       console.log(
         "Gemini response did not contain inlineData. Response parts:",
-        JSON.stringify(candidates[0].content.parts)
+        JSON.stringify(candidates[0].content.parts),
       );
-      throw new Error("Model returned text instead of image. Prompt might be blocked or model failed.");
+      throw new Error(
+        "Model returned text instead of image. Prompt might be blocked or model failed.",
+      );
     }
 
     // 5. Upload to R2
@@ -170,16 +171,16 @@ export async function POST(req: NextRequest) {
 
     console.time(`R2-Upload-${type}`);
     try {
-        await R2.putObject({
-          Bucket: r2Bucket,
-          Key: fileName,
-          Body: generatedImageBuffer,
-          ContentType: generatedMimeType,
-          ACL: "public-read", // or rely on bucket policy
-        }).promise();
+      await R2.putObject({
+        Bucket: r2Bucket,
+        Key: fileName,
+        Body: generatedImageBuffer,
+        ContentType: generatedMimeType,
+        ACL: "public-read", // or rely on bucket policy
+      }).promise();
     } catch (r2Error: any) {
-        console.error("R2 Upload Error:", r2Error);
-        throw new Error(`R2 Upload Failed: ${r2Error.message}`);
+      console.error("R2 Upload Error:", r2Error);
+      throw new Error(`R2 Upload Failed: ${r2Error.message}`);
     }
     console.timeEnd(`R2-Upload-${type}`);
 
@@ -190,7 +191,7 @@ export async function POST(req: NextRequest) {
     // Save to DB for persistence
     await db.query(
       "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3) on conflict do nothing",
-      [sessionId, publicUrl, imageType]
+      [sessionId, publicUrl, imageType],
     );
 
     return NextResponse.json({
@@ -202,7 +203,7 @@ export async function POST(req: NextRequest) {
     // Return a friendly error or a placeholder if really needed, but for now let's be honest.
     return NextResponse.json(
       { error: error.message || "Failed to generate draping" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
