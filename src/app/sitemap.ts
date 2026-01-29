@@ -12,7 +12,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/validator',
     '/profile',
     '/privacy-policy',
-    '/terms-of-service'
+    '/terms-of-service',
+    '/examples/deep-winter-analysis',
+    '/examples/soft-autumn-analysis',
+    '/examples/light-summer-analysis',
+    '/examples/warm-spring-analysis'
   ];
 
   const sitemapEntry: MetadataRoute.Sitemap = [];
