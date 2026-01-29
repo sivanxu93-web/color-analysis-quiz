@@ -14,6 +14,7 @@ import LoginButton from './LoginButton';
 import LoginModal from './LoginModal';
 import LogoutModal from "./LogoutModal";
 import { getLinkHref } from "~/configs/buildLink";
+import { usePathname } from 'next/navigation';
 
 export default function Header({
   locale,
@@ -27,7 +28,7 @@ export default function Header({
     menuText
   } = useCommonContext();
 
-  const [pageResult] = useState(getLinkHref(locale, page))
+  const pathname = usePathname();
 
   const checkLocalAndLoading = (lang) => {
     setMobileMenuOpen(false);
@@ -43,7 +44,7 @@ export default function Header({
       <GeneratingModal generatingText={commonText.generateText} />
       <LoginModal
         loadingText={commonText.loadingText}
-        redirectPath={pageResult}
+        redirectPath={pathname}
         loginModalDesc={authText.loginModalDesc}
         loginModalButtonText={authText.loginModalButtonText}
       />
@@ -51,7 +52,7 @@ export default function Header({
         logoutModalDesc={authText.logoutModalDesc}
         confirmButtonText={authText.confirmButtonText}
         cancelButtonText={authText.cancelButtonText}
-        redirectPath={pageResult}
+        redirectPath={pathname}
       />
       
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4" aria-label="Global">

@@ -8,11 +8,30 @@ import { useCommonContext } from '~/context/common-context';
 import BaseModal from '~/components/BaseModal';
 import { sendGAEvent } from '@next/third-parties/google';
 
-// Helper for image compression
-const compressImage = (file: File): Promise<{ blob: Blob, width: number, height: number }> => {
+// Helper for image compression and HEIC conversion
+const compressImage = async (file: File): Promise<{ blob: Blob, width: number, height: number }> => {
+    let sourceBlob: Blob | File = file;
+
+    // Handle HEIC/HEIF files
+    if (file.type === 'image/heic' || file.type === 'image/heif' || file.name.toLowerCase().endsWith('.heic')) {
+        try {
+            const heic2any = (await import('heic2any')).default;
+            const converted = await heic2any({
+                blob: file,
+                toType: 'image/jpeg',
+                quality: 0.9
+            });
+            // heic2any can return Blob or Blob[], we expect single Blob
+            sourceBlob = Array.isArray(converted) ? converted[0] : converted;
+        } catch (e) {
+            console.error("HEIC conversion failed:", e);
+            throw new Error("Could not process HEIC image");
+        }
+    }
+
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.src = URL.createObjectURL(file);
+        img.src = URL.createObjectURL(sourceBlob);
         img.onload = () => {
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -103,74 +122,95 @@ export default function PageComponent({
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      // 1. Immediately show preview
-      processFile(file);
-
-      // 2. Run Face Detection Async
-      if (faceApi) {
+      try {
           setIsCheckingFace(true);
           
-          // Use setTimeout to yield to the main thread so UI renders the preview first
-          setTimeout(async () => {
-              try {
-                  const img = new Image();
-                  img.src = URL.createObjectURL(file);
-                  await new Promise((resolve, reject) => {
-                      img.onload = resolve;
-                      img.onerror = reject;
-                  });
+          // Convert/Compress first to ensure browser compatibility (HEIC -> JPEG)
+          const { blob, width, height } = await compressImage(file);
+          const previewUrl = URL.createObjectURL(blob);
+          
+          // Update Preview immediately
+          setPreviewUrl(previewUrl);
+          // Store the processed file so we don't need to re-convert in startAnalysis
+          // We cast Blob to File for compatibility with state, adding a name property
+          const processedFile = new File([blob], file.name.replace(/\.heic$/i, '.jpg'), { type: 'image/jpeg' });
+          setSelectedFile(processedFile);
 
-                  // Resize for faster detection (Max 600px)
-                  const canvas = document.createElement('canvas');
-                  const ctx = canvas.getContext('2d');
-                  if (ctx) {
-                      const MAX_DETECTION_SIZE = 600;
-                      let width = img.width;
-                      let height = img.height;
-                      
-                      if (width > height) {
-                          if (width > MAX_DETECTION_SIZE) {
-                              height *= MAX_DETECTION_SIZE / width;
-                              width = MAX_DETECTION_SIZE;
-                          }
-                      } else {
-                          if (height > MAX_DETECTION_SIZE) {
-                              width *= MAX_DETECTION_SIZE / height;
-                              height = MAX_DETECTION_SIZE;
-                          }
-                      }
-                      
-                      canvas.width = width;
-                      canvas.height = height;
-                      ctx.drawImage(img, 0, 0, width, height);
+          // 2. Run Face Detection Async
+          if (faceApi) {
+              // Use setTimeout to yield to the main thread so UI renders the preview first
+              setTimeout(async () => {
+                  try {
+                      // Resize for faster detection (Max 600px) - using the already compressed/resized blob
+                      const img = new Image();
+                      img.src = previewUrl;
+                      await new Promise((resolve) => { img.onload = resolve; });
 
-                      // Detect on the resized canvas
-                      const detections = await faceApi.detectAllFaces(canvas, new faceApi.TinyFaceDetectorOptions());
-
-                      if (!detections || detections.length === 0) {
-                          setAlertState({
-                              isOpen: true,
-                              title: "No Face Detected",
-                              message: "We couldn't detect a clear face in this photo. The analysis might fail or be inaccurate. Do you want to continue?",
-                              type: 'warning',
-                              showCancel: true,
-                              confirmText: "Continue Anyway",
-                              onConfirm: () => { /* Already processed */ },
-                              onCancel: () => {
-                                  setSelectedFile(null);
-                                  setPreviewUrl(null);
-                                  if (fileInputRef.current) fileInputRef.current.value = '';
+                      const canvas = document.createElement('canvas');
+                      const ctx = canvas.getContext('2d');
+                      if (ctx) {
+                          const MAX_DETECTION_SIZE = 600;
+                          let dWidth = img.width;
+                          let dHeight = img.height;
+                          
+                          if (dWidth > dHeight) {
+                              if (dWidth > MAX_DETECTION_SIZE) {
+                                  dHeight *= MAX_DETECTION_SIZE / dWidth;
+                                  dWidth = MAX_DETECTION_SIZE;
                               }
-                          });
-                          // Note: We don't clear the file here, we let the user choose to continue or cancel (by closing or re-uploading)
+                          } else {
+                              if (dHeight > MAX_DETECTION_SIZE) {
+                                  dWidth *= MAX_DETECTION_SIZE / dHeight;
+                                  dHeight = MAX_DETECTION_SIZE;
+                              }
+                          }
+                          
+                          canvas.width = dWidth;
+                          canvas.height = dHeight;
+                          ctx.drawImage(img, 0, 0, dWidth, dHeight);
+
+                          // Detect on the resized canvas
+                          const detections = await faceApi.detectAllFaces(canvas, new faceApi.TinyFaceDetectorOptions());
+
+                          if (!detections || detections.length === 0) {
+                              setAlertState({
+                                  isOpen: true,
+                                  title: "No Face Detected",
+                                  message: "We couldn't detect a clear face in this photo. The analysis might fail or be inaccurate. Do you want to continue?",
+                                  type: 'warning',
+                                  showCancel: true,
+                                  confirmText: "Continue Anyway",
+                                  onConfirm: () => { /* Already processed */ },
+                                  onCancel: () => {
+                                      setSelectedFile(null);
+                                      setPreviewUrl(null);
+                                      if (fileInputRef.current) fileInputRef.current.value = '';
+                                  }
+                              });
+                          }
                       }
+                  } catch (e) {
+                      console.error("Face detection error", e);
+                  } finally {
+                      setIsCheckingFace(false);
                   }
-              } catch (e) {
-                  console.error("Face detection error", e);
-              } finally {
-                  setIsCheckingFace(false);
-              }
-          }, 100);
+              }, 100);
+          } else {
+              setIsCheckingFace(false);
+          }
+      } catch (e) {
+          console.error("Image processing failed", e);
+          setAlertState({
+              isOpen: true,
+              title: "Image Error",
+              message: "Could not process this image. Please try a standard JPG or PNG.",
+              type: 'error',
+              showCancel: false
+          });
+          setIsCheckingFace(false);
+      } finally {
+          // Reset input value to allow selecting the same file again
+          event.target.value = '';
       }
     }
   };
