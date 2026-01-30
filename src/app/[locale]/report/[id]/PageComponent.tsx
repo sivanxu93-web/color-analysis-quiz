@@ -238,6 +238,13 @@ export default function PageComponent({
   const displayReport = report || MOCK_REPORT;
   const displayDraping = isLocked ? { best: userImage, worst: userImage } : drapingImages;
 
+  // 3. Auto-show login modal if locked and not logged in
+  useEffect(() => {
+    if (isLocked && !userData?.user_id) {
+        setShowLoginModal(true);
+    }
+  }, [isLocked, userData?.user_id, setShowLoginModal]);
+
   const { 
       season: dSeason, headline: dHeadline, description: dDescription, characteristics: dCharacteristics, 
       palette: dPalette, makeup_recommendations: dMakeup, styling: dStyling, 
@@ -324,8 +331,8 @@ export default function PageComponent({
                     onClick={handleUnlockClick}
                     className="group w-full bg-[#1A1A2E] text-white py-4 rounded-full font-bold text-lg shadow-xl hover:bg-primary transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
                  >
-                    <span>Unlock Full Report</span>
-                    <span className="bg-white/20 px-3 py-0.5 rounded-full text-xs font-medium tracking-wide uppercase">1 Credit</span>
+                    <span>{userData?.user_id ? "Unlock Full Report" : "Login to Unlock"}</span>
+                    {userData?.user_id && <span className="bg-white/20 px-3 py-0.5 rounded-full text-xs font-medium tracking-wide uppercase">1 Credit</span>}
                  </button>
                  
                  <p className="mt-6 text-xs text-gray-400">
