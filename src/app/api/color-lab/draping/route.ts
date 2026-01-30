@@ -26,8 +26,8 @@ export async function POST(req: NextRequest) {
     // Default makeup instructions if not provided by the analyze step
     const defaultMakeup =
       type === "best"
-        ? "Apply an ultra-realistic, sheer makeup look. Soft, hydrating lip tint in a harmonious shade. Subtle blush that melts into the skin. NO heavy contouring, NO smoothing."
-        : "Apply a makeup look with colors that clash with the skin tone. Use a lip color that is too cool or too warm for the user, creating a disharmonious visual effect. The makeup application is professional, but the SHADE selection is wrong.";
+        ? "Apply an ultra-realistic, 'No-Makeup' makeup look. Use a sheer, hydrating lip tint and subtle blush that harmonizes with the skin. Maintain skin texture and avoid any heavy application."
+        : "Apply a natural makeup look, but use colors that slightly clash with the skin's undertone. The application must remain light and sheer, showing how the wrong undertone makes the skin look duller without using heavy makeup textures.";
 
     const makeupInstruction = makeup_prompt || defaultMakeup;
 
@@ -88,32 +88,21 @@ export async function POST(req: NextRequest) {
       model: "gemini-3-pro-image-preview",
     });
 
-    const fullPrompt = `You are an expert High-End Beauty Retoucher for Vogue.
-    Task: Virtual Try-On & Realistic Makeup Simulation.
+    const fullPrompt = `STRICT IMAGE EDITING INSTRUCTION FOR 'COLOR ANALYSIS QUIZ'.
     
-    INPUT: A high-resolution photo of a user.
-    GOAL: Change the clothing color and apply SUBTLE, PHOTOREALISTIC makeup.
+    TASK: Change the color of the user's clothing to "${prompt}".
     
-    TARGET LOOK:
-    - Clothing Color: "${prompt}"
+    CONSTRAINTS (NON-NEGOTIABLE):
+    1. 🖼️ IDENTITY LOCK: Keep the user's face, expression, smile, and eyes EXACTLY as they are in the original photo. Do not retouch features.
+    2. 👗 GARMENT ONLY: Change ONLY the color of the clothing the person is currently wearing. Do not add clothes, do not add blankets or "grey cloths".
+    3. 🎨 TEXTURE PRESERVATION: Keep the original fabric texture, folds, and shadows. The clothing should look like the same shirt but dyed a different color.
+    4. 🌆 BACKGROUND LOCK: Keep the background 100% identical to the original image.
+    5. 💄 MAKEUP: ${makeupInstruction}
     
-    STRICT TECHNICAL REQUIREMENTS:
-    1. 📸 REALISM: The output must be indistinguishable from a real photo. Preserve skin texture, pores, moles, and natural lighting.
-    2. 🚫 NO FILTERS: Do not apply smoothing, airbrushing, or 'beauty filters'. Keep it raw and authentic.
-    3. 🛑 SKIN TONE LOCK: **CRITICAL: DO NOT LIGHTEN, DARKEN, OR CHANGE THE USER'S SKIN TONE.** The foundation/base skin color must remain 100% identical to the original.
-    4. 💄 MAKEUP STYLE: 
-       - The makeup must sit ON TOP of the skin.
-       - Lips: Sheer, satin finish.
-       - Skin: Retain natural highlights and shadows.
-    5. 🖼️ BACKGROUND: STRICTLY PRESERVE the original background.
-    6. 👕 CLOTHING: Keep the original fabric texture (folds, shadows). Only change the hue/saturation.
+    STYLE: Professional, photorealistic studio result. NO filters. NO AI-generated faces.
     
-    SPECIFIC INSTRUCTIONS:
-    - ${makeupInstruction}
-       
-    Summary: "Photorealistic edit. Change shirt to ${prompt}. Apply makeup shades as described. DO NOT CHANGE SKIN TONE."
-    
-    Output: Return ONLY the final generated image.`;
+    FINAL COMMAND: "Modify only the clothing to ${prompt} and apply the specified subtle makeup. Everything else must remain pixel-perfect identical to the original."`;
+
 
     console.log(`Calling Gemini (${type})...`);
     console.time(`Gemini-Gen-${type}`);
@@ -131,8 +120,9 @@ export async function POST(req: NextRequest) {
       ]);
       response = await result.response;
     } catch (geminiError: any) {
-      console.error("Gemini API Error:", geminiError);
-      throw new Error(`Gemini Generation Failed: ${geminiError.message}`);
+      console.error("Gemini API Technical Error:", geminiError);
+      // Bragging about high volume while masking the technical error
+      throw new Error("Wow! We're experiencing overwhelming demand from our global community. Our AI stylists are working at maximum capacity—please give us a few seconds and try again!");
     }
     console.timeEnd(`Gemini-Gen-${type}`);
 

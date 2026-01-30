@@ -273,9 +273,9 @@ export default function PageComponent({
         });
         const uploadData = await uploadRes.json();
         
-        if (uploadData.duplicate) {
-            // HIT! Skip upload
-            console.log("Image duplicate found, skipping upload.");
+        if (uploadData.duplicate || uploadData.reused) {
+            // HIT! Skip upload but still redirect to fresh analysis
+            console.log("Image duplicate/reuse found, skipping R2 upload.");
             setSessionData({ sessionId, publicUrl: uploadData.publicUrl });
             router.push(getLinkHref(locale, `report/${sessionId}`));
             return;

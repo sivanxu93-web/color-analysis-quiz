@@ -30,77 +30,55 @@ export type ColorUsage =
   | "lipstick"
   | "makeup";
 
-export type PaletteColor = {
-  name: string;
-  hex: string;
-  usage: ColorUsage[];
-};
-
-export type AvoidColor = {
-  name: string;
-  hex: string;
-  reason: string;
+export type PaletteGroup = {
+  colors: { hex: string; name: string }[];
+  usage_advice: string;
 };
 
 export type ColorLabReport = {
-  meta: {
-    version: string;
-    locale: string;
-    model: string;
-    generated_at: string;
-  };
-  input_summary: {
-    age_range?: string;
-    gender_expression?: string;
-    goals?: string[];
-  };
-  classification: {
-    season: SeasonName;
-    season_group: "Spring" | "Summer" | "Autumn" | "Winter";
-    alt_season?: SeasonName | "";
-    confidence: number;
-    undertone: Undertone;
-    contrast_level: ContrastLevel;
-    value_level: ValueLevel;
-    chroma_level: ChromaLevel;
-    key_observations: string[];
-  };
-  headline_advice: {
-    one_sentence: string;
-    instant_wins: string[];
+  season: SeasonName;
+  headline: string;
+  description: string;
+  characteristics: {
+    skin: string;
+    eyes: string;
+    hair: string;
   };
   palette: {
-    core_neutrals: PaletteColor[];
-    everyday_colors: PaletteColor[];
-    accent_colors: PaletteColor[];
-    avoid_colors: AvoidColor[];
+    neutrals: PaletteGroup;
+    power: PaletteGroup;
+    pastels: PaletteGroup;
   };
-  wardrobe_tips: {
-    neutrals_usage: string[];
-    tops_and_dresses: string[];
-    patterns_and_contrast: string[];
-    accessories: string[];
+  makeup: {
+    lips: { hex: string; name: string; brand_hint: string }[];
+    blush: { hex: string; name: string; brand_hint: string }[];
+    eyes: { hex: string; name: string; brand_hint: string }[];
   };
-  makeup_tips: {
-    base: string[];
-    blush: string[];
-    lips: string[];
-    eyes: string[];
-    brows: string[];
+  makeup_recommendations: {
+    summary: string;
+    lipstick_guide: string[];
+    specific_products: { category: string; shade: string; recommendation: string }[];
   };
-  hair_tips: {
-    recommended: string[];
-    avoid: string[];
+  hair_color_recommendations: { color: string; desc: string }[];
+  fashion_guide: {
+    work: string;
+    casual: string;
+    special_event: string;
   };
-  theory_section: {
-    short_explanation: string[];
-    season_neighbors: {
-      season: SeasonName;
-      note: string;
-    }[];
+  styling: {
+    metals: string[];
+    fabrics: string[];
+    keywords: string[];
+    accessories: string;
   };
-  debug_info?: {
-    warnings?: string[];
+  worst_colors: { hex: string; name: string; reason: string }[];
+  virtual_draping_prompts: {
+    best_color_prompt: string;
+    worst_color_prompt: string;
+    best_makeup_prompt: string;
+    worst_makeup_prompt: string;
   };
+  celebrities: string[];
 };
+
 

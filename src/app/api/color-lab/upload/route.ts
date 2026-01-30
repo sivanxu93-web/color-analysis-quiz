@@ -23,40 +23,34 @@ export async function POST(req: NextRequest) {
     // 1. Check for Duplicate / Existing Hash
     if (imageHash) {
         const existingRes = await db.query(
-            `SELECT * FROM color_lab_reports 
-             WHERE image_hash = $1 AND status = 'completed' AND payload IS NOT NULL 
+            `SELECT input_image_url FROM color_lab_reports 
+             WHERE image_hash = $1 AND status = 'completed' AND input_image_url IS NOT NULL 
              ORDER BY created_at DESC LIMIT 1`,
             [imageHash]
         );
 
         if (existingRes.rows.length > 0) {
-            const existing = existingRes.rows[0];
-            console.log(`Image Hash Hit! Reusing report from session ${existing.session_id}`);
+            const reusedUrl = existingRes.rows[0].input_image_url;
+            console.log(`Image Hash Hit! Reusing image URL: ${reusedUrl}`);
 
-            // Reuse the existing S3/R2 URL if available
-            const reusedUrl = existing.input_image_url;
+            // Link the existing image record to the new session
+            await db.query(
+                "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
+                [sessionId, reusedUrl, 'user_upload']
+            );
 
-            // Clone report to new session
+            // Create a NEW Draft Report (even though image exists, we want a fresh analysis)
             await saveColorLabReport(
                 sessionId,
-                existing.season,
-                existing.payload,
-                'completed',
+                null,
+                null,
+                'draft',
                 reusedUrl,
                 imageHash
             );
 
-            // Also link the image record if we have a URL
-            if (reusedUrl) {
-                await db.query(
-                    "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
-                    [sessionId, reusedUrl, 'user_upload']
-                );
-            }
-
             return NextResponse.json({ 
-                duplicate: true, 
-                reportId: sessionId,
+                reused: true, 
                 publicUrl: reusedUrl 
             });
         }

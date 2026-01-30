@@ -34,154 +34,325 @@ export default function PageComponent({
   const { userData, setShowLoginModal, setShowPricingModal } = useCommonContext();
   const router = useRouter();
   
-  const [status, setStatus] = useState(initialStatus);
-  const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
-  const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
-  const [currentTipIndex, setCurrentTipIndex] = useState(0);
-  const [drapingError, setDrapingError] = useState<string | null>(null);
-  const [generationError, setGenerationError] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
-  
-  // Feedback State
-  const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
-  const [feedbackComment, setFeedbackComment] = useState('');
-  const [isMainFeedbackVisible, setIsMainFeedbackVisible] = useState(false);
-  const [hasSeenContent, setHasSeenContent] = useState(false);
-
-  const LOADING_TIPS = [
-    "Analyzing your skin undertones...",
-    "Matching with 12-season color theory...",
-    "Simulating fabric reflections...",
-    "Finding your perfect power colors...",
-    "Consulting the AI stylist...",
-  ];
-
-  // Sync status when server props update (after router.refresh)
-  useEffect(() => {
-      if (initialStatus && initialStatus !== status) {
-          setStatus(initialStatus);
-      }
-  }, [initialStatus]);
-
-  // 1. Auto-Trigger Generation & Session Claim
-  useEffect(() => {
-      if (!userData?.email) return;
-
-      // Silent Claim: Link this session to the user's email to prevent orphaned data
-      if (sessionId) {
-          fetch('/api/color-lab/session/claim', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({ sessionId, email: userData.email })
-          }).catch(err => console.error("Session claim failed", err));
-      }
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const paymentSuccess = urlParams.get('payment_success');
-
-      if (paymentSuccess === 'true') {
-          window.history.replaceState({}, '', window.location.pathname);
-          if (status === 'draft') {
-              triggerGeneration();
-          }
-      } 
-  }, [status, userData?.email, sessionId]);
-
-  const triggerGeneration = async () => {
-      if (!sessionId || !userData?.email) return;
-      
-      setStatus('processing');
-      setGenerationError(null);
-      sendGAEvent('event', 'start_analysis', { sessionId });
-
-      try {
-          const res = await fetch('/api/color-lab/analyze', {
-              method: 'POST',
-              headers: {'Content-Type': 'application/json'},
-              body: JSON.stringify({
-                  sessionId,
-                  imageUrl: userImage,
-                  email: userData.email
-              })
-          });
-
-          if (res.status === 402) {
-              console.log("Not enough credits, opening pricing modal...");
-              setStatus('draft');
-              setShowPricingModal(true);
-              return;
-          }
-
-          if (res.ok) {
-              const data = await res.json();
-              router.refresh(); 
-          } else {
-              setGenerationError("Analysis failed. Please try again.");
-          }
-      } catch (e) {
-          console.error(e);
-          setGenerationError("Connection error. Please check your network.");
-      }
-  };
-
-  const handleUnlockClick = () => {
-      if (!userData?.user_id) {
-          setShowLoginModal(true);
-      } else {
-          triggerGeneration();
-      }
-  };
-
-  // 2. Draping Logic
-  useEffect(() => {
-      if (status === 'completed' && report && !drapingImages.best && !isGeneratingDraping && sessionId && !drapingError) {
-          handleGenerateDraping();
-      }
-  }, [status, sessionId, report]); 
-
-  const handleGenerateDraping = async () => {
-    if (!sessionId || !report?.virtual_draping_prompts) return;
-    setIsGeneratingDraping(true);
+    const [status, setStatus] = useState(initialStatus);
+    const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
+    const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
+    const hasTriggeredDraping = useRef(false);
+    const [currentTipIndex, setCurrentTipIndex] = useState(0);
+    const [drapingError, setDrapingError] = useState<string | null>(null);
+    const [generationError, setGenerationError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
     
-    try {
-        const [bestRes, worstRes] = await Promise.all([
-            fetch('/api/color-lab/draping', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    sessionId, 
-                    prompt: report.virtual_draping_prompts.best_color_prompt, 
-                    makeup_prompt: report.virtual_draping_prompts.best_makeup_prompt,
-                    type: 'best' 
-                })
-            }),
-            fetch('/api/color-lab/draping', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ 
-                    sessionId, 
-                    prompt: report.virtual_draping_prompts.worst_color_prompt, 
-                    makeup_prompt: report.virtual_draping_prompts.worst_makeup_prompt,
-                    type: 'worst' 
-                })
-            })
-        ]);
+    // Feedback State
+    const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
+    const [feedbackComment, setFeedbackComment] = useState('');
+    const [isMainFeedbackVisible, setIsMainFeedbackVisible] = useState(false);
+    const [hasSeenContent, setHasSeenContent] = useState(false);
 
-        if (bestRes.ok && worstRes.ok) {
-            const bestData = await bestRes.json();
-            const worstData = await worstRes.json();
-            setDrapingImages({
-                best: bestData.imageUrl,
-                worst: worstData.imageUrl
-            });
+    const LOADING_TIPS = [
+        "Analyzing your skin undertones...",
+        "Matching with 12-season color theory...",
+        "Simulating fabric reflections...",
+        "Finding your perfect power colors...",
+        "Consulting the AI stylist...",
+    ];
+
+    // Sync status when server props update
+    useEffect(() => {
+        if (initialStatus && initialStatus !== status) {
+            setStatus(initialStatus);
         }
-    } catch (error) {
-        console.error("Draping error", error);
-        setDrapingError("Failed to generate draping.");
-    } finally {
-        setIsGeneratingDraping(false);
-    }
-  };
+    }, [initialStatus]);
+
+    // 1. Auto-Trigger Generation & Session Claim
+    useEffect(() => {
+        if (!userData?.email) return;
+
+        if (sessionId) {
+            fetch('/api/color-lab/session/claim', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ sessionId, email: userData.email })
+            }).catch(err => console.error("Session claim failed", err));
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentSuccess = urlParams.get('payment_success');
+
+        if (paymentSuccess === 'true') {
+            window.history.replaceState({}, '', window.location.pathname);
+            if (status === 'draft') {
+                triggerGeneration();
+            }
+        } 
+    }, [status, userData?.email, sessionId]);
+
+    const triggerGeneration = async () => {
+        if (!sessionId || !userData?.email) return;
+        
+        setStatus('processing');
+        setGenerationError(null);
+        sendGAEvent('event', 'start_analysis', { sessionId });
+
+        try {
+            const res = await fetch('/api/color-lab/analyze', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    sessionId,
+                    imageUrl: userImage,
+                    email: userData.email
+                })
+            });
+
+            if (res.status === 402) {
+                setStatus('draft');
+                setShowPricingModal(true);
+                return;
+            }
+
+            if (res.ok) {
+                router.refresh(); 
+            } else {
+                setGenerationError("Analysis failed. Please try again.");
+            }
+        } catch (e) {
+            setGenerationError("Connection error. Please check your network.");
+        }
+    };
+
+    const handleUnlockClick = () => {
+        if (!userData?.user_id) {
+            setShowLoginModal(true);
+        } else {
+            triggerGeneration();
+        }
+    };
+
+    // 2. Draping Logic
+    useEffect(() => {
+        if (status === 'completed' && report && !drapingImages.best && !isGeneratingDraping && sessionId && !drapingError && !hasTriggeredDraping.current) {
+            handleGenerateDraping();
+        }
+    }, [status, sessionId, report, drapingImages.best, drapingError]); 
+  
+  
+  
+      const handleGenerateDraping = async () => {
+  
+  
+  
+        if (!sessionId || !report?.virtual_draping_prompts) return;
+  
+  
+  
+        
+  
+  
+  
+        // Reset state to trigger loading UI
+  
+  
+  
+        setDrapingError(null);
+  
+  
+  
+        setIsGeneratingDraping(true);
+  
+  
+  
+        hasTriggeredDraping.current = true;
+  
+  
+  
+        
+  
+  
+  
+        try {
+  
+  
+  
+            const [bestRes, worstRes] = await Promise.all([
+  
+  
+  
+                fetch('/api/color-lab/draping', {
+  
+  
+  
+                    method: 'POST',
+  
+  
+  
+                    headers: {'Content-Type': 'application/json'},
+  
+  
+  
+                    body: JSON.stringify({ 
+  
+  
+  
+                        sessionId, 
+  
+  
+  
+                        prompt: report.virtual_draping_prompts.best_color_prompt, 
+  
+  
+  
+                        makeup_prompt: report.virtual_draping_prompts.best_makeup_prompt,
+  
+  
+  
+                        type: 'best' 
+  
+  
+  
+                    })
+  
+  
+  
+                }),
+  
+  
+  
+                fetch('/api/color-lab/draping', {
+  
+  
+  
+                    method: 'POST',
+  
+  
+  
+                    headers: {'Content-Type': 'application/json'},
+  
+  
+  
+                    body: JSON.stringify({ 
+  
+  
+  
+                        sessionId, 
+  
+  
+  
+                        prompt: report.virtual_draping_prompts.worst_color_prompt, 
+  
+  
+  
+                        makeup_prompt: report.virtual_draping_prompts.worst_makeup_prompt,
+  
+  
+  
+                        type: 'worst' 
+  
+  
+  
+                    })
+  
+  
+  
+                })
+  
+  
+  
+            ]);
+  
+  
+  
+    
+  
+  
+  
+            if (!bestRes.ok || !worstRes.ok) {
+  
+  
+  
+                console.error("Draping API failed:", !bestRes.ok ? await bestRes.text() : await worstRes.text());
+  
+  
+  
+                throw new Error("HIGH_VOLUME_ERROR");
+  
+  
+  
+            }
+  
+  
+  
+    
+  
+  
+  
+            const bestData = await bestRes.json();
+  
+  
+  
+            const worstData = await worstRes.json();
+  
+  
+  
+            
+  
+  
+  
+            setDrapingImages({
+  
+  
+  
+                best: bestData.imageUrl,
+  
+  
+  
+                worst: worstData.imageUrl
+  
+  
+  
+            });
+  
+  
+  
+        } catch (error: any) {
+  
+  
+  
+            console.error("Draping technical error:", error);
+  
+  
+  
+            // Force a friendly, high-volume message regardless of the actual error
+  
+  
+  
+            setDrapingError("We're seeing a huge surge in users right now! Our AI is working overtime to style everyone—please try clicking again in a moment.");
+  
+  
+  
+            hasTriggeredDraping.current = false; 
+  
+  
+  
+        } finally {
+  
+  
+  
+            setIsGeneratingDraping(false);
+  
+  
+  
+        }
+  
+  
+  
+      };
+  
+  
+  
+    
+  
+  
 
   const handleFeedback = async (rating: 'good' | 'bad') => {
       setFeedbackStatus(rating);
@@ -205,12 +376,21 @@ export default function PageComponent({
           hair: "Deep Tone"
       },
       palette: {
-          power: [
-              { hex: "#2E1A47", name: "Royal Purple" }, { hex: "#0F4C3A", name: "Emerald" },
-              { hex: "#8B0000", name: "Deep Red" }, { hex: "#000000", name: "Black" }
-          ],
-          neutrals: [{ hex: "#333333", name: "Charcoal" }, { hex: "#FFFFFF", name: "Pure White" }],
-          pastels: [{ hex: "#E6E6FA", name: "Icy Lavender" }, { hex: "#F0FFFF", name: "Icy Blue" }]
+          power: {
+              colors: [
+                { hex: "#2E1A47", name: "Royal Purple" }, { hex: "#0F4C3A", name: "Emerald" },
+                { hex: "#8B0000", name: "Deep Red" }, { hex: "#000000", name: "Black" }
+              ],
+              usage_advice: "Wear these near your face to make your eyes pop and skin look luminous."
+          },
+          neutrals: {
+              colors: [{ hex: "#333333", name: "Charcoal" }, { hex: "#FFFFFF", name: "Pure White" }],
+              usage_advice: "These should form the foundation of your investment pieces like coats and suits."
+          },
+          pastels: {
+              colors: [{ hex: "#E6E6FA", name: "Icy Lavender" }, { hex: "#F0FFFF", name: "Icy Blue" }],
+              usage_advice: "Use these for a softer look, ideal for summer weight fabrics or casual knits."
+          }
       },
       makeup_recommendations: {
           summary: "Opt for cool, deep shades. A bold red lip is your signature look.",
@@ -250,6 +430,21 @@ export default function PageComponent({
       palette: dPalette, makeup_recommendations: dMakeup, styling: dStyling, 
       worst_colors: dWorst, celebrities: dCelebs, hair_color_recommendations: dHair
   } = displayReport;
+
+  // --- BACKWARDS COMPATIBILITY LOGIC ---
+  const normalizePalette = (group: any) => {
+    if (!group) return { colors: [], usage_advice: null };
+    if (Array.isArray(group)) return { colors: group, usage_advice: null };
+    return { 
+        colors: group.colors || [], 
+        usage_advice: group.usage_advice || null 
+    };
+  };
+
+  const powerPalette = normalizePalette(dPalette?.power);
+  const neutralPalette = normalizePalette(dPalette?.neutrals);
+  const pastelPalette = normalizePalette(dPalette?.pastels);
+  // --------------------------------------
 
   // Loading View
   useEffect(() => {
@@ -471,7 +666,7 @@ export default function PageComponent({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto">
                     <ColorFan 
                         imageUrl={userImage} 
-                        colors={dPalette?.power || []} 
+                        colors={powerPalette.colors || []} 
                         title="Best Matches" 
                     />
                     <ColorFan 
@@ -568,8 +763,17 @@ export default function PageComponent({
                                 <h3 className="font-serif text-2xl font-bold italic">Power Colors</h3>
                                 <span className="h-px flex-1 bg-gray-200"></span>
                             </div>
+                            
+                            {powerPalette.usage_advice && (
+                                <div className="bg-[#FFFBF7] p-6 rounded-2xl border border-primary/10 mb-8 text-center">
+                                    <p className="text-[#1A1A2E] font-medium italic leading-relaxed">
+                                        &quot;{powerPalette.usage_advice}&quot;
+                                    </p>
+                                </div>
+                            )}
+
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                {dPalette.power?.map((color: any, idx: number) => (
+                                {powerPalette.colors.map((color: any, idx: number) => (
                                     <div key={idx} className="group">
                                         <div className="aspect-square rounded-2xl shadow-md transition-transform group-hover:-translate-y-2 relative overflow-hidden" style={{backgroundColor: color.hex}}>
                                             <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -585,9 +789,10 @@ export default function PageComponent({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div>
-                                <h3 className="font-serif text-xl font-bold mb-6 text-gray-800 border-b pb-2">Essentials / Neutrals</h3>
+                                <h3 className="font-serif text-xl font-bold mb-4 text-gray-800 border-b pb-2">Essentials / Neutrals</h3>
+                                {neutralPalette.usage_advice && <p className="text-sm text-gray-500 italic mb-6">{neutralPalette.usage_advice}</p>}
                                 <div className="space-y-3">
-                                    {dPalette.neutrals?.map((color: any, idx: number) => (
+                                    {neutralPalette.colors.map((color: any, idx: number) => (
                                         <div key={idx} className="flex items-center gap-4 group cursor-default">
                                             <div className="w-12 h-12 rounded-full shadow-sm border-2 border-white ring-1 ring-gray-100" style={{backgroundColor: color.hex}}></div>
                                             <div>
@@ -599,9 +804,10 @@ export default function PageComponent({
                                 </div>
                             </div>
                             <div>
-                                <h3 className="font-serif text-xl font-bold mb-6 text-gray-800 border-b pb-2">Soft / Pastels</h3>
+                                <h3 className="font-serif text-xl font-bold mb-4 text-gray-800 border-b pb-2">Soft / Pastels</h3>
+                                {pastelPalette.usage_advice && <p className="text-sm text-gray-500 italic mb-6">{pastelPalette.usage_advice}</p>}
                                 <div className="flex flex-wrap gap-3">
-                                    {dPalette.pastels?.map((color: any, idx: number) => (
+                                    {pastelPalette.colors.map((color: any, idx: number) => (
                                         <div key={idx} className="flex flex-col items-center w-20">
                                             <div className="w-16 h-16 rounded-full shadow-sm border border-gray-100 mb-2" style={{backgroundColor: color.hex}}></div>
                                             <p className="text-[10px] text-center text-gray-500 leading-tight">{color.name}</p>

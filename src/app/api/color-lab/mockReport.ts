@@ -1,182 +1,88 @@
-import {ColorLabReport} from "~/libs/colorLabTypes";
+import { ColorLabReport } from "~/libs/colorLabTypes";
 
 export const buildMockReport = (locale: string): ColorLabReport => {
-  const now = new Date().toISOString();
   return {
-    meta: {
-      version: "1.0",
-      locale,
-      model: "mock",
-      generated_at: now,
-    },
-    input_summary: {
-      age_range: "25-34",
-      gender_expression: "feminine",
-      goals: ["professional wardrobe", "special occasions"],
-    },
-    classification: {
-      season: "Deep Winter",
-      season_group: "Winter",
-      alt_season: "Cool Winter",
-      confidence: 0.86,
-      undertone: "cool",
-      contrast_level: "high",
-      value_level: "deep",
-      chroma_level: "high",
-      key_observations: [
-        "Dark hair and eyes with lighter skin create strong natural contrast.",
-        "Skin and features lean cool rather than golden or peachy.",
-      ],
-    },
-    headline_advice: {
-      one_sentence:
-        "You are a Deep Winter: high contrast, cool intensity, best in clear jewel tones and crisp neutrals.",
-      instant_wins: [
-        "Swap beige trench coats for deep navy or charcoal.",
-        "Choose cool cherry or berry lipstick instead of warm coral.",
-        "Pick bright white or cool off‑white near your face instead of creamy ivory.",
-      ],
+    season: "Deep Winter",
+    headline: "The Dark Romantic",
+    description: "Your primary characteristic is Deep, and your secondary characteristic is Cool. You shine in colors that are dark, vivid, and cool-toned. Your high contrast features require equally high contrast outfits to look your best.",
+    characteristics: {
+      skin: "Cool Undertone",
+      eyes: "High Contrast",
+      hair: "Deep Tone"
     },
     palette: {
-      core_neutrals: [
-        {
-          name: "Ink Navy",
-          hex: "#101827",
-          usage: ["coats", "blazers", "trousers"],
-        },
-        {
-          name: "Cool Charcoal",
-          hex: "#3A3F4C",
-          usage: ["suits", "knitwear"],
-        },
-        {
-          name: "Soft Black",
-          hex: "#111827",
-          usage: ["tops", "dresses"],
-        },
-      ],
-      everyday_colors: [
-        {
-          name: "Blueberry",
-          hex: "#294C8F",
-          usage: ["tops", "dresses"],
-        },
-        {
-          name: "Deep Teal",
-          hex: "#0F4C5C",
-          usage: ["knitwear", "dresses"],
-        },
-        {
-          name: "Plum",
-          hex: "#5B2245",
-          usage: ["tops", "accessories"],
-        },
-      ],
-      accent_colors: [
-        {
-          name: "Ruby",
-          hex: "#A0103A",
-          usage: ["dresses", "lipstick", "accessories"],
-        },
-        {
-          name: "Fuchsia",
-          hex: "#C026D3",
-          usage: ["tops", "accessories"],
-        },
-        {
-          name: "Cobalt",
-          hex: "#1D4ED8",
-          usage: ["jackets", "dresses"],
-        },
-      ],
-      avoid_colors: [
-        {
-          name: "Warm Camel",
-          hex: "#C89A56",
-          reason:
-            "Too warm and muted; it can make your skin look sallow and tired.",
-        },
-        {
-          name: "Dusty Peach",
-          hex: "#E5A58A",
-          reason:
-            "Low contrast and warm undertone clash with your cool, high‑contrast coloring.",
-        },
-        {
-          name: "Soft Olive",
-          hex: "#A3A36A",
-          reason:
-            "Muted yellow‑green tones fight your clear, cool color direction.",
-        },
-      ],
+      power: {
+        colors: [
+          { hex: "#2E1A47", name: "Royal Purple" }, 
+          { hex: "#0F4C3A", name: "Emerald" },
+          { hex: "#8B0000", name: "Deep Red" }, 
+          { hex: "#000000", name: "Black" }
+        ],
+        usage_advice: "Wear these near your face to make your eyes pop and skin look luminous."
+      },
+      neutrals: {
+        colors: [
+          { hex: "#333333", name: "Charcoal" }, 
+          { hex: "#FFFFFF", name: "Pure White" }
+        ],
+        usage_advice: "These should form the foundation of your investment pieces like coats and suits."
+      },
+      pastels: {
+        colors: [
+          { hex: "#E6E6FA", name: "Icy Lavender" }, 
+          { hex: "#F0FFFF", name: "Icy Blue" }
+        ],
+        usage_advice: "Use these for a softer look, ideal for summer weight fabrics or casual knits."
+      }
     },
-    wardrobe_tips: {
-      neutrals_usage: [
-        "Use ink navy and charcoal as your main base colors for jackets, trousers and outerwear.",
-        "Reserve pure black for sharp, modern looks or evening wear rather than everyday basics.",
-      ],
-      tops_and_dresses: [
-        "Choose cool, clear colors such as blue‑red, fuchsia, teal and deep emerald near your face.",
-        "Avoid dusty, muted shades that sit between grey and beige.",
-      ],
-      patterns_and_contrast: [
-        "High‑contrast patterns (e.g. black‑and‑white, navy‑and‑fuchsia) mirror your natural contrast.",
-        "Small, busy prints in soft colors can look dull on you; choose bolder, cleaner patterns.",
-      ],
-      accessories: [
-        "Silver, white gold and platinum jewelry harmonize best with your cool undertone.",
-        "Choose statement accessories in your accent colors to bring focus to your face.",
-      ],
-    },
-    makeup_tips: {
-      base: [
-        "Choose foundation with cool or neutral undertones; avoid formulas described as warm, golden or peachy.",
+    makeup: {
+      lips: [
+        { hex: "#800020", name: "Burgundy", brand_hint: "Like MAC 'Diva'" },
+        { hex: "#E0115F", name: "Ruby Red", brand_hint: "Like Ruby Woo" }
       ],
       blush: [
-        "Cool pink, rose and raspberry blushes mimic your natural flush better than warm coral or apricot.",
-      ],
-      lips: [
-        "Best shades: blue‑based reds, deep berry, wine and raspberry.",
-        "Avoid: orange‑red, brick and peachy nudes which clash with your cool undertones.",
+        { hex: "#D10056", name: "Deep Berry", brand_hint: "Like NARS 'Aria'" }
       ],
       eyes: [
-        "Cool taupe, charcoal, navy and deep plum eyeshadows enhance your eye color.",
-        "Avoid warm browns and golden olives which can make your eyes look dull.",
-      ],
-      brows: [
-        "Keep brow color close to your natural hair (cool dark brown or soft black); avoid warm or reddish brow pens.",
-      ],
+        { hex: "#191970", name: "Midnight Blue", brand_hint: "Like Chanel 'Marine'" }
+      ]
     },
-    hair_tips: {
-      recommended: [
-        "Cool dark brown, espresso or soft black with minimal red or golden tones.",
-        "Subtle cool highlights (ash brown, blue‑black lowlights) can add dimension without warmth.",
+    makeup_recommendations: {
+      summary: "Opt for cool, deep shades. A bold red lip is your signature look.",
+      lipstick_guide: [
+        "Stick to cool-toned reds and plums.",
+        "Avoid warm corals and peachy nudes."
       ],
-      avoid: [
-        "Warm caramel, honey blonde or copper highlights which fight your cool undertone.",
-      ],
+      specific_products: [
+        { category: "Lipstick", shade: "Ruby Woo", recommendation: "Perfect matte red for high contrast." },
+        { category: "Blush", shade: "Deep Berry", recommendation: "Apply lightly to mimic a natural flush." }
+      ]
     },
-    theory_section: {
-      short_explanation: [
-        "Deep Winters belong to the Winter family: cool undertones, clear colors and higher contrast.",
-        "Within Winter, Deep means your hair and eyes are darker than your skin, which suits rich, deep colors.",
-      ],
-      season_neighbors: [
-        {
-          season: "Cool Winter",
-          note: "If your contrast softens or your features appear slightly lighter, you may lean Cool Winter.",
-        },
-        {
-          season: "Deep Autumn",
-          note: "If your undertone appears warmer with more golden tones, Deep Autumn could be considered.",
-        },
-      ],
+    fashion_guide: {
+      work: "Sharp charcoal suits paired with pure white shirts and emerald ties.",
+      casual: "Deep navy knit sweaters with high-quality dark denim.",
+      special_event: "A stunning floor-length gown in Royal Purple or a classic Black tuxedo."
     },
-    debug_info: {
-      warnings: [
-        "This is a mock report for UI development and does not reflect real analysis.",
-      ],
+    styling: {
+      metals: ["Silver", "Platinum"],
+      fabrics: ["Heavy Silk", "Velvet", "Crisp Cotton"],
+      keywords: ["Dramatic", "Bold", "Sharp"],
+      accessories: "Opt for high-shine silver metals and geometric shapes to complement your contrast."
     },
+    worst_colors: [
+      { hex: "#DAA520", name: "Goldenrod", reason: "Too warm and muted, makes your skin look sallow." },
+      { hex: "#FF8C00", name: "Dark Orange", reason: "Clashes aggressively with your cool undertones." }
+    ],
+    hair_color_recommendations: [
+      { color: "Jet Black", desc: "Enhances your natural high contrast features." },
+      { color: "Cool Dark Brown", desc: "A softer alternative that still maintains depth." }
+    ],
+    virtual_draping_prompts: {
+      best_color_prompt: "User wearing a high-quality Royal Purple silk top, natural lighting.",
+      worst_color_prompt: "User wearing a Goldenrod cotton top, flat lighting.",
+      best_makeup_prompt: "Sheer ruby red lip tint, minimalist cool-toned look.",
+      worst_makeup_prompt: "Keep original makeup to show the unflattering effect of the color."
+    },
+    celebrities: ["Anne Hathaway", "Kendall Jenner", "Lucy Liu"]
   };
 };
-
