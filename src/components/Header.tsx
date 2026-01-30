@@ -45,6 +45,7 @@ export default function Header({
       <LoginModal
         loadingText={commonText.loadingText}
         redirectPath={pathname}
+        loginModalTitle={authText.loginModalTitle}
         loginModalDesc={authText.loginModalDesc}
         loginModalButtonText={authText.loginModalButtonText}
       />

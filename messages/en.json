@@ -44,7 +44,8 @@
   },
   "AuthText": {
     "loginText": "Login",
-    "loginModalDesc": "Please login to save your personal color reports",
+    "loginModalTitle": "Secure Your Style Profile",
+    "loginModalDesc": "Login to save your personal color reports and access your power palette anytime.",
     "loginModalButtonText": "Login with Google",
     "logoutModalDesc": "Are you sure you want to log out?",
     "confirmButtonText": "Confirm",

@@ -44,7 +44,8 @@
   },
   "AuthText": {
     "loginText": "登录",
-    "loginModalDesc": "请登录以保存您的色彩报告",
+    "loginModalTitle": "锁定您的美学档案",
+    "loginModalDesc": "登录以保存您的专属色彩分析报告，随时随地开启色彩之旅。",
     "loginModalButtonText": "使用 Google 登录",
     "logoutModalDesc": "您确定要退出登录吗？",
     "confirmButtonText": "确认",

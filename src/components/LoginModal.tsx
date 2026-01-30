@@ -9,11 +9,13 @@ import {signInUseAuth} from "~/libs/nextAuthClient";
 const LoginModal = ({
                       loadingText,
                       redirectPath,
+                      loginModalTitle,
                       loginModalDesc,
                       loginModalButtonText,
                     }: {
                         loadingText: string,
                         redirectPath: string,
+                        loginModalTitle: string,
                         loginModalDesc: string,
                         loginModalButtonText: string
                     }) => {
@@ -61,7 +63,7 @@ const LoginModal = ({
                   </div>
 
                   <Dialog.Title as="h3" className="text-2xl font-serif font-bold text-[#1A1A2E] mb-2">
-                    Save Your Results
+                    {loginModalTitle || "Save Your Results"}
                   </Dialog.Title>
                   
                   {/* Promotional Offer Card - Only show in Beta (Free) Mode */}
