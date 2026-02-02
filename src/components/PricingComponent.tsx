@@ -30,6 +30,17 @@ export default function Pricing({
     }
 
     try {
+        let finalSuccessUrl = `${window.location.origin}/${locale}/profile`; // Default
+
+        if (redirectUrl) {
+            const baseUrl = redirectUrl.startsWith('http') 
+                ? redirectUrl 
+                : `${window.location.origin}${redirectUrl.startsWith('/') ? '' : '/'}${redirectUrl}`;
+            
+            const hasQuery = baseUrl.includes('?');
+            finalSuccessUrl = `${baseUrl}${hasQuery ? '&' : '?'}payment_success=true`;
+        }
+
         const res = await fetch('/api/creem/checkout', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -41,7 +52,7 @@ export default function Pricing({
                     plan: plan
                 },
                 // Default success URL for landing page (e.g. user profile or history)
-                successUrl: `${window.location.origin}/${locale}/profile` 
+                successUrl: finalSuccessUrl
             })
         });
 

@@ -3,15 +3,18 @@ import HeadInfo from "~/components/HeadInfo";
 import Header from "~/components/Header";
 import Footer from "~/components/Footer";
 import Pricing from "~/components/PricingComponent";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useRef, useState, Suspense} from "react";
 import TopBlurred from "~/components/TopBlurred";
 import {useCommonContext} from "~/context/common-context";
+import { useSearchParams } from 'next/navigation';
 
 
-const PageComponent = ({
+const PricingPageInner = ({
                          locale,
                        }) => {
   const [pagePath] = useState('pricing');
+  const searchParams = useSearchParams();
+  const redirectParam = searchParams.get('redirect');
 
   const {
     setShowLoadingModal,
@@ -50,7 +53,7 @@ const PageComponent = ({
       <div className={"mt-8 my-auto min-h-[90vh]"}>
         <TopBlurred/>
         <Pricing
-          redirectUrl={`${locale}/pricing`}
+          redirectUrl={redirectParam || `${locale}/pricing`}
           isPricing={true}
         />
       </div>
@@ -61,5 +64,13 @@ const PageComponent = ({
     </>
   )
 }
+
+const PageComponent = ({ locale }) => {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#FFFBF7]" />}>
+      <PricingPageInner locale={locale} />
+    </Suspense>
+  );
+};
 
 export default PageComponent

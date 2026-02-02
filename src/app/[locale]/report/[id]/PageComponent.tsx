@@ -107,7 +107,9 @@ export default function PageComponent({
 
             if (res.status === 402) {
                 setStatus('draft');
-                setShowPricingModal(true);
+                // Redirect to pricing page with return URL
+                const currentPath = window.location.pathname;
+                router.push(`/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}`);
                 return;
             }
 

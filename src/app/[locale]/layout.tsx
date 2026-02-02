@@ -65,8 +65,8 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
     },
     icons: {
       icon: '/favicon.ico',
-      shortcut: '/appicon.svg',
-      apple: '/appicon.svg',
+      shortcut: '/appicon.png',
+      apple: '/appicon.png',
     }
   };
 }
