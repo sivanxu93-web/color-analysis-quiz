@@ -140,6 +140,13 @@ export async function POST(req: NextRequest) {
     );
 
     if (pendingRes.rows.length > 0) {
+        // Conflict detected!
+        // CRITICAL: Delete the *current* session (the one trying to start) so it doesn't leave a zombie draft.
+        await db.query(
+            "DELETE FROM color_lab_sessions WHERE id = $1 AND email = $2",
+            [sessionId, email]
+        );
+
         return NextResponse.json(
             { 
                 error: "You already have a pending report.", 
