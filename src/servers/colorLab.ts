@@ -190,3 +190,11 @@ export const addToColorLabWaitlist = async (params: {
   );
 };
 
+export const deleteColorLabSession = async (sessionId: string, email: string) => {
+  const db = getDb();
+  await db.query(
+    "delete from color_lab_sessions where id = $1 and email = $2",
+    [sessionId, email]
+  );
+};
+
