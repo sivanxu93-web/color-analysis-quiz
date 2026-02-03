@@ -131,17 +131,20 @@ export async function POST(req: NextRequest) {
 
     // 2. CHECK FOR EXISTING PENDING REPORTS (Anti-Abuse & Conversion Logic)
     // User can only have ONE pending (protected/analyzing) report at a time.
+    // CRITICAL: Exclude the *current* session ID to prevent self-conflict if the API is called twice 
+    // or if the session was already marked 'analyzing'.
     const pendingRes = await db.query(
         `SELECT id FROM color_lab_sessions 
          WHERE email = $1 
          AND (status = 'protected' OR status = 'analyzing')
+         AND id != $2
          LIMIT 1`,
-        [email]
+        [email, sessionId]
     );
 
     if (pendingRes.rows.length > 0) {
         // Conflict detected!
-        // CRITICAL: Delete the *current* session (the one trying to start) so it doesn't leave a zombie draft.
+        // Delete the *current* session so it doesn't leave a zombie draft.
         await db.query(
             "DELETE FROM color_lab_sessions WHERE id = $1 AND email = $2",
             [sessionId, email]
