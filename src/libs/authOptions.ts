@@ -51,6 +51,34 @@ export const authOptions: NextAuthOptions = {
         }
         return user
       }
+    }),
+    // DEV ONLY: Direct Login
+    CredentialsProvider({
+        id: "dev-login",
+        name: "Dev Direct Login",
+        credentials: {
+            email: { label: "Email", type: "text", placeholder: "test@example.com" }
+        },
+        async authorize(credentials) {
+            if (process.env.NODE_ENV !== 'development') {
+                return null;
+            }
+            const email = credentials?.email;
+            if (!email) return null;
+
+            const user = {
+                email: email,
+                name: "Dev User",
+                image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+            };
+
+            try {
+                await checkAndSaveUser(user.name, user.email, user.image, 'unknown');
+            } catch (e) {
+                console.error("Dev Login DB Error:", e);
+            }
+            return user;
+        }
     })
   ],
   secret: process.env.NEXTAUTH_SECRET,

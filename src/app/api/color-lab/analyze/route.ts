@@ -129,27 +129,12 @@ export async function POST(req: NextRequest) {
     }
     const userId = userRes.rows[0].user_id;
 
-    // 2. Check Credits
+    // 2. Check Credits - REMOVED for Teaser Model
+    // We allow analysis even with 0 credits. Credits are required to UNLOCK.
+    /*
     const creditRes = await db.query("select available_times from user_available where user_id = $1", [userId]);
-    if (creditRes.rows.length === 0) {
-        // Auto-create credit record if missing (safety net)
-        const freeTimes = Number(process.env.FREE_TIMES || 0);
-        await db.query("insert into user_available(user_id, available_times) values($1, $2)", [userId, freeTimes]);
-        
-        // Log the bonus
-        if (freeTimes > 0) {
-            await db.query("insert into credit_logs(user_id, amount, type, description) values($1, $2, 'bonus', 'Beta test free credits')", [userId, freeTimes]);
-        }
-
-        if (freeTimes <= 0) {
-             return NextResponse.json({ error: "Insufficient credits." }, { status: 402 });
-        }
-    } else {
-        const credits = creditRes.rows[0].available_times;
-        if (credits <= 0) {
-             return NextResponse.json({ error: "Insufficient credits. Please upgrade." }, { status: 402 });
-        }
-    }
+    // ... logic removed ...
+    */
 
     // If email is provided (from the lead magnet modal), save it!
     if (email) {
@@ -212,24 +197,23 @@ export async function POST(req: NextRequest) {
       throw new Error("Invalid JSON response from AI");
     }
 
-    // Save report to DB with 'completed' status
+    // Save report to DB with 'protected' status (Teaser Mode)
     await saveColorLabReport(
         sessionId, 
         analysisResult.season, 
         analysisResult, 
-        'completed', 
+        'protected', 
         imageUrl
     );
 
-    // Update session status
+    // Update session status to 'protected' explicitly
     await db.query("update color_lab_sessions set status = $1 where id = $2", [
-      "analyzed",
+      "protected",
       sessionId,
     ]);
 
-    // *** DEDUCT CREDIT HERE (Success Only) ***
-    await db.query("update user_available set available_times = available_times - 1 where user_id = $1", [userId]);
-    await db.query("insert into credit_logs(user_id, amount, type, description) values($1, -1, 'usage', $2)", [userId, `AI Analysis: ${sessionId}`]);
+    // *** NO DEDUCTION HERE ***
+    // Deduction happens in /api/color-lab/unlock
 
     return NextResponse.json({ success: true, reportId: sessionId });
   } catch (error: any) {

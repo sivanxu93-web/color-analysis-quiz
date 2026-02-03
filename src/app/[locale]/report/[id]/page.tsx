@@ -14,19 +14,42 @@ export async function generateMetadata({ params: { id } }: { params: { id: strin
 }
 
 export default async function ReportPage({
-  params: { locale, id }
+  params: { locale, id },
+  searchParams
 }: {
-  params: { locale: string; id: string }
+  params: { locale: string; id: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const colorLabText = await getColorLabText();
-  const data = await getColorLabReport(id);
+  const isDemo = searchParams?.demo === 'true';
+  let data;
+
+  if (isDemo) {
+      data = {
+          report: null, // PageComponent handles mock report if null in demo mode
+          status: 'draft', // Default, overridden by PageComponent logic
+          imageUrl: null,
+          drapingImages: { best: null, worst: null },
+          rating: undefined,
+          ownerEmail: 'demo@example.com'
+      };
+  } else {
+      try {
+        data = await getColorLabReport(id);
+      } catch (error) {
+        console.error("Failed to fetch report:", error);
+        return <div>Report not found</div>;
+      }
+  }
+
   const session = await getServerSession(authOptions);
 
   if (!data) {
       return <div>Report not found</div> // Simple fallback
   }
 
-  const isOwner = session?.user?.email === data.ownerEmail;
+  // In demo mode, treat as owner so all UI features are visible for testing
+  const isOwner = isDemo || (session?.user?.email === data.ownerEmail);
 
   return (
     <PageComponent 

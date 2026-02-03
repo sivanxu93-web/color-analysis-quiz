@@ -6,7 +6,7 @@ import { getLinkHref } from '~/configs/buildLink';
 import { useState, useEffect, useRef } from 'react';
 import { sendGAEvent } from '@next/third-parties/google';
 import { useCommonContext } from '~/context/common-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PricingModal from '~/components/PricingModal';
 import ColorFan from '~/components/ColorFan';
 
@@ -43,6 +43,25 @@ export default function PageComponent({
     const [generationError, setGenerationError] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
     
+    // DEMO MODE LOGIC
+    const searchParams = useSearchParams ? useSearchParams() : null; // Safety check
+    const isDemo = searchParams?.get('demo') === 'true';
+    const mockStatus = searchParams?.get('mock_status') || 'protected';
+
+    // Sync status when server props update, BUT respect demo mode
+    useEffect(() => {
+        if (isDemo) {
+            setStatus(mockStatus);
+        } else if (initialStatus && initialStatus !== status) {
+            // Prevent regression: If we are already 'completed', don't revert to 'protected' 
+            // just because the server prop is stale (race condition with router.refresh)
+            if (status === 'completed' && (initialStatus === 'protected' || initialStatus === 'processing')) {
+                return;
+            }
+            setStatus(initialStatus);
+        }
+    }, [initialStatus, isDemo, mockStatus, status]);
+
     // Feedback State
     const [feedbackStatus, setFeedbackStatus] = useState<'idle' | 'good' | 'bad' | 'submitted'>(rating ? 'submitted' : 'idle');
     const [feedbackComment, setFeedbackComment] = useState('');
@@ -57,18 +76,10 @@ export default function PageComponent({
         "Consulting the AI stylist...",
     ];
 
-    // Sync status when server props update
-    useEffect(() => {
-        if (initialStatus && initialStatus !== status) {
-            setStatus(initialStatus);
-        }
-    }, [initialStatus]);
-
     // 1. Auto-Trigger Generation & Session Claim
     useEffect(() => {
-        if (!userData?.email) return;
-
-        if (sessionId) {
+        // Claim session if user is logged in
+        if (userData?.email && sessionId) {
             fetch('/api/color-lab/session/claim', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -80,12 +91,22 @@ export default function PageComponent({
         const paymentSuccess = urlParams.get('payment_success');
 
         if (paymentSuccess === 'true') {
-            window.history.replaceState({}, '', window.location.pathname);
-            if (status === 'draft') {
-                triggerGeneration();
+            // Only attempt unlock if user is loaded.
+            if (userData?.user_id) {
+                window.history.replaceState({}, '', window.location.pathname);
+                if (status === 'protected') {
+                    handleUnlockClick();
+                }
             }
-        } 
-    }, [status, userData?.email, sessionId]);
+        } else if (status === 'draft') {
+            // Auto-start analysis or prompt login
+            if (userData?.email) {
+                triggerGeneration();
+            } else {
+                setShowLoginModal(true);
+            }
+        }
+    }, [status, userData?.email, sessionId, setShowLoginModal, userData?.user_id]);
 
     const triggerGeneration = async () => {
         if (!sessionId || !userData?.email) return;
@@ -106,7 +127,7 @@ export default function PageComponent({
             });
 
             if (res.status === 402) {
-                setStatus('draft');
+                setStatus('protected');
                 // Redirect to pricing page with return URL
                 const currentPath = window.location.pathname;
                 router.push(`/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}`);
@@ -123,11 +144,45 @@ export default function PageComponent({
         }
     };
 
-    const handleUnlockClick = () => {
+    const handleUnlockClick = async () => {
         if (!userData?.user_id) {
             setShowLoginModal(true);
-        } else {
-            triggerGeneration();
+            return;
+        }
+
+        setStatus('processing');
+
+        try {
+            const res = await fetch('/api/color-lab/unlock', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    sessionId,
+                    email: userData.email
+                })
+            });
+
+            if (res.status === 402) {
+                // Insufficient credits -> Go to pricing
+                const currentPath = window.location.pathname;
+                router.push(`/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}`);
+                return;
+            }
+
+            if (res.ok) {
+                // Unlock successful -> Reveal content
+                setStatus('completed');
+                router.refresh();
+                // Draping generation will auto-trigger via existing useEffect
+            } else {
+                const errorText = await res.text();
+                console.error("Unlock failed", res.status, errorText);
+                alert("Something went wrong unlocking the report. Please try again.");
+                setStatus('protected');
+            }
+        } catch (e) {
+            console.error("Unlock error", e);
+            setStatus('protected');
         }
     };
 
@@ -142,212 +197,60 @@ export default function PageComponent({
   
       const handleGenerateDraping = async () => {
   
-  
-  
+        // Double check: Only generate if paid
+        if (status !== 'completed') return;
+
         if (!sessionId || !report?.virtual_draping_prompts) return;
   
-  
-  
-        
-  
-  
-  
         // Reset state to trigger loading UI
-  
-  
-  
         setDrapingError(null);
-  
-  
-  
         setIsGeneratingDraping(true);
-  
-  
-  
         hasTriggeredDraping.current = true;
   
-  
-  
-        
-  
-  
-  
         try {
-  
-  
-  
             const [bestRes, worstRes] = await Promise.all([
-  
-  
-  
                 fetch('/api/color-lab/draping', {
-  
-  
-  
                     method: 'POST',
-  
-  
-  
                     headers: {'Content-Type': 'application/json'},
-  
-  
-  
                     body: JSON.stringify({ 
-  
-  
-  
                         sessionId, 
-  
-  
-  
                         prompt: report.virtual_draping_prompts.best_color_prompt, 
-  
-  
-  
                         makeup_prompt: report.virtual_draping_prompts.best_makeup_prompt,
-  
-  
-  
                         type: 'best' 
-  
-  
-  
                     })
-  
-  
-  
                 }),
-  
-  
-  
                 fetch('/api/color-lab/draping', {
-  
-  
-  
                     method: 'POST',
-  
-  
-  
                     headers: {'Content-Type': 'application/json'},
-  
-  
-  
                     body: JSON.stringify({ 
-  
-  
-  
                         sessionId, 
-  
-  
-  
                         prompt: report.virtual_draping_prompts.worst_color_prompt, 
-  
-  
-  
                         makeup_prompt: report.virtual_draping_prompts.worst_makeup_prompt,
-  
-  
-  
                         type: 'worst' 
-  
-  
-  
                     })
-  
-  
-  
                 })
-  
-  
-  
             ]);
-  
-  
-  
     
-  
-  
-  
             if (!bestRes.ok || !worstRes.ok) {
-  
-  
-  
                 console.error("Draping API failed:", !bestRes.ok ? await bestRes.text() : await worstRes.text());
-  
-  
-  
                 throw new Error("HIGH_VOLUME_ERROR");
-  
-  
-  
             }
-  
-  
-  
     
-  
-  
-  
             const bestData = await bestRes.json();
-  
-  
-  
             const worstData = await worstRes.json();
-  
-  
-  
             
-  
-  
-  
             setDrapingImages({
-  
-  
-  
                 best: bestData.imageUrl,
-  
-  
-  
                 worst: worstData.imageUrl
-  
-  
-  
             });
-  
-  
-  
         } catch (error: any) {
-  
-  
-  
             console.error("Draping technical error:", error);
-  
-  
-  
             // Force a friendly, high-volume message regardless of the actual error
-  
-  
-  
             setDrapingError("We're seeing a huge surge in users right now! Our AI is working overtime to style everyone—please try clicking again in a moment.");
-  
-  
-  
             hasTriggeredDraping.current = false; 
-  
-  
-  
         } finally {
-  
-  
-  
             setIsGeneratingDraping(false);
-  
-  
-  
         }
-  
-  
-  
       };
   
   
@@ -416,22 +319,42 @@ export default function PageComponent({
       celebrities: ["Anne Hathaway", "Kendall Jenner", "Lucy Liu"]
   };
 
-  const isLocked = status === 'draft';
-  const displayReport = report || MOCK_REPORT;
-  const displayDraping = isLocked ? { best: userImage, worst: userImage } : drapingImages;
+  const isLocked = status === 'protected';
+  const displayReport = isDemo ? MOCK_REPORT : report;
+  
+  // Handle User Image for Demo
+  const displayUserImage = (isDemo && !userImage) ? '/seasonal_color_analysis.jpg' : userImage;
+
+  // Handle Draping Images for Demo
+  const displayDraping = isDemo && status === 'completed' 
+      ? { best: displayUserImage, worst: displayUserImage } 
+      : (isLocked ? { best: displayUserImage, worst: displayUserImage } : drapingImages);
 
   // 3. Auto-show login modal if locked and not logged in
   useEffect(() => {
-    if (isLocked && !userData?.user_id) {
+    if (!isDemo && isLocked && !userData?.user_id) {
         setShowLoginModal(true);
     }
-  }, [isLocked, userData?.user_id, setShowLoginModal]);
+  }, [isLocked, userData?.user_id, setShowLoginModal, isDemo]);
 
   const { 
-      season: dSeason, headline: dHeadline, description: dDescription, characteristics: dCharacteristics, 
+      season: rawSeason, headline: dHeadline, description: dDescription, characteristics: dCharacteristics, 
       palette: dPalette, makeup_recommendations: dMakeup, styling: dStyling, 
       worst_colors: dWorst, celebrities: dCelebs, hair_color_recommendations: dHair
-  } = displayReport;
+  } = displayReport || {};
+
+  // --- LOCKED CONTENT LOGIC ---
+  // 1. Mask Season Name (e.g. "Deep Winter" -> "**** Winter")
+  const baseSeason = rawSeason?.split(' ').pop();
+  const dSeason = isLocked ? (
+      <span className="inline-flex items-baseline gap-2">
+          <span className="text-white/40 tracking-widest animate-pulse font-mono text-4xl">****</span> 
+          <span>{baseSeason}</span>
+          <span className="bg-white/10 p-1.5 rounded-full ml-2 self-center">
+            <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          </span>
+      </span>
+  ) : rawSeason;
 
   // --- BACKWARDS COMPATIBILITY LOGIC ---
   const normalizePalette = (group: any) => {
@@ -443,22 +366,46 @@ export default function PageComponent({
     };
   };
 
-  const powerPalette = normalizePalette(dPalette?.power);
+  const fullPowerPalette = normalizePalette(dPalette?.power);
+  // 2. Limit Power Colors (Show 1 if locked)
+  const powerPalette = isLocked 
+    ? { ...fullPowerPalette, colors: fullPowerPalette.colors.slice(0, 1) } 
+    : fullPowerPalette;
+
   const neutralPalette = normalizePalette(dPalette?.neutrals);
   const pastelPalette = normalizePalette(dPalette?.pastels);
+  
+  // 3. Limit Celebrities (Show 1 if locked)
+  const displayCelebs = (isLocked && dCelebs) ? dCelebs.slice(0, 1) : dCelebs;
   // --------------------------------------
 
-  // Loading View
-  useEffect(() => {
-    if (status === 'processing') {
-      const interval = setInterval(() => {
-        setCurrentTipIndex((prev) => (prev + 1) % LOADING_TIPS.length);
-      }, 2500);
-      return () => clearInterval(interval);
-    }
-  }, [status]);
+  // --- HELPER COMPONENT FOR LOCKING CONTENT ---
+  const BlurLock = ({ children, label = "Unlock to View" }: { children: React.ReactNode, label?: string }) => {
+      if (!isLocked) return <>{children}</>;
+      
+      return (
+        <div className="relative group cursor-pointer overflow-hidden rounded-xl border border-gray-100/50" onClick={handleUnlockClick}>
+            {/* Content Layer - Blurred & Faded */}
+            <div className="blur-[6px] select-none pointer-events-none opacity-60 transition-all duration-500 group-hover:blur-[4px]">
+                {children}
+            </div>
+            
+            {/* Overlay Layer */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-white/20 hover:bg-white/10 transition-colors">
+                <div className="bg-[#1A1A2E] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 transform transition-all group-hover:scale-105 ring-4 ring-white/50 hover:bg-black">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <span className="text-xs font-bold tracking-wide uppercase">{label}</span>
+                </div>
+            </div>
+        </div>
+      );
+  };
+  // --------------------------------------------
 
-  if (status === 'processing') {
+  // Loading View (Processing OR Initializing)
+  if (status === 'processing' || (!displayReport && !isDemo)) {
       return (
         <>
           <Header locale={locale} page={'report'} />
@@ -502,45 +449,8 @@ export default function PageComponent({
       <Header locale={locale} page={'report'} />
       <PricingModal locale={locale} page={'report'} />
 
-      {/* PAYWALL OVERLAY */}
-      {isLocked && (
-         <div className="fixed inset-0 top-[60px] md:top-[72px] z-40 flex items-center justify-center p-4 w-full overflow-hidden">
-             <div className="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
-             <div className="relative bg-white/95 backdrop-blur-xl p-8 md:p-12 rounded-[2.5rem] shadow-2xl border border-white/50 max-w-lg w-full text-center animate-fade-in-up">
-                 <div className="relative inline-block mb-8">
-                     <div className="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-pulse"></div>
-                     {userImage ? (
-                         <img src={userImage} alt="User" className="relative w-32 h-32 rounded-full border-4 border-white shadow-xl object-cover mx-auto" />
-                     ) : (
-                         <div className="relative w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center text-4xl border-4 border-white shadow-xl">👤</div>
-                     )}
-                     <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-2 rounded-full border-4 border-white shadow-sm">
-                         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                     </div>
-                 </div>
-
-                 <h1 className="text-3xl font-serif font-bold text-[#1A1A2E] mb-3">Analysis Ready!</h1>
-                 <p className="text-gray-500 mb-8 leading-relaxed">
-                     Your personalized color season, best matches, and styling guide are ready to be unlocked.
-                 </p>
-
-                 <button 
-                    onClick={handleUnlockClick}
-                    className="group w-full bg-[#1A1A2E] text-white py-4 rounded-full font-bold text-lg shadow-xl hover:bg-primary transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-3"
-                 >
-                    <span>{userData?.user_id ? "Unlock Full Report" : "Login to Unlock"}</span>
-                    {userData?.user_id && <span className="bg-white/20 px-3 py-0.5 rounded-full text-xs font-medium tracking-wide uppercase">1 Credit</span>}
-                 </button>
-                 
-                 <p className="mt-6 text-xs text-gray-400">
-                    One-time payment • Secure via Creem
-                 </p>
-             </div>
-         </div>
-      )}
-
       {/* Main Content (Blurred if Locked) */}
-      <main className={`min-h-screen bg-[#FFFBF7] font-sans text-[#1A1A2E] pb-20 scroll-smooth transition-all duration-1000 ${isLocked ? 'blur-xl opacity-60 pointer-events-none select-none overflow-hidden h-screen fixed w-full' : ''}`}>
+      <main className={`min-h-screen bg-[#FFFBF7] font-sans text-[#1A1A2E] pb-20 scroll-smooth transition-all duration-1000`}>
 
         {/* Sticky Nav */}
         <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#FFFBF7]/95 backdrop-blur-md border-b border-[#E8E1D9] py-3 overflow-x-auto no-scrollbar shadow-sm transition-all">
@@ -562,64 +472,84 @@ export default function PageComponent({
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 pt-8">
 
-            {/* 1. The Reveal */}
-            <div id="reveal" className="relative bg-[#1A1A2E] text-white rounded-3xl overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
-                <div className="absolute inset-0 bg-gradient-to-r from-[#1A1A2E] via-[#1A1A2E]/90 to-transparent z-10"></div>
+            {/* 1. The Reveal - Magazine Card Layout */}
+            <div id="reveal" className="relative bg-[#1A1A2E] text-white rounded-[2.5rem] overflow-hidden shadow-2xl min-h-[650px] flex flex-col md:flex-row">
                 
-                <div className="relative z-20 flex flex-col md:flex-row items-stretch min-h-[500px]">
-                    {/* Text Side */}
-                    <div className="flex-1 p-10 md:p-16 flex flex-col justify-center">
-                        <div className="inline-block px-4 py-1 border border-accent-gold/50 text-accent-gold text-xs font-bold uppercase tracking-[0.2em] mb-6 w-max rounded-full">
-                            Personal Analysis
+                {/* Background Pattern */}
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0 pointer-events-none"></div>
+
+                {/* Right Side: Image (Background Anchor) */}
+                <div className="relative w-full md:absolute md:right-0 md:top-0 md:bottom-0 md:w-[55%] h-[400px] md:h-full z-0 order-1 md:order-2">
+                    {displayUserImage ? (
+                        <div className="w-full h-full relative">
+                            <img src={displayUserImage} alt="User" className="w-full h-full object-cover object-top opacity-90" />
+                            {/* Gradient: Bottom fade for mobile */}
+                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1A1A2E] to-transparent md:hidden"></div>
+                            {/* Gradient: Left fade for desktop */}
+                            <div className="hidden md:block absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-[#1A1A2E] via-[#1A1A2E]/60 to-transparent"></div>
                         </div>
-                        <h1 className="font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight">
-                            You are a <br/>
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400 italic pr-2">{dSeason}</span>
-                        </h1>
-                        <p className="text-lg md:text-xl text-gray-300 font-light italic mb-8 border-l-2 border-accent-gold pl-6">
-                            &quot;{dHeadline || 'Discover your true colors.'}&quot;
-                        </p>
-                        <p className="text-gray-400 leading-relaxed max-w-md">
-                            {dDescription}
-                        </p>
-                        
-                        {/* Quick Traits */}
-                        <div className="mt-10 grid grid-cols-3 gap-6 text-sm border-t border-white/5 pt-6">
-                            {dCharacteristics && Object.entries(dCharacteristics).map(([key, value]) => (
-                                <div key={key}>
-                                    <p className="text-accent-gold uppercase text-[10px] tracking-widest mb-1 font-bold opacity-80">{key}</p>
-                                    <p className="font-medium text-white leading-snug">{value as string}</p>
+                    ) : (
+                        <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">No Image</div>
+                    )}
+                </div>
+
+                {/* Left Side: Content (The Hook) */}
+                <div className="relative z-10 w-full md:w-[55%] p-8 md:p-16 flex flex-col justify-center order-2 md:order-1 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E] to-transparent md:bg-none -mt-20 md:mt-0">
+                    <div className="inline-block px-4 py-1 border border-accent-gold/50 text-accent-gold text-xs font-bold uppercase tracking-[0.2em] mb-6 w-max rounded-full backdrop-blur-md bg-[#1A1A2E]/30">
+                        Personal Analysis
+                    </div>
+                    
+                    <h1 className="font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg">
+                        You are a <br/>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">{dSeason}</span>
+                    </h1>
+                    
+                    <p className="text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80">
+                        &quot;{dHeadline || 'Discover your true colors.'}&quot;
+                    </p>
+                    
+                    {/* Quick Traits Grid */}
+                    <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8 backdrop-blur-sm bg-[#1A1A2E]/20 rounded-xl p-4 -mx-4 md:mx-0">
+                        {dCharacteristics && Object.entries(dCharacteristics).map(([key, value]) => (
+                            <div key={key}>
+                                <p className="text-accent-gold uppercase text-[10px] tracking-widest mb-1.5 font-bold opacity-80">{key}</p>
+                                <p className="font-medium text-white text-sm md:text-base leading-snug">{value as string}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 1.5 The Profile (Deep Dive) - New Section */}
+            <div id="profile" className="max-w-4xl mx-auto px-6 text-center space-y-12">
+                {/* Analysis Text */}
+                <div className="relative">
+                    <span className="absolute -top-6 -left-4 text-8xl text-primary/10 font-serif leading-none">&ldquo;</span>
+                    <p className="text-xl md:text-2xl text-[#1A1A2E] font-serif leading-relaxed italic">
+                        {dDescription}
+                    </p>
+                    <span className="absolute -bottom-12 -right-4 text-8xl text-primary/10 font-serif leading-none rotate-180">&rdquo;</span>
+                </div>
+
+                {/* Celebrity Twins */}
+                {displayCelebs && (
+                    <div className="border-t border-gray-100 pt-10">
+                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-6">Celebrity Muse</p>
+                        <div className="flex flex-wrap justify-center gap-4 md:gap-8">
+                            {displayCelebs.map((celeb: string, i: number) => (
+                                <div key={i} className="bg-white border border-gray-200 px-6 py-3 rounded-full shadow-sm flex items-center gap-3">
+                                    <span className="text-xl">✨</span>
+                                    <span className="font-serif text-lg text-gray-900 italic">{celeb}</span>
                                 </div>
                             ))}
-                        </div>
-
-                        {/* Celebrity Twins */}
-                        {dCelebs && (
-                            <div className="mt-8 pt-6 border-t border-white/10">
-                                <p className="text-gray-500 text-xs font-bold uppercase tracking-widest mb-3">Celebrity Twins</p>
-                                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                                    {dCelebs.map((celeb: string, i: number) => (
-                                        <span key={i} className="text-white font-serif text-lg italic opacity-90 border-b border-white/20 pb-0.5">
-                                            {celeb}
-                                        </span>
-                                    ))}
+                            {isLocked && (
+                                <div className="bg-gray-50 border border-gray-200 px-6 py-3 rounded-full shadow-sm flex items-center gap-2 opacity-60">
+                                    <span className="text-sm font-bold text-gray-400">+ 2 others</span>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Image Side */}
-                    <div className="relative w-full md:w-[400px] shrink-0 p-6 md:p-8 flex items-start justify-center bg-black/20">
-                        <div className="relative w-full rounded-2xl overflow-hidden shadow-2xl border-4 border-white/10 rotate-2 hover:rotate-0 transition-transform duration-700">
-                            {userImage ? (
-                                <img src={userImage} alt="User" className="w-full h-auto max-h-[600px] object-contain bg-gray-900" />
-                            ) : (
-                                <div className="w-full aspect-[3/4] bg-gray-800 flex items-center justify-center text-gray-500">No Image</div>
                             )}
                         </div>
                     </div>
-                </div>
+                )}
             </div>
 
             {/* 2. Visual Proof */}
@@ -651,15 +581,68 @@ export default function PageComponent({
 
             {/* Draping: If Locked, show mock images. Else show real or loading */}
             {isLocked ? (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-4xl mx-auto opacity-50">
-                    <div className="relative bg-white p-3 shadow-xl rounded-2xl">
-                        <div className="w-full rounded-xl overflow-hidden bg-gray-50">
-                            <img src={userImage || ''} alt="Mock Draping Best" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
+                 <div className="relative max-w-5xl mx-auto cursor-pointer group overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20" onClick={handleUnlockClick}>
+                    {/* Background Grid */}
+                    <div className="grid grid-cols-2 h-[400px] md:h-[500px] relative">
+                        {/* Left: Best Match Preview */}
+                        <div className="relative overflow-hidden bg-gray-100">
+                            <img 
+                                src={displayUserImage || ''} 
+                                alt="Locked Best" 
+                                className="w-full h-full object-cover object-top blur-[6px] scale-105 transition-transform duration-1000 group-hover:scale-100" 
+                            />
+                            {/* Vibrant Overlay - Good Color */}
+                            <div className="absolute inset-0 bg-emerald-900/30 mix-blend-multiply"></div>
+                            <div className="absolute top-6 left-0 right-0 text-center z-10">
+                                <span className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white/90 shadow-lg tracking-widest uppercase border border-white/10">
+                                    ✨ Best Match
+                                </span>
+                            </div>
                         </div>
+
+                        {/* Right: Worst Match Preview */}
+                        <div className="relative overflow-hidden bg-gray-100">
+                            <img 
+                                src={displayUserImage || ''} 
+                                alt="Locked Worst" 
+                                className="w-full h-full object-cover object-top blur-[6px] scale-105 transition-transform duration-1000 group-hover:scale-100" 
+                            />
+                            {/* Dull Overlay - Bad Color */}
+                            <div className="absolute inset-0 bg-yellow-900/40 mix-blend-multiply"></div>
+                            <div className="absolute top-6 left-0 right-0 text-center z-10">
+                                <span className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white/90 shadow-lg tracking-widest uppercase border border-white/10">
+                                    🚫 To Avoid
+                                </span>
+                            </div>
+                        </div>
+
+                        {/* Central Divider - Soft Light */}
+                        <div className="absolute top-0 bottom-0 left-1/2 -translate-x-1/2 w-px bg-gradient-to-b from-transparent via-white/50 to-transparent"></div>
                     </div>
-                    <div className="relative bg-white p-3 shadow-xl rounded-2xl">
-                        <div className="w-full rounded-xl overflow-hidden bg-gray-50">
-                            <img src={userImage || ''} alt="Mock Draping Worst" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
+
+                    {/* Central Floating Lock UI - Enhanced Readability */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center z-20 p-6 bg-gradient-to-t from-black/60 via-transparent to-transparent">
+                        {/* Radial Shadow for text pop */}
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0.4)_0%,_transparent_70%)] pointer-events-none"></div>
+                        
+                        <div className="text-center relative z-30 transform transition-transform duration-500 group-hover:scale-105">
+                            <div className="bg-white/20 backdrop-blur-md p-4 rounded-full inline-flex mb-5 ring-1 ring-white/40 shadow-2xl">
+                                <svg className="w-8 h-8 text-white drop-shadow-md" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <h3 className="font-serif text-4xl md:text-5xl font-bold text-white mb-3 drop-shadow-xl tracking-tight leading-tight">
+                                See the Difference
+                            </h3>
+                            <p className="text-white/90 text-lg mb-8 max-w-md mx-auto drop-shadow-md font-medium leading-relaxed">
+                                Don&apos;t guess. Let AI show you exactly what works.
+                            </p>
+                            
+                            <button className="group/btn relative inline-flex items-center gap-3 bg-white text-[#1A1A2E] px-10 py-4 rounded-full font-bold text-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] transition-all overflow-hidden" onClick={handleUnlockClick}>
+                                <span className="relative z-10">Unlock Visual Proof</span>
+                                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000"></div>
+                                <span className="relative z-10 bg-[#1A1A2E] text-white text-xs px-2 py-0.5 rounded ml-1">1 Credit</span>
+                            </button>
                         </div>
                     </div>
                  </div>
@@ -774,7 +757,8 @@ export default function PageComponent({
                                 </div>
                             )}
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 relative">
+                                {/* Visible Colors (1st one) */}
                                 {powerPalette.colors.map((color: any, idx: number) => (
                                     <div key={idx} className="group">
                                         <div className="aspect-square rounded-2xl shadow-md transition-transform group-hover:-translate-y-2 relative overflow-hidden" style={{backgroundColor: color.hex}}>
@@ -786,9 +770,30 @@ export default function PageComponent({
                                         </div>
                                     </div>
                                 ))}
+
+                                {/* Blurred/Locked Colors (Simulated Variety) */}
+                                {isLocked && ['#FFB7B2', '#B5EAD7', '#C7CEEA'].map((mockColor, i) => (
+                                    <div key={`locked-${i}`} className="opacity-60 blur-[4px] select-none pointer-events-none grayscale-[30%]">
+                                        <div className="aspect-square rounded-2xl shadow-sm" style={{backgroundColor: mockColor}}></div>
+                                        <div className="text-center mt-3 space-y-2">
+                                            <div className="h-4 w-20 bg-gray-200/50 rounded mx-auto"></div>
+                                            <div className="h-3 w-12 bg-gray-100/50 rounded mx-auto"></div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                                {isLocked && (
+                                     <div className="absolute inset-0 left-[25%] flex items-center justify-center z-10" onClick={handleUnlockClick}>
+                                        <div className="bg-[#1A1A2E] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 cursor-pointer hover:bg-black transition-all transform hover:scale-105 ring-4 ring-white/50">
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                            <span className="text-xs font-bold tracking-wide uppercase">Unlock Personalized Palette</span>
+                                        </div>
+                                     </div>
+                                )}
                             </div>
                         </div>
 
+                        <BlurLock label="Unlock Full Palette">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                             <div>
                                 <h3 className="font-serif text-xl font-bold mb-4 text-gray-800 border-b pb-2">Essentials / Neutrals</h3>
@@ -818,6 +823,7 @@ export default function PageComponent({
                                 </div>
                             </div>
                         </div>
+                        </BlurLock>
 
                         {dWorst && dWorst.length > 0 && (
                             <div className="mt-16 pt-12 border-t border-dashed border-gray-200">
@@ -827,6 +833,7 @@ export default function PageComponent({
                                     </h3>
                                     <p className="text-sm text-gray-500 mt-2">Shades that may conflict with your natural undertones.</p>
                                 </div>
+                                <BlurLock label="Unlock to Avoid Mistakes">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     {dWorst.map((color: any, idx: number) => (
                                         <div key={idx} className="flex items-center gap-4 bg-red-50/50 p-4 rounded-xl border border-red-100">
@@ -838,6 +845,7 @@ export default function PageComponent({
                                         </div>
                                     ))}
                                 </div>
+                                </BlurLock>
                             </div>
                         )}
                     </div>
@@ -858,6 +866,7 @@ export default function PageComponent({
                         </p>
                     </div>
 
+                    <BlurLock label="Unlock Makeup Guide">
                     <div className="space-y-6">
                         {dMakeup?.specific_products?.map((prod: any, i: number) => (
                             <div key={i} className="flex items-center gap-5 p-4 hover:bg-gray-50 rounded-xl transition-colors border-b border-gray-50 last:border-0">
@@ -894,6 +903,7 @@ export default function PageComponent({
                             </div>
                         </div>
                     )}
+                    </BlurLock>
                 </div>
 
                 {/* Styling */}
@@ -905,6 +915,7 @@ export default function PageComponent({
                                 <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
                                     <span>💇‍♀️</span> Hair Color
                                 </h3>
+                                <BlurLock label="Unlock Hair Colors">
                                 <div className="space-y-4">
                                     {dHair.map((hair: any, i: number) => (
                                         <div key={i} className="bg-white/10 backdrop-blur border border-white/10 p-4 rounded-xl">
@@ -913,6 +924,7 @@ export default function PageComponent({
                                         </div>
                                     ))}
                                 </div>
+                                </BlurLock>
                             </div>
                             <div className="absolute top-0 right-0 w-48 h-48 bg-accent-gold/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
                         </div>
@@ -1063,6 +1075,25 @@ export default function PageComponent({
                     </div>
                 </div>
             </div>
+        )}
+
+        {/* Sticky Unlock Bar (For Locked State) */}
+        {isLocked && (
+             <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up">
+                <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
+                    <div className="hidden md:block">
+                        <p className="text-sm font-bold text-[#1A1A2E]">Your analysis is complete!</p>
+                        <p className="text-xs text-gray-500">Unlock your personalized palette & style guide.</p>
+                    </div>
+                    <button 
+                        onClick={handleUnlockClick}
+                        className="flex-1 md:flex-none bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-lg flex items-center justify-center gap-2"
+                    >
+                        <span>Unlock full {baseSeason || 'Report'}</span>
+                        <span className="text-accent-gold bg-white/10 px-2 py-0.5 rounded">1 Credit</span>
+                    </button>
+                </div>
+             </div>
         )}
     </>
   )

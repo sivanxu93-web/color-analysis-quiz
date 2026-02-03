@@ -34,6 +34,24 @@ export async function POST(req: NextRequest) {
     // 1. Get User Image from DB
     const db = getDb();
 
+    // SECURITY CHECK: Verify session status is 'completed' (Paid)
+    const sessionRes = await db.query(
+      "select status from color_lab_sessions where id = $1",
+      [sessionId]
+    );
+
+    if (sessionRes.rowCount === 0) {
+        return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    if (sessionRes.rows[0].status !== 'completed') {
+        console.warn(`Blocked draping attempt for unpaid session: ${sessionId}`);
+        return NextResponse.json(
+            { error: "Payment required to unlock virtual draping." }, 
+            { status: 403 }
+        );
+    }
+
     // CHECK CACHE: Check if draping image already exists
     const imageType = type === "best" ? "best_draping" : "worst_draping";
     const existingRes = await db.query(
