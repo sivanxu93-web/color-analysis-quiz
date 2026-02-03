@@ -511,7 +511,7 @@ export default function PageComponent({
                     </h1>
                     
                     <p className="text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80">
-                        &quot;{dHeadline || 'Discover your true colors.'}&quot;
+                        &quot;{isLocked ? 'Unlock to reveal your true style persona.' : (dHeadline || 'Discover your true colors.')}&quot;
                     </p>
                     
                     {/* Quick Traits Grid */}
@@ -519,7 +519,13 @@ export default function PageComponent({
                         {dCharacteristics && Object.entries(dCharacteristics).map(([key, value]) => (
                             <div key={key}>
                                 <p className="text-accent-gold uppercase text-[10px] tracking-widest mb-1.5 font-bold opacity-80">{key}</p>
-                                <p className="font-medium text-white text-sm md:text-base leading-snug">{value as string}</p>
+                                <p className="font-medium text-white text-sm md:text-base leading-snug">
+                                    {isLocked ? (
+                                        <span className="blur-sm select-none opacity-50">Hidden</span>
+                                    ) : (
+                                        value as string
+                                    )}
+                                </p>
                             </div>
                         ))}
                     </div>
@@ -529,13 +535,15 @@ export default function PageComponent({
             {/* 1.5 The Profile (Deep Dive) - New Section */}
             <div id="profile" className="max-w-4xl mx-auto px-6 text-center space-y-12">
                 {/* Analysis Text */}
-                <div className="relative">
-                    <span className="absolute -top-6 -left-4 text-8xl text-primary/10 font-serif leading-none">&ldquo;</span>
-                    <p className="text-xl md:text-2xl text-[#1A1A2E] font-serif leading-relaxed italic">
-                        {dDescription}
-                    </p>
-                    <span className="absolute -bottom-12 -right-4 text-8xl text-primary/10 font-serif leading-none rotate-180">&rdquo;</span>
-                </div>
+                <BlurLock label="Unlock Full Analysis">
+                    <div className="relative">
+                        <span className="absolute -top-6 -left-4 text-8xl text-primary/10 font-serif leading-none">&ldquo;</span>
+                        <p className="text-xl md:text-2xl text-[#1A1A2E] font-serif leading-relaxed italic">
+                            {dDescription}
+                        </p>
+                        <span className="absolute -bottom-12 -right-4 text-8xl text-primary/10 font-serif leading-none rotate-180">&rdquo;</span>
+                    </div>
+                </BlurLock>
 
                 {/* Celebrity Twins */}
                 {displayCelebs && (
