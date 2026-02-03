@@ -26,61 +26,61 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         credential: { type: "text" },
       },
-      // @ts-ignore
-      authorize: async (credentials) => {
-        const token = credentials!.credential;
-        const ticket = await googleAuthClient.verifyIdToken({
-          idToken: token,
-          audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
-        });
-
-        const payload = ticket.getPayload();
-        if (!payload) {
-          throw new Error("Cannot extract payload from signin token");
-        }
-        const { email, name, picture: image } = payload;
-        if (!email) {
-          throw new Error("Email not available");
-        }
-        const user = {email, name, image}
-        
-        try {
-            await checkAndSaveUser(user.name!, user.email, user.image!, 'unknown');
-        } catch (e) {
-            console.error("Authorize DB Error:", e);
-        }
-        return user
-      }
-    }),
-    // DEV ONLY: Direct Login
-    CredentialsProvider({
-        id: "dev-login",
-        name: "Dev Direct Login",
-        credentials: {
-            email: { label: "Email", type: "text", placeholder: "test@example.com" }
-        },
-        async authorize(credentials) {
-            if (process.env.NODE_ENV !== 'development') {
-                return null;
+              // @ts-ignore
+            authorize: async (credentials) => {
+              const token = credentials!.credential;
+              const ticket = await googleAuthClient.verifyIdToken({
+                idToken: token,
+                audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
+              });
+      
+              const payload = ticket.getPayload();
+              if (!payload) {
+                throw new Error("Cannot extract payload from signin token");
+              }
+              const { email, name, picture: image, sub } = payload;
+              if (!email) {
+                throw new Error("Email not available");
+              }
+              const user = {id: sub, email, name, image}
+              
+              try {
+                  await checkAndSaveUser(user.name!, user.email, user.image!, 'unknown');
+              } catch (e) {
+                  console.error("Authorize DB Error:", e);
+              }
+              return user
             }
-            const email = credentials?.email;
-            if (!email) return null;
-
-            const user = {
-                email: email,
-                name: "Dev User",
-                image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
-            };
-
-            try {
-                await checkAndSaveUser(user.name, user.email, user.image, 'unknown');
-            } catch (e) {
-                console.error("Dev Login DB Error:", e);
-            }
-            return user;
-        }
-    })
-  ],
+          }),
+          // DEV ONLY: Direct Login
+          CredentialsProvider({
+              id: "dev-login",
+              name: "Dev Direct Login",
+              credentials: {
+                  email: { label: "Email", type: "text", placeholder: "test@example.com" }
+              },
+              async authorize(credentials) {
+                  if (process.env.NODE_ENV !== 'development') {
+                      return null;
+                  }
+                  const email = credentials?.email;
+                  if (!email) return null;
+      
+                  const user = {
+                      id: email, // Use email as mock ID for dev
+                      email: email,
+                      name: "Dev User",
+                      image: "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y"
+                  };
+      
+                  try {
+                      await checkAndSaveUser(user.name, user.email, user.image, 'unknown');
+                  } catch (e) {
+                      console.error("Dev Login DB Error:", e);
+                  }
+                  return user;
+              }
+          })  ],
   secret: process.env.NEXTAUTH_SECRET,
   debug: true, // Enable debug
   callbacks: {

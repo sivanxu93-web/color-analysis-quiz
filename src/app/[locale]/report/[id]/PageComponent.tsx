@@ -44,7 +44,7 @@ export default function PageComponent({
     const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
     
     // DEMO MODE LOGIC
-    const searchParams = useSearchParams ? useSearchParams() : null; // Safety check
+    const searchParams = useSearchParams();
     const isDemo = searchParams?.get('demo') === 'true';
     const mockStatus = searchParams?.get('mock_status') || 'protected';
 
