@@ -83,8 +83,9 @@ export const getColorLabReport = async (
   const db = getDb();
   
   // 1. Get Session & Report (Left Join to allow missing report)
+  // Fetch session status as well
   const sessionRes = await db.query(
-    `SELECT s.email as owner_email, r.payload, r.rating, r.status, r.input_image_url
+    `SELECT s.email as owner_email, s.status as session_status, r.payload, r.rating, r.status as report_status, r.input_image_url
      FROM color_lab_sessions s
      LEFT JOIN color_lab_reports r ON s.id = r.session_id
      WHERE s.id = $1
@@ -118,9 +119,19 @@ export const getColorLabReport = async (
       }
   });
 
+  // Determine status: Report status > Session status > Fallback
+  let status = sessionRow.report_status || sessionRow.session_status || (sessionRow.payload ? 'completed' : 'draft');
+  
+  // Map backend status to frontend status
+  if (status === 'analyzing') {
+      status = 'processing';
+  } else if (status === 'created') {
+      status = 'draft';
+  }
+
   return {
     report: sessionRow.payload as ColorLabReport | null,
-    status: sessionRow.status || (sessionRow.payload ? 'completed' : 'draft'), // Fallback for old records or missing report (virtual draft)
+    status: status,
     rating: sessionRow.rating,
     ownerEmail: sessionRow.owner_email,
     imageUrl: userImageUrl,

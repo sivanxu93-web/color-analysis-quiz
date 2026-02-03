@@ -55,7 +55,11 @@ export default function PageComponent({
         } else if (initialStatus && initialStatus !== status) {
             // Prevent regression: If we are already 'completed', don't revert to 'protected' 
             // just because the server prop is stale (race condition with router.refresh)
-            if (status === 'completed' && (initialStatus === 'protected' || initialStatus === 'processing')) {
+            if (status === 'completed' && (initialStatus === 'protected' || initialStatus === 'processing' || initialStatus === 'draft')) {
+                return;
+            }
+            // Fix for infinite loop: Don't revert from processing/protected to draft
+            if ((status === 'processing' || status === 'protected') && initialStatus === 'draft') {
                 return;
             }
             setStatus(initialStatus);
@@ -76,9 +80,8 @@ export default function PageComponent({
         "Consulting the AI stylist...",
     ];
 
-    // 1. Auto-Trigger Generation & Session Claim
+    // 1. Session Claim (Separate Effect to avoid spamming)
     useEffect(() => {
-        // Claim session if user is logged in
         if (userData?.email && sessionId) {
             fetch('/api/color-lab/session/claim', {
                 method: 'POST',
@@ -86,7 +89,10 @@ export default function PageComponent({
                 body: JSON.stringify({ sessionId, email: userData.email })
             }).catch(err => console.error("Session claim failed", err));
         }
+    }, [userData?.email, sessionId]);
 
+    // 2. Auto-Trigger Generation & Payment Check
+    useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const paymentSuccess = urlParams.get('payment_success');
 
@@ -106,7 +112,7 @@ export default function PageComponent({
                 setShowLoginModal(true);
             }
         }
-    }, [status, userData?.email, sessionId, setShowLoginModal, userData?.user_id]);
+    }, [status, userData?.email, setShowLoginModal, userData?.user_id]);
 
     const triggerGeneration = async () => {
         if (!sessionId || !userData?.email) return;
