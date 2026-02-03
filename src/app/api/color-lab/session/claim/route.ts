@@ -12,15 +12,19 @@ export async function POST(req: NextRequest) {
 
     const db = getDb();
     
-    // Link the session to the user's email
-    // Only update if it's currently null or different? 
-    // Just update it to be safe.
-    await db.query(
-      "UPDATE color_lab_sessions SET email = $1 WHERE id = $2",
+    // Security Fix: Only claim sessions that have NO owner (email is null).
+    // Prevent overwriting existing owners (hijacking).
+    const result = await db.query(
+      "UPDATE color_lab_sessions SET email = $1 WHERE id = $2 AND email IS NULL",
       [email, sessionId]
     );
-
-    return NextResponse.json({ success: true });
+    
+    // If no rows updated, it means either:
+    // 1. Session doesn't exist
+    // 2. Session already has an owner
+    // In either case, we don't want to throw an error (idempotent), but we definitely didn't steal it.
+    
+    return NextResponse.json({ success: true, claimed: result.rowCount > 0 });
   } catch (error: any) {
     console.error("Session Claim Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
