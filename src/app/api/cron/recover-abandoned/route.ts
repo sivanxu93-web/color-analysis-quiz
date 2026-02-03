@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
       FROM color_lab_reports r
       JOIN color_lab_sessions s ON r.session_id = s.id
       LEFT JOIN user_info u ON s.email = u.email
-      WHERE r.status = 'draft'
+      WHERE r.status = 'protected'
         AND r.recovery_sent_at IS NULL
         AND s.email IS NOT NULL
         AND r.created_at < now() - interval '1 hour'
@@ -55,9 +55,9 @@ export async function GET(req: NextRequest) {
       const reportUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app'}/report/${session_id}`;
 
       try {
-        // Check if this is a Returning Customer (Has at least one 'analyzed' session)
+        // Check if this is a Returning Customer (Has at least one 'completed' session)
         const historyRes = await db.query(
-            "SELECT 1 FROM color_lab_sessions WHERE email = $1 AND status = 'analyzed' LIMIT 1",
+            "SELECT 1 FROM color_lab_sessions WHERE email = $1 AND (status = 'completed' OR status = 'analyzed') LIMIT 1",
             [email]
         );
         const isReturningCustomer = historyRes.rowCount > 0;
@@ -75,7 +75,7 @@ export async function GET(req: NextRequest) {
             <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
               <p>Hi ${firstName},</p>
               <p>It's great to see you back!</p>
-              <p>We noticed you uploaded a new photo to test a different look, but the analysis is still locked in <strong>Draft</strong> mode.</p>
+              <p>We noticed you uploaded a new photo to test a different look, but the analysis is still locked.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
                 <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Your Report is Ready</h2>
