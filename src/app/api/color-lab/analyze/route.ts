@@ -129,7 +129,28 @@ export async function POST(req: NextRequest) {
     }
     const userId = userRes.rows[0].user_id;
 
-    // 2. Check Credits - REMOVED for Teaser Model
+    // 2. CHECK FOR EXISTING PENDING REPORTS (Anti-Abuse & Conversion Logic)
+    // User can only have ONE pending (protected/analyzing) report at a time.
+    const pendingRes = await db.query(
+        `SELECT id FROM color_lab_sessions 
+         WHERE email = $1 
+         AND (status = 'protected' OR status = 'analyzing')
+         LIMIT 1`,
+        [email]
+    );
+
+    if (pendingRes.rows.length > 0) {
+        return NextResponse.json(
+            { 
+                error: "You already have a pending report.", 
+                code: "PENDING_REPORT_EXISTS",
+                sessionId: pendingRes.rows[0].id 
+            },
+            { status: 409 }
+        );
+    }
+
+    // 3. Check Credits - REMOVED for Teaser Model
     // We allow analysis even with 0 credits. Credits are required to UNLOCK.
     /*
     const creditRes = await db.query("select available_times from user_available where user_id = $1", [userId]);

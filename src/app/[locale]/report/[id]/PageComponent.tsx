@@ -140,6 +140,13 @@ export default function PageComponent({
                 return;
             }
 
+            if (res.status === 409) {
+                const data = await res.json();
+                setGenerationError("You already have a pending report waiting for you.");
+                // Optionally could redirect directly to the pending report if ID was returned
+                return;
+            }
+
             if (res.ok) {
                 router.refresh(); 
             } else {
@@ -421,17 +428,33 @@ export default function PageComponent({
                 <div className="relative z-10 text-center">
                     {generationError ? (
                         <>
-                            <div className="text-5xl mb-6 opacity-80">🤔</div>
-                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-3">Stylist Interrupted</h2>
+                            <div className="text-5xl mb-6 opacity-80">
+                                {generationError.includes("pending report") ? "⚠️" : "🤔"}
+                            </div>
+                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-3">
+                                {generationError.includes("pending report") ? "One Report at a Time" : "Stylist Interrupted"}
+                            </h2>
                             <p className="text-gray-500 font-medium mb-8 max-w-xs mx-auto leading-relaxed">
-                                We hit a small snag connecting to our AI stylist. Don&apos;t worry, your credits are safe.
+                                {generationError.includes("pending report") 
+                                    ? "You have a pending analysis waiting for you. Please unlock or delete it before starting a new one."
+                                    : "We hit a small snag connecting to our AI stylist. Don't worry, your credits are safe."}
                             </p>
-                            <button 
-                                onClick={triggerGeneration}
-                                className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg transform hover:-translate-y-0.5"
-                            >
-                                Resume Analysis
-                            </button>
+                            
+                            {generationError.includes("pending report") ? (
+                                <Link 
+                                    href={`/${locale}/profile`}
+                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg inline-block"
+                                >
+                                    View My Reports
+                                </Link>
+                            ) : (
+                                <button 
+                                    onClick={triggerGeneration}
+                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg transform hover:-translate-y-0.5"
+                                >
+                                    Resume Analysis
+                                </button>
+                            )}
                         </>
                     ) : (
                         <>
