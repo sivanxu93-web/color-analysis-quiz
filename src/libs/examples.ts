@@ -41,28 +41,28 @@ export const SEO_EXAMPLES = [
   {
     slug: "light-spring-analysis",
     season: "Light Spring",
-    headline: "The Radiant Morning",
+    headline: "The Sun-Kissed Ethereal",
     imageUrl:
       "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/af1a972b-93af-46e2-8cb4-25c3f779f8a7/best_3e98c3ae-d711-4c90-a557-c49cde2387a2.png",
   },
   {
     slug: "true-spring-analysis",
     season: "True Spring",
-    headline: "The Golden Sunbeam",
+    headline: "The Golden Radiance",
     imageUrl:
       "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/258766e5-e68b-40fb-ac9b-474a61a77f18/best_cdeead2f-3e99-4cbc-86dc-a4344f4e6a25.png",
   },
   {
     slug: "soft-summer-analysis",
     season: "Soft Summer",
-    headline: "The Ethereal Mist",
+    headline: "The Ethereal Sophisticate",
     imageUrl:
       "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/cec2e247-27d1-432c-a058-d6c7db53f4fc/best_bae38c0e-5dae-47ac-b00b-5fd6e3bdbe16.png",
   },
   {
     slug: "true-summer-analysis",
     season: "True Summer",
-    headline: "The Royal Azure",
+    headline: "The Cool Romantic",
     imageUrl:
       "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/c78b72ea-ccd3-4509-8822-4f71724f59fa/best_4ac19592-1ea5-47e8-a218-a00b116b2b9a.png",
   },
