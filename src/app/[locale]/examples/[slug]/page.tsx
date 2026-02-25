@@ -3,14 +3,9 @@ import { getColorLabReport } from '~/servers/colorLab';
 import PageComponent from '../../report/[id]/PageComponent'; // Reuse existing component
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { EXAMPLE_MAP } from '~/libs/examples';
 
-// Mapping Slug -> UUID
-const EXAMPLE_MAP: Record<string, string> = {
-  'deep-winter-analysis': '26a4b77e-c1d7-4749-ac38-a468fcc44ab1',
-  'soft-autumn-analysis': '0087af50-44e8-4535-882d-3ed4b3ee9834',
-  'light-summer-analysis': '8efb12d2-be91-4ce5-a492-c6e1ecbb3814',
-  'warm-spring-analysis': 'af413445-5804-4371-b375-2ed33632e86d'
-};
+// Mapping Slug -> UUID moved to src/libs/examples.ts
 
 // SEO Metadata Generator
 export async function generateMetadata({ params: { slug } }: { params: { slug: string } }): Promise<Metadata> {

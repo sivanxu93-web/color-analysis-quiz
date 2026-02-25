@@ -1,9 +1,13 @@
 import { MetadataRoute } from 'next';
 import { locales } from '~/i18n/config';
+import { EXAMPLE_MAP } from '~/libs/examples';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
   
+  // Example Routes
+  const exampleRoutes = Object.keys(EXAMPLE_MAP).map(slug => `/examples/${slug}`);
+
   // Key static routes
   const routes = [
     '',
@@ -13,10 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/profile',
     '/privacy-policy',
     '/terms-of-service',
-    '/examples/deep-winter-analysis',
-    '/examples/soft-autumn-analysis',
-    '/examples/light-summer-analysis',
-    '/examples/warm-spring-analysis'
+    ...exampleRoutes
   ];
 
   const sitemapEntry: MetadataRoute.Sitemap = [];
