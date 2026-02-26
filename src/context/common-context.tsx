@@ -20,6 +20,18 @@ export const CommonProvider = ({
   const [showGeneratingModal, setShowGeneratingModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
+  // Capture coupon from URL and persist it
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const coupon = params.get('coupon');
+      if (coupon) {
+        localStorage.setItem('active_coupon', coupon);
+        console.log("Coupon captured and saved:", coupon);
+      }
+    }
+  }, []);
+
   // Sync userData with Session
   useEffect(() => {
     // @ts-ignore
