@@ -178,7 +178,9 @@ export default function PageComponent({
             if (res.status === 402) {
                 // Insufficient credits -> Go to pricing
                 const currentPath = window.location.pathname;
-                router.push(`/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}`);
+                const coupon = searchParams?.get('coupon');
+                const pricingUrl = `/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}${coupon ? `&coupon=${coupon}` : ''}`;
+                router.push(pricingUrl);
                 return;
             }
 

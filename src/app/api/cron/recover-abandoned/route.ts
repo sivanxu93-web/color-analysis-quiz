@@ -23,7 +23,8 @@ export async function GET(req: NextRequest) {
         r.session_id,
         s.email,
         u.name,
-        r.created_at
+        r.created_at,
+        r.report->>'season' as season_name
       FROM color_lab_reports r
       JOIN color_lab_sessions s ON r.session_id = s.id
       LEFT JOIN user_info u ON s.email = u.email
@@ -49,9 +50,9 @@ export async function GET(req: NextRequest) {
 
     // 2. Send Emails with Rate Limiting
     for (const draft of abandonedDrafts) {
-      const { session_id, email, name } = draft;
+      const { session_id, email, name, season_name } = draft;
       const firstName = name ? name.split(' ')[0] : 'there';
-      const reportUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app'}/report/${session_id}`;
+      const reportUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app'}/report/${session_id}?coupon=WELCOMEBACK`;
 
       try {
         // Check if this is a Returning Customer (Has at least one 'completed' session)
@@ -69,28 +70,71 @@ export async function GET(req: NextRequest) {
 
         if (isReturningCustomer) {
             // --- COPY FOR RETURNING CUSTOMERS ---
-            subject = 'Your new analysis is waiting 🎨';
+            subject = `Your new ${season_name || 'seasonal'} analysis is ready 🎨`;
             htmlContent = `
             <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
               <p>Hi ${firstName},</p>
               <p>It's great to see you back!</p>
-              <p>We noticed you uploaded a new photo to test a different look, but the analysis is still locked.</p>
+              <p>Our AI has finished analyzing your new photo. You've been identified as a <strong>${season_name || 'unique season'}</strong>.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Your Report is Ready</h2>
+                <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Unlock Your ${season_name} Palette</h2>
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
-                  Since you've used Color Analysis Quiz before, we want to make sure you get the most out of your new results.
+                  Since you've used us before, we've applied an <strong>extra 50% discount</strong> to your new report.
                 </p>
-                <p style="font-size: 14px; color: #888;">Session ID: ${session_id.slice(0, 8)}...</p>
+                <p style="font-size: 18px; color: #E88D8D; font-weight: bold;">Just $2.45 to unlock.</p>
               </div>
-
-              <p>Don't forget, we've updated our AI to be more "Skin-First" and realistic.</p>
 
               <p style="text-align: center; margin-top: 30px;">
                 <a href="${reportUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                  Unlock My New Report &rarr;
+                  View My New Report &rarr;
                 </a>
               </p>
+
+              <p style="margin-top: 40px; font-size: 14px; color: #666;">Happy styling,<br/>The Color Analysis Quiz Team</p>
+            </div>`;
+        } else {
+            // --- COPY FOR NEW LEADS (NEVER PAID) ---
+            subject = `Result Ready: You are a ${season_name || 'Seasonal'} Color Type! 🎨`;
+            htmlContent = `
+            <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
+              <p>Hi ${firstName},</p>
+              <p>Great news! Our AI has finished your personal color analysis. Based on your features, you are a <strong>${season_name || 'unique seasonal type'}</strong>.</p>
+              
+              <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
+                <p style="margin: 0 0 5px 0; font-weight: bold; color: #1A1A2E; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">One-Time Exclusive Offer</p>
+                <h2 style="margin: 0 0 5px 0; color: #E88D8D; font-size: 32px;">EXTRA 50% OFF</h2>
+                <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
+                  We've automatically applied the 50% off coupon for you.
+                </p>
+                <div style="display: flex; justify-content: space-around; margin-top: 20px;">
+                    <div style="text-align: center;">
+                        <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Single Report</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$4.90</span> $2.45</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Style Pack (3x)</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$9.90</span> $4.95</p>
+                    </div>
+                </div>
+              </div>
+
+              <p>Your <strong>${season_name}</strong> profile includes:</p>
+              <ul>
+                <li>🎨 <strong>Power Palette:</strong> 30+ shades that make your skin glow.</li>
+                <li>💄 <strong>Makeup Guide:</strong> Best lipstick and blush for your undertone.</li>
+                <li>👗 <strong>Style Validator:</strong> Instant check for any clothing item.</li>
+              </ul>
+
+              <p style="text-align: center; margin-top: 30px;">
+                <a href="${reportUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                  Unlock My ${season_name || ''} Report Now &rarr;
+                </a>
+              </p>
+
+              <p style="margin-top: 40px; font-size: 14px; color: #666;">Hope to see you inside!<br/>The Color Analysis Quiz Team</p>
+            </div>`;
+        }
 
               <p style="margin-top: 40px; font-size: 14px; color: #666;">Happy styling,<br/>The Color Analysis Quiz Team</p>
             </div>`;

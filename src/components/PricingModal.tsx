@@ -2,7 +2,7 @@
 import React from 'react';
 import BaseModal from './BaseModal';
 import {useCommonContext} from "~/context/common-context";
-import {useParams} from 'next/navigation';
+import {useParams, useSearchParams} from 'next/navigation';
 import { sendGAEvent } from '@next/third-parties/google';
 import PricingContent from './PricingContent';
 
@@ -13,9 +13,11 @@ export default function PricingModal({
 
   const {showPricingModal, setShowPricingModal, userData, setShowLoginModal} = useCommonContext();
   const params = useParams();
+  const searchParams = useSearchParams();
   const currentLocale = params?.locale || 'en';
   // If we are on a report page, 'id' will be the sessionId
   const sessionId = params?.id as string;
+  const coupon = searchParams?.get('coupon');
 
   const isPaymentEnabled = !!process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL;
   const singleProductId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID_SINGLE;
@@ -25,7 +27,8 @@ export default function PricingModal({
     sendGAEvent('event', 'purchase_attempt', { 
         item: plan === 'pack' ? 'style_pack' : 'single_report', 
         status: userData?.user_id ? 'logged_in' : 'guest',
-        sessionId: sessionId 
+        sessionId: sessionId,
+        coupon: coupon
     });
 
     if (!userData?.user_id) {
@@ -60,7 +63,8 @@ export default function PricingModal({
             body: JSON.stringify({
                 productId: productId,
                 metadata: metadata,
-                successUrl: successUrl
+                successUrl: successUrl,
+                discountCode: coupon
             })
         });
 

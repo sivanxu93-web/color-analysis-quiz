@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
-    const { productId, metadata, successUrl } = await req.json();
+    const { productId, metadata, successUrl, discountCode } = await req.json();
 
     if (!productId) {
       return NextResponse.json({ error: "Missing productId" }, { status: 400 });
@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
     const payload = {
       product_id: productId,
       success_url: successUrl,
+      discount_code: discountCode,
       metadata: metadata || {},
       customer: {
           email: metadata?.email
