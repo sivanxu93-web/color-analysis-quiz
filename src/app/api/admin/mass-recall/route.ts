@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       try {
         // 2. Try to find the LATEST 'protected' report for this user
         const reportQuery = `
-          SELECT r.session_id, r.report->>'season' as season_name
+          SELECT r.session_id, r.season as season_name
           FROM color_lab_sessions s
           JOIN color_lab_reports r ON s.id = r.session_id
           WHERE s.email = $1 AND r.status = 'protected'

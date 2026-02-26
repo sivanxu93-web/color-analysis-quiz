@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
         s.email,
         u.name,
         r.created_at,
-        r.report->>'season' as season_name
+        r.season as season_name
       FROM color_lab_reports r
       JOIN color_lab_sessions s ON r.session_id = s.id
       LEFT JOIN user_info u ON s.email = u.email
