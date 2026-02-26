@@ -21,15 +21,18 @@ export async function POST(req: NextRequest) {
     const isTestMode = process.env.NODE_ENV !== 'production';
     const apiUrl = isTestMode ? "https://test-api.creem.io/v1/checkouts" : "https://api.creem.io/v1/checkouts";
 
-    const payload = {
+    const payload: any = {
       product_id: productId,
       success_url: successUrl,
-      discount_code: discountCode,
       metadata: metadata || {},
       customer: {
           email: metadata?.email
       }
     };
+
+    if (discountCode) {
+        payload.discount_code = discountCode;
+    }
 
     console.log("Creating Creem Checkout:", apiUrl, JSON.stringify(payload));
 
@@ -44,9 +47,19 @@ export async function POST(req: NextRequest) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Creem API Error:", response.status, errorText);
-      return NextResponse.json({ error: "Failed to create checkout session", details: errorText }, { status: response.status });
+      const errorData = await response.json().catch(() => ({}));
+      console.error("Creem API Error:", response.status, errorData);
+      
+      const message = errorData.message?.[0] || "Failed to create checkout session";
+      
+      if (message === "Discount not found") {
+          return NextResponse.json({ 
+              error: "Invalid discount code", 
+              details: "The coupon code '"+ discountCode +"' does not exist in your Creem dashboard." 
+          }, { status: 400 });
+      }
+
+      return NextResponse.json({ error: "Checkout failed", details: message }, { status: response.status });
     }
 
     const data = await response.json();

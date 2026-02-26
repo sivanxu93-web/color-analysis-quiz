@@ -1,6 +1,6 @@
 import React from 'react';
 import { useCommonContext } from "~/context/common-context";
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import PricingContent from './PricingContent';
 
 export default function Pricing({
@@ -12,7 +12,9 @@ export default function Pricing({
 }) {
   const { userData, setShowLoginModal } = useCommonContext();
   const params = useParams();
+  const searchParams = useSearchParams();
   const locale = params?.locale || 'en';
+  const coupon = searchParams?.get('coupon');
 
   const singleProductId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID_SINGLE;
   const packProductId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID_PACK;
@@ -52,10 +54,10 @@ export default function Pricing({
                     plan: plan
                 },
                 // Default success URL for landing page (e.g. user profile or history)
-                successUrl: finalSuccessUrl
+                successUrl: finalSuccessUrl,
+                discountCode: coupon
             })
         });
-
         if (!res.ok) throw new Error("Failed to init checkout");
         
         const { checkout_url } = await res.json();
