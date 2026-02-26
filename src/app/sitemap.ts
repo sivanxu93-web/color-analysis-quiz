@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/profile',
     '/privacy-policy',
     '/terms-of-service',
+    '/examples',
     ...exampleRoutes
   ];
 
