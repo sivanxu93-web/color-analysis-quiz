@@ -136,45 +136,6 @@ export async function GET(req: NextRequest) {
             </div>`;
         }
 
-              <p style="margin-top: 40px; font-size: 14px; color: #666;">Happy styling,<br/>The Color Analysis Quiz Team</p>
-            </div>`;
-        } else {
-            // --- COPY FOR NEW LEADS (NEVER PAID) ---
-            subject = '🎁 A special gift to complete your color analysis (50% OFF)';
-            htmlContent = `
-            <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
-              <p>Hi ${firstName},</p>
-              <p>We noticed you started your color analysis but haven't unlocked the full results yet. We’d love to help you cross the finish line!</p>
-              
-              <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <p style="margin: 0 0 5px 0; font-weight: bold; color: #1A1A2E; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">One-Time Exclusive Offer</p>
-                <h2 style="margin: 0 0 5px 0; color: #E88D8D; font-size: 32px;">EXTRA 50% OFF</h2>
-                <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
-                  Yes, this stacks on top of our existing discount!<br/>
-                  <span style="text-decoration: line-through; color: #999;">$19.90</span> &rarr; <span style="text-decoration: line-through; color: #999;">$4.90</span> &rarr; <strong style="color: #E88D8D;">$2.45</strong>
-                </p>
-                <div style="background-color: #fff; border: 2px dashed #E88D8D; display: inline-block; padding: 12px 24px; font-weight: bold; font-size: 20px; color: #333; letter-spacing: 2px;">
-                  CODE: WELCOMEBACK
-                </div>
-                <p style="font-size: 12px; color: #888; margin-top: 10px;">Valid for 48 hours.</p>
-              </div>
-
-              <p>We’ve also just released a major update:</p>
-              <ul>
-                <li>🎨 <strong>New "Color Fan" Mode:</strong> Compare your best vs. worst colors instantly.</li>
-                <li>💄 <strong>Top Brand Picks:</strong> Get specific makeup recommendations for your season.</li>
-              </ul>
-
-              <p style="text-align: center; margin-top: 30px;">
-                <a href="${reportUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                  Unlock My Report Now &rarr;
-                </a>
-              </p>
-
-              <p style="margin-top: 40px; font-size: 14px; color: #666;">Hope to see you inside!<br/>The Color Analysis Quiz Team</p>
-            </div>`;
-        }
-
         const emailResult = await resend.emails.send({
           from: 'Color Analysis Quiz Team <support@coloranalysisquiz.app>',
           to: email,
