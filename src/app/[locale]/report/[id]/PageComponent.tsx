@@ -97,6 +97,17 @@ export default function PageComponent({
         const paymentSuccess = urlParams.get('payment_success');
 
         if (paymentSuccess === 'true') {
+            // Track Conversion in Google Ads
+            if (typeof window !== 'undefined' && (window as any).gtag) {
+                (window as any).gtag('event', 'conversion', {
+                    'send_to': 'AW-17982041169', // You can append specific label here if you have one
+                    'value': 4.90,
+                    'currency': 'USD',
+                    'transaction_id': sessionId
+                });
+                console.log("Google Ads Conversion Tracked for Session:", sessionId);
+            }
+
             // Only attempt unlock if user is loaded.
             if (userData?.user_id) {
                 window.history.replaceState({}, '', window.location.pathname);

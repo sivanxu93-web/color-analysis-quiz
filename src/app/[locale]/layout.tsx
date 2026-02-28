@@ -10,6 +10,7 @@ import { getAuthText, getCommonText, getMenuText, getPricingText } from "~/i18n/
 import { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import MicrosoftClarity from '~/components/MicrosoftClarity';
+import Script from 'next/script';
 
 // Font Setup: Inter for Body, Playfair Display for Headings
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -105,6 +106,18 @@ export default async function LocaleLayout({
         </NextAuthProvider>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID || ""} />
         <MicrosoftClarity />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17982041169"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17982041169');
+          `}
+        </Script>
       </body>
     </html>
   );
