@@ -97,15 +97,22 @@ export default function PageComponent({
         const paymentSuccess = urlParams.get('payment_success');
 
         if (paymentSuccess === 'true') {
-            // Track Conversion in Google Ads
+            // Track Purchase Conversion in Google Ads
+            // Using the global ID as the base for tracking
+            const conversionId = 'AW-17982041169'; 
+            
             if (typeof window !== 'undefined' && (window as any).gtag) {
-                (window as any).gtag('event', 'conversion', {
-                    'send_to': 'AW-17982041169', // You can append specific label here if you have one
+                (window as any).gtag('event', 'purchase', {
+                    'transaction_id': sessionId,
                     'value': 4.90,
                     'currency': 'USD',
-                    'transaction_id': sessionId
+                    'items': [{
+                        'item_id': 'color_report_single',
+                        'item_name': 'Color Analysis Report',
+                        'price': 4.90
+                    }]
                 });
-                console.log("Google Ads Conversion Tracked for Session:", sessionId);
+                console.log("Google Ads Purchase Tracked:", sessionId);
             }
 
             // Only attempt unlock if user is loaded.
