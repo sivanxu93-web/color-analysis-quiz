@@ -11,7 +11,11 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
   const { userData } = useCommonContext();
   const searchParams = useSearchParams();
   const coupon = searchParams?.get('coupon');
-  const isDiscounted = coupon === 'WELCOMEBACK';
+  
+  // Check both URL and Database for active offers
+  // @ts-ignore
+  const isDiscounted = coupon === 'WELCOMEBACK' || userData?.promo_tag === 'WELCOMEBACK';
+  const isAds75 = coupon === 'OFF75';
 
   const isPaymentEnabled = !!process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL;
 
@@ -24,7 +28,9 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
             <span className="text-4xl font-bold tracking-tight text-gray-900">${isDiscounted ? '2.45' : '4.90'}</span>
             <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">${isDiscounted ? '4.90' : '19.90'}</span>
         </div>
-        <div className="mt-2 inline-block bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">{isDiscounted ? 'EXTRA 50% OFF APPLIED' : '75% OFF'}</div>
+        <div className="mt-2 inline-block bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
+            {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '75% OFF')}
+        </div>
         
         <button
             onClick={() => onCheckout('single')}

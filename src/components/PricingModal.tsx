@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import BaseModal from './BaseModal';
 import {useCommonContext} from "~/context/common-context";
 import {useParams, useSearchParams} from 'next/navigation';
@@ -22,6 +22,47 @@ export default function PricingModal({
   const isPaymentEnabled = !!process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL;
   const singleProductId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID_SINGLE;
   const packProductId = process.env.NEXT_PUBLIC_CREEM_PRODUCT_ID_PACK;
+
+  const [timeLeft, setTimeLeft] = useState<string | null>(null);
+
+  // Check if user is from Google Ads
+  const [isFromGoogle, setIsFromGoogle] = useState(false);
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+        const source = localStorage.getItem('utm_source');
+        setIsFromGoogle(source === 'google_ads_gclid');
+    }
+  }, []);
+
+  // Countdown Logic
+  useEffect(() => {
+    if (!showPricingModal) return;
+
+    const TIMER_KEY = `offer_deadline_${sessionId || 'global'}`;
+    const DURATION = 15 * 60 * 1000; // 15 minutes
+
+    let deadline = localStorage.getItem(TIMER_KEY);
+    if (!deadline) {
+        deadline = (Date.now() + DURATION).toString();
+        localStorage.setItem(TIMER_KEY, deadline);
+    }
+
+    const interval = setInterval(() => {
+        const now = Date.now();
+        const diff = parseInt(deadline!) - now;
+
+        if (diff <= 0) {
+            setTimeLeft("00:00");
+            clearInterval(interval);
+        } else {
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+            setTimeLeft(`${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`);
+        }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [showPricingModal, sessionId]);
 
   const handleCreemCheckout = async (plan: 'single' | 'pack') => {
     sendGAEvent('event', 'purchase_attempt', { 
@@ -90,6 +131,17 @@ export default function PricingModal({
       icon={<span className="text-4xl">✨</span>}
       maxWidth="sm:max-w-4xl"
     >
+        {timeLeft && (
+            <div className={`mb-6 -mt-2 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border ${timeLeft === '00:00' ? 'bg-black border-black text-white' : 'bg-red-50 border-red-100 text-red-700'}`}>
+                <span className={`w-2 h-2 rounded-full ${timeLeft === '00:00' ? 'bg-yellow-400 animate-ping' : 'bg-red-500 animate-pulse'}`}></span>
+                <span className="text-xs font-bold uppercase tracking-wider">
+                    {timeLeft === '00:00' 
+                        ? "LAST CHANCE: Discount Expired! Secure $4.90 before price reverts." 
+                        : `${isFromGoogle ? 'Google Search Exclusive' : 'Limited Time Special'} Offer Expires In: ${timeLeft}`
+                    }
+                </span>
+            </div>
+        )}
         <div className="text-center mt-2">
             <PricingContent onCheckout={handleCreemCheckout} isModal={true} />
             <div className="mt-8 pt-6 border-t border-gray-100">
