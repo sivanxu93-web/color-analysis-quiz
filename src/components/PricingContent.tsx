@@ -28,9 +28,9 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         
         <button
             onClick={() => onCheckout('single')}
-            className="mt-6 block w-full rounded-md bg-indigo-50 px-3 py-2 text-center text-sm font-semibold text-indigo-600 hover:bg-indigo-100 transition-colors"
+            className="mt-6 block w-full rounded-md bg-[#1A1A2E] px-3 py-2 text-center text-sm font-bold text-white hover:bg-black transition-all shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
         >
-            Unlock Now
+            Unlock My Full Analysis
         </button>
 
         <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-600">
@@ -49,6 +49,10 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
             <li className="flex items-start gap-x-3">
                 <span className="text-green-500 mt-0.5 shrink-0">✅</span>
                 <span><strong>Avoid List</strong></span>
+            </li>
+            <li className="flex items-start gap-x-3 bg-green-50/50 p-2 rounded-lg border border-green-100 -mx-2">
+                <span className="text-xl shrink-0 leading-none">🎁</span>
+                <span><strong>3 Style Validations</strong> <span className="text-xs text-gray-500 block">Test clothes before you buy</span></span>
             </li>
         </ul>
     </div>
@@ -90,6 +94,10 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
             <li className="flex items-start gap-x-3">
                 <span className="text-primary text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Huge Savings</strong></span>
+            </li>
+            <li className="flex items-start gap-x-3 bg-white/10 p-2 rounded-lg border border-white/10 -mx-2 mt-4">
+                <span className="text-xl shrink-0 leading-none">🎁</span>
+                <span><strong>10 Style Validations</strong> <span className="text-xs text-gray-400 block">AI checks your shopping</span></span>
             </li>
         </ul>
     </div>

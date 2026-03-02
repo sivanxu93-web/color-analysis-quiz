@@ -39,10 +39,38 @@ export default function PageComponent({
     const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
     const hasTriggeredDraping = useRef(false);
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
+    const [progress, setProgress] = useState(0);
     const [drapingError, setDrapingError] = useState<string | null>(null);
     const [generationError, setGenerationError] = useState<string | null>(null);
-    const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
-    
+
+    // 0. Loading State Management (Tips & Progress)
+    useEffect(() => {
+        let tipInterval: any;
+        let progressInterval: any;
+
+        if (status === 'processing') {
+            // Rotate tips
+            tipInterval = setInterval(() => {
+                setCurrentTipIndex(prev => (prev + 1) % LOADING_TIPS.length);
+            }, 3500);
+
+            // Fake progress: Fast at first, slows down near the end
+            progressInterval = setInterval(() => {
+                setProgress(prev => {
+                    if (prev < 30) return prev + 2; // Fast start
+                    if (prev < 70) return prev + 1; // Steady middle
+                    if (prev < 92) return prev + 0.5; // Slow down
+                    return prev; // Stay at 92% until real data hits
+                });
+            }, 500);
+        }
+
+                return () => {
+                    clearInterval(tipInterval);
+                    clearInterval(progressInterval);
+                };
+            }, [status]);
+            const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');    
     // DEMO MODE LOGIC
     const searchParams = useSearchParams();
     const isDemo = searchParams?.get('demo') === 'true';
@@ -154,9 +182,7 @@ export default function PageComponent({
 
             if (res.status === 402) {
                 setStatus('protected');
-                // Redirect to pricing page with return URL
-                const currentPath = window.location.pathname;
-                router.push(`/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}`);
+                // Removed router.push to pricing - stay on page to show the teaser!
                 return;
             }
 
@@ -196,11 +222,9 @@ export default function PageComponent({
             });
 
             if (res.status === 402) {
-                // Insufficient credits -> Go to pricing
-                const currentPath = window.location.pathname;
-                const coupon = searchParams?.get('coupon');
-                const pricingUrl = `/${locale}/pricing?redirect=${encodeURIComponent(currentPath)}${coupon ? `&coupon=${coupon}` : ''}`;
-                router.push(pricingUrl);
+                // Insufficient credits -> Show Pricing Modal instead of redirecting
+                setStatus('protected');
+                setShowPricingModal(true);
                 return;
             }
 
@@ -480,11 +504,32 @@ export default function PageComponent({
                         </>
                     ) : (
                         <>
-                            <div className="w-20 h-20 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-8"></div>
-                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-4">Creating Your Report...</h2>
-                            <p className="text-gray-500 font-medium animate-pulse transition-all duration-500 min-h-[24px]">
-                                {LOADING_TIPS[currentTipIndex]}
-                            </p>
+                            {/* Professional Progress Circle */}
+                            <div className="relative w-32 h-32 mx-auto mb-10 group">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-gray-100" />
+                                    <circle cx="64" cy="64" r="60" stroke="currentColor" strokeWidth="6" fill="transparent" 
+                                            strokeDasharray={377} 
+                                            strokeDashoffset={377 - (377 * progress) / 100} 
+                                            className="text-primary transition-all duration-700 ease-out" 
+                                            strokeLinecap="round" />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-2xl font-bold font-mono text-[#1A1A2E]">{Math.floor(progress)}%</span>
+                                </div>
+                                <div className="absolute -inset-4 bg-primary/10 rounded-full blur-xl animate-pulse -z-10"></div>
+                            </div>
+
+                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-2 tracking-tight">AI Stylist at Work</h2>
+                            <p className="text-xs font-bold text-primary uppercase tracking-[0.3em] mb-8 animate-pulse">Personalizing Your Report</p>
+                            
+                            {/* Rotating Tip Card */}
+                            <div className="bg-white/60 backdrop-blur-sm p-6 rounded-2xl border border-primary/10 shadow-sm min-h-[100px] flex items-center justify-center transition-all duration-1000">
+                                <p className="text-[#1A1A2E] font-medium leading-relaxed italic text-sm md:text-base">
+                                    &quot;{LOADING_TIPS[currentTipIndex]}&quot;
+                                </p>
+                            </div>
+                            <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest">Processing High-Resolution Data • Please Don&apos;t Refresh</p>
                         </>
                     )}
                 </div>
@@ -1138,7 +1183,7 @@ export default function PageComponent({
 
         {/* Sticky Unlock Bar (For Locked State) */}
         {isLocked && (
-             <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up">
+             <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up">
                 <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
                     <div className="hidden md:block">
                         <p className="text-sm font-bold text-[#1A1A2E]">Your analysis is complete!</p>

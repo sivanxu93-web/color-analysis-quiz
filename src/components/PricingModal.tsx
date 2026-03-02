@@ -86,13 +86,16 @@ export default function PricingModal({
     <BaseModal 
       isOpen={showPricingModal} 
       onClose={() => setShowPricingModal(false)}
-      title="Unlock Your Analysis"
-      icon={<span className="text-4xl">💎</span>}
+      title="Reveal Your Full Color Palette & Style Guide"
+      icon={<span className="text-4xl">✨</span>}
       maxWidth="sm:max-w-4xl"
     >
         <div className="text-center mt-2">
             <PricingContent onCheckout={handleCreemCheckout} isModal={true} />
-            <p className="text-xs text-gray-400 mt-6">Secure payment via Creem • 100% Satisfaction Guarantee</p>
+            <div className="mt-8 pt-6 border-t border-gray-100">
+                <p className="text-xs font-bold text-gray-900 mb-1 uppercase tracking-widest">Expert AI Analysis • One-Time Payment • Lifetime Access</p>
+                <p className="text-[10px] text-gray-400">Join 5,000+ style enthusiasts. Secure checkout powered by Creem.</p>
+            </div>
         </div>
     </BaseModal>
   )

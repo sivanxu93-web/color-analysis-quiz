@@ -12,16 +12,17 @@ export async function POST(req: NextRequest) {
     } catch(e) {
         return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const { filename, contentType, sessionId, imageHash } = body;
+    const { filename, contentType, sessionId, imageHash, type } = body;
 
     if (!filename || !contentType || !sessionId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const db = getDb();
+    const isOutfit = type === 'outfits';
 
-    // 1. Check for Duplicate / Existing Hash
-    if (imageHash) {
+    // 1. Check for Duplicate / Existing Hash (Skip for outfits)
+    if (imageHash && !isOutfit) {
         const existingRes = await db.query(
             `SELECT input_image_url FROM color_lab_reports 
              WHERE image_hash = $1 AND status = 'completed' AND input_image_url IS NOT NULL 
@@ -58,7 +59,9 @@ export async function POST(req: NextRequest) {
 
     // 2. No Hit - Proceed to Upload
     const fileExtension = filename.split('.').pop();
-    const key = `color-lab/${sessionId}/${uuidv4()}.${fileExtension}`;
+    const key = isOutfit 
+        ? `color-lab/outfits/${sessionId}/${uuidv4()}.${fileExtension}`
+        : `color-lab/${sessionId}/${uuidv4()}.${fileExtension}`;
 
     const params = {
       Bucket: r2Bucket,
@@ -70,20 +73,23 @@ export async function POST(req: NextRequest) {
     const uploadUrl = await R2.getSignedUrlPromise('putObject', params);
     const publicUrl = `${process.env.NEXT_PUBLIC_STORAGE_URL}/${key}`;
 
-    await db.query(
-        "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
-        [sessionId, publicUrl, 'user_upload']
-    );
+    // Only create session-related DB records if this is a main analysis photo
+    if (!isOutfit) {
+        await db.query(
+            "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3)",
+            [sessionId, publicUrl, 'user_upload']
+        );
 
-    // Create Draft Report Immediately (with Hash)
-    await saveColorLabReport(
-        sessionId,
-        null,
-        null,
-        'draft',
-        publicUrl,
-        imageHash || null
-    );
+        // Create Draft Report Immediately (with Hash)
+        await saveColorLabReport(
+            sessionId,
+            null,
+            null,
+            'draft',
+            publicUrl,
+            imageHash || null
+        );
+    }
 
     return NextResponse.json({ uploadUrl, key, publicUrl });
 

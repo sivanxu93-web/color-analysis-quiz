@@ -32,16 +32,23 @@ export async function POST(req: NextRequest) {
     // Based on test event: body.object.customer.email, body.object.metadata.user_id
     const email = body.email || body.payload?.email || body.object?.customer?.email || body.data?.email || body.customer_email;
     const userId = body.metadata?.user_id || body.payload?.metadata?.user_id || body.object?.metadata?.user_id || body.custom_fields?.user_id;
+    const plan = body.metadata?.plan || body.payload?.metadata?.plan || body.object?.metadata?.plan || body.custom_fields?.plan;
     
-    // Determine credits based on amount
+    // Determine credits based on amount or metadata
     const amount = body.amount || body.payload?.amount || body.object?.order?.amount || body.data?.amount;
     let creditsToAdd = 1;
-    if (amount) {
+    let validatorCreditsToAdd = 3; // 3 free validations for single report
+    
+    if (plan === 'validator_pack') {
+        creditsToAdd = 0; // Don't give full report credits for validator top-up
+        validatorCreditsToAdd = 20;
+    } else if (amount) {
         const val = parseFloat(amount);
         // If amount > 2500 (cents) or 25 (dollars), assume it's the $29.90 pack
         // Creem usually sends cents, so 2990.
         if (val > 2500 || (val > 25 && val < 100)) {
             creditsToAdd = 3;
+            validatorCreditsToAdd = 10; // 10 free validations for the pack
         }
     }
 
@@ -66,9 +73,9 @@ export async function POST(req: NextRequest) {
         const creditRes = await db.query("SELECT * FROM user_available WHERE user_id = $1", [targetUserId]);
         
         if (creditRes.rows.length === 0) {
-             await db.query("INSERT INTO user_available(user_id, available_times) VALUES($1, $2)", [targetUserId, creditsToAdd]);
+             await db.query("INSERT INTO user_available(user_id, available_times, validator_times) VALUES($1, $2, $3)", [targetUserId, creditsToAdd, validatorCreditsToAdd]);
         } else {
-             await db.query("UPDATE user_available SET available_times = available_times + $2 WHERE user_id = $1", [targetUserId, creditsToAdd]);
+             await db.query("UPDATE user_available SET available_times = available_times + $2, validator_times = COALESCE(validator_times, 0) + $3 WHERE user_id = $1", [targetUserId, creditsToAdd, validatorCreditsToAdd]);
         }
 
         // Log transaction
