@@ -250,12 +250,13 @@ export default function PageComponent({
   
         // Compute Hash for Deduplication
         const imageHash = await computeSHA256(uploadBody);
+        const utmSource = typeof window !== 'undefined' ? localStorage.getItem('utm_source') : null;
   
         // 1. Create Session
         const sessionRes = await fetch('/api/color-lab/session', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({})
+          body: JSON.stringify({ utm_source: utmSource })
         });
         const { sessionId } = await sessionRes.json();
         if (!sessionId) throw new Error("Failed to create session");

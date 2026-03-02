@@ -20,14 +20,24 @@ export const CommonProvider = ({
   const [showGeneratingModal, setShowGeneratingModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
 
-  // Capture coupon from URL and persist it
+  // Capture coupon and UTMs from URL and persist them
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
+      
       const coupon = params.get('coupon');
       if (coupon) {
         localStorage.setItem('active_coupon', coupon);
-        console.log("Coupon captured and saved:", coupon);
+      }
+
+      // Capture Google Ads and UTM parameters
+      const gclid = params.get('gclid');
+      const utm_source = params.get('utm_source');
+      
+      if (gclid) {
+        localStorage.setItem('utm_source', 'google_ads_gclid');
+      } else if (utm_source) {
+        localStorage.setItem('utm_source', utm_source);
       }
     }
   }, []);

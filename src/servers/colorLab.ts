@@ -4,22 +4,30 @@ import {v4 as uuidv4} from "uuid";
 
 export type ColorLabSessionStatus = "created" | "paid" | "analyzed";
 
-export const createColorLabSession = async (email: string | null, ip: string | null = null) => {
+export const createColorLabSession = async (email: string | null, ip: string | null = null, utmSource: string | null = null) => {
   const db = getDb();
   const id = uuidv4();
-  // Attempt to insert with IP, fallback if column missing (graceful degradation or user needs to run migration)
+  // Attempt to insert with IP and utmSource, fallback if column missing (graceful degradation or user needs to run migration)
   try {
       await db.query(
-        "insert into color_lab_sessions(id, email, status, ip) values($1,$2,$3,$4)",
-        [id, email, "created", ip],
+        "insert into color_lab_sessions(id, email, status, ip, utm_source) values($1,$2,$3,$4,$5)",
+        [id, email, "created", ip, utmSource],
       );
   } catch (e: any) {
-      // If column 'ip' doesn't exist, fallback to old insert
-      if (e.message.includes('column "ip" of relation "color_lab_sessions" does not exist')) {
-          await db.query(
-            "insert into color_lab_sessions(id, email, status) values($1,$2,$3)",
-            [id, email, "created"],
-          );
+      // If column 'ip' or 'utm_source' doesn't exist, fallback to old insert
+      if (e.message.includes('column') && e.message.includes('does not exist')) {
+          try {
+              // Try with IP only if utm_source failed
+               await db.query(
+                "insert into color_lab_sessions(id, email, status, ip) values($1,$2,$3,$4)",
+                [id, email, "created", ip],
+              );
+          } catch(err2) {
+              await db.query(
+                "insert into color_lab_sessions(id, email, status) values($1,$2,$3)",
+                [id, email, "created"],
+              );
+          }
       } else {
           throw e;
       }

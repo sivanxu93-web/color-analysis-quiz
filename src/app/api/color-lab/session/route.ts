@@ -10,11 +10,13 @@ export async function POST(
       typeof body.email === "string" && body.email.length > 3
         ? body.email
         : null;
+        
+    const utmSource = body.utm_source || null;
     
     // Get IP
     const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
 
-    const sessionId = await createColorLabSession(email, ip);
+    const sessionId = await createColorLabSession(email, ip, utmSource);
 
     return NextResponse.json({sessionId});
   } catch (error: any) {
