@@ -51,6 +51,12 @@ export async function GET(req: NextRequest) {
       const firstName = name ? name.split(' ')[0] : 'beauty';
 
       try {
+        // 1.5 Mark user account with persistent promo tag
+        await db.query(
+            "UPDATE user_info SET promo_tag = 'WELCOMEBACK' WHERE email = $1",
+            [email]
+        );
+
         // 2. Try to find the LATEST 'protected' report for this user
         const reportQuery = `
           SELECT r.session_id, r.season as season_name
