@@ -10,6 +10,7 @@ export const GET = async (req: Request) => {
   const result = {
     userId: userId,
     available_times: 0,
+    validator_times: 0,
     subscribeStatus: ''
   };
 
@@ -28,6 +29,7 @@ export const GET = async (req: Request) => {
 
     if (origin.length !== 0) {
       result.available_times = origin[0].available_times;
+      result.validator_times = origin[0].validator_times || 0;
     } else {
       // Lazy init: If user exists but no credit record, give free times
       const freeTimes = Number(process.env.FREE_TIMES || 0);

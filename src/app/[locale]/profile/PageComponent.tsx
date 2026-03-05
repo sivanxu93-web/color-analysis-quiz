@@ -19,6 +19,7 @@ export default function PageComponent({
   const { status } = useSession();
   const [history, setHistory] = useState<any[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
+  const [validatorCredits, setValidatorCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -57,6 +58,7 @@ export default function PageComponent({
           const res = await fetch(`/api/user/getAvailableTimes?userId=${userData.user_id}`);
           const json = await res.json();
           setCredits(json.available_times);
+          setValidatorCredits(json.validator_times);
       } catch (e) {
           console.error(e);
       }
@@ -106,8 +108,11 @@ export default function PageComponent({
                       <p className="text-gray-500 text-sm md:text-base">{userData?.email}</p>
                       
                       <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start pt-2 w-full">
-                          <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold text-sm md:text-base">
-                              💎 {credits !== null ? credits : '-'} Credits Available
+                          <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold text-sm md:text-base flex items-center gap-2">
+                              <span className="text-lg">💎</span> {credits !== null ? credits : '-'} Analysis Credits
+                          </div>
+                          <div className="px-6 py-2 bg-accent-gold/5 rounded-full border border-accent-gold/10 text-[#B8860B] font-bold text-sm md:text-base flex items-center gap-2">
+                              <span className="text-lg">👗</span> {validatorCredits !== null ? validatorCredits : '-'} Style Validations
                           </div>
                           <button 
                               onClick={() => setShowLogoutModal(true)}
