@@ -29,7 +29,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Spring',
     headline: "Golden Hour Incarnate",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/af413445-5804-4371-b375-2ed33632e86d/best_a678c08c-cb69-4f82-8c13-03bab53c6d0c.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/af413445-5804-4371-b375-2ed33632e86d/best_ba6ef127-f9d9-4a9c-87c9-23709c9cb9d5.png",
   },
   {
     slug: "soft-summer-analysis",
@@ -37,7 +37,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Summer',
     headline: "The Ethereal Sophisticate",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/cec2e247-27d1-432c-a058-d6c7db53f4fc/best_bae38c0e-5dae-47ac-b00b-5fd6e3bdbe16.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/cec2e247-27d1-432c-a058-d6c7db53f4fc/best_4f96c64e-b727-4010-a0d8-53b146e44bd6.png",
   },
   {
     slug: "true-autumn-analysis",
@@ -45,7 +45,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Autumn',
     headline: "The Golden Hour Muse",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/124c62d7-f29c-413a-8392-0f91630ddac2/best_30e92e53-1e65-46cb-b0df-b80add03f5bf.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/124c62d7-f29c-413a-8392-0f91630ddac2/best_afcd5179-8a0c-4171-984e-f4173b896bfd.png",
   },
   {
     slug: "cool-winter-analysis",
@@ -53,7 +53,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Winter',
     headline: "The Crystal Cool Icon",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/3ca5dde6-f815-41b9-aa01-ace3b29cc192/best_8d366820-cfb7-4a48-94ef-ac5e5ab451cc.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/3ca5dde6-f815-41b9-aa01-ace3b29cc192/best_9f50572f-8177-4f9a-b068-9d0bb5c94dd0.png",
   },
   
   // Remaining examples for the Examples Gallery
@@ -63,7 +63,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Winter',
     headline: "The Noir Romantic",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/26a4b77e-c1d7-4749-ac38-a468fcc44ab1/best_403eecb5-e8bd-43b3-a624-e4419c5594dd.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/26a4b77e-c1d7-4749-ac38-a468fcc44ab1/best_6a9a77f1-e993-4b39-84df-23db8b3160f6.png",
   },
   {
     slug: "true-winter-analysis",
@@ -71,7 +71,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Winter',
     headline: "The Icy Royal",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/341e64a2-15a5-4b03-9de6-4044d90d42fb/best_e04d39d2-2fcf-4183-af09-3aeade20bb8c.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/341e64a2-15a5-4b03-9de6-4044d90d42fb/best_b76910df-2057-4fdc-89e4-ca991a416dea.png",
   },
   {
     slug: "soft-autumn-analysis",
@@ -79,7 +79,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Autumn',
     headline: "The Rustic Romantic",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/0087af50-44e8-4535-882d-3ed4b3ee9834/best_086df296-b114-46a6-b270-e28d7100d041.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/0087af50-44e8-4535-882d-3ed4b3ee9834/best_03f097dc-14b7-421f-bb32-db49b2aae11c.png",
   },
   {
     slug: "deep-autumn-analysis",
@@ -87,7 +87,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Autumn',
     headline: "The Midnight Sun",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/790eeaf3-b327-46c3-a7f7-e9d512a125f0/best_d18e5773-56f4-40e1-96aa-5dd6c0ee784a.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/790eeaf3-b327-46c3-a7f7-e9d512a125f0/best_9d97b38f-ed3d-48c7-af21-721a4418f1ca.png",
   },
   {
     slug: "light-summer-analysis",
@@ -95,7 +95,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Summer',
     headline: "The Crystalline Muse",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/8efb12d2-be91-4ce5-a492-c6e1ecbb3814/best_54abc66d-3163-471f-a284-b1cc07a6bf3a.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/8efb12d2-be91-4ce5-a492-c6e1ecbb3814/best_8d4a1acd-da07-45eb-b628-2714f1d8d5bd.png",
   },
   {
     slug: "true-summer-analysis",
@@ -103,7 +103,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Summer',
     headline: "The Cool Romantic",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/c78b72ea-ccd3-4509-8822-4f71724f59fa/best_4ac19592-1ea5-47e8-a218-a00b116b2b9a.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/c78b72ea-ccd3-4509-8822-4f71724f59fa/best_8a254c84-2a8b-46e9-9197-41a04c4dee17.png",
   },
   {
     slug: "light-spring-analysis",
@@ -111,7 +111,7 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Spring',
     headline: "The Sun-Kissed Ethereal",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/af1a972b-93af-46e2-8cb4-25c3f779f8a7/best_3e98c3ae-d711-4c90-a557-c49cde2387a2.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/af1a972b-93af-46e2-8cb4-25c3f779f8a7/best_de0c0199-a543-4afb-9953-ac469382780f.png",
   },
   {
     slug: "true-spring-analysis",
@@ -119,6 +119,6 @@ export const SEO_EXAMPLES: ExampleItem[] = [
     category: 'Spring',
     headline: "The Golden Radiance",
     imageUrl:
-      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/258766e5-e68b-40fb-ac9b-474a61a77f18/best_cdeead2f-3e99-4cbc-86dc-a4344f4e6a25.png",
+      "https://pub-6ecbfcbc11a346deadf5251217b00520.r2.dev/draping/258766e5-e68b-40fb-ac9b-474a61a77f18/best_bc8f3bdb-35f8-4a51-8c31-c1d786ca0b74.png",
   }
 ];

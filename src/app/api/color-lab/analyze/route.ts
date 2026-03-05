@@ -201,7 +201,7 @@ export async function POST(req: NextRequest) {
     // Call Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-3-pro-preview",
+      model: "gemini-3.1-pro-preview",
       generationConfig: { 
           responseMimeType: "application/json",
           temperature: 0.0 // Reduce randomness

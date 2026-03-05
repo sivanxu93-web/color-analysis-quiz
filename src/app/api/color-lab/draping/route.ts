@@ -24,17 +24,28 @@ export async function POST(req: NextRequest) {
     }
 
     // Default makeup instructions if not provided by the analyze step
-    const defaultMakeup =
-      type === "best"
-        ? "Apply an ultra-realistic, 'No-Makeup' makeup look. Use a sheer, hydrating lip tint and subtle blush that harmonizes with the skin. Maintain skin texture and avoid any heavy application."
-        : "Apply a natural makeup look, but use colors that slightly clash with the skin's undertone. The application must remain light and sheer, showing how the wrong undertone makes the skin look duller without using heavy makeup textures.";
+    // We want to be as neutral as possible to allow the color theory to shine, not the "AI retouching"
+    const defaultMakeup = "KEEP FACE PIXEL-PERFECT ORIGINAL. DO NOT add makeup, do not change lip color, do not add blush. Maintain 100% of the original facial skin texture and features.";
 
     const makeupInstruction = makeup_prompt || defaultMakeup;
 
     // 1. Get User Image from DB
     const db = getDb();
 
-    // SECURITY CHECK: Verify session status is 'completed' (Paid)
+    // SECURITY CHECK: Verify session status is 'completed' (Paid) 
+    // OR if it's one of our public example sessions
+    const EXAMPLE_IDS = [
+        "26a4b77e-c1d7-4749-ac38-a468fcc44ab1", "341e64a2-15a5-4b03-9de6-4044d90d42fb",
+        "3ca5dde6-f815-41b9-aa01-ace3b29cc192", "0087af50-44e8-4535-882d-3ed4b3ee9834",
+        "124c62d7-f29c-413a-8392-0f91630ddac2", "790eeaf3-b327-46c3-a7f7-e9d512a125f0",
+        "8efb12d2-be91-4ce5-a492-c6e1ecbb3814", "cec2e247-27d1-432c-a058-d6c7db53f4fc",
+        "c78b72ea-ccd3-4509-8822-4f71724f59fa", "af413445-5804-4371-b375-2ed33632e86d",
+        "af1a972b-93af-46e2-8cb4-25c3f779f8a7", "258766e5-e68b-40fb-ac9b-474a61a77f18",
+        "1288ff36-015f-4ea4-a228-14349c01636f" // Your test session
+    ];
+
+    const isExample = EXAMPLE_IDS.includes(sessionId);
+
     const sessionRes = await db.query(
       "select status from color_lab_sessions where id = $1",
       [sessionId]
@@ -44,7 +55,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    if (sessionRes.rows[0].status !== 'completed') {
+    if (!isExample && sessionRes.rows[0].status !== 'completed') {
         console.warn(`Blocked draping attempt for unpaid session: ${sessionId}`);
         return NextResponse.json(
             { error: "Payment required to unlock virtual draping." }, 
@@ -101,9 +112,9 @@ export async function POST(req: NextRequest) {
     }
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Using gemini-3-pro-image-preview which supports image generation
+    // Using gemini-3.1-flash-image-preview which is optimized for image-to-image tasks in the 3.1 era
     const model = genAI.getGenerativeModel({
-      model: "gemini-3-pro-image-preview",
+      model: "gemini-3.1-flash-image-preview",
     });
 
     const fullPrompt = `STRICT IMAGE EDITING INSTRUCTION FOR 'COLOR ANALYSIS QUIZ'.

@@ -204,13 +204,13 @@ export default function PageComponent({
     };
 
     const handleUnlockClick = async () => {
+        // 1. Direct to pricing/value if not logged in
         if (!userData?.user_id) {
-            setShowLoginModal(true);
+            setShowPricingModal(true);
             return;
         }
 
-        setStatus('processing');
-
+        // 2. Try to unlock SILENTLY first to avoid UI "flashing" to processing state
         try {
             const res = await fetch('/api/color-lab/unlock', {
                 method: 'POST',
@@ -222,26 +222,24 @@ export default function PageComponent({
             });
 
             if (res.status === 402) {
-                // Insufficient credits -> Show Pricing Modal instead of redirecting
-                setStatus('protected');
+                // No credits -> Show Pricing Modal directly, NO FLASH
                 setShowPricingModal(true);
                 return;
             }
 
             if (res.ok) {
-                // Unlock successful -> Reveal content
-                setStatus('completed');
+                // Has credits and success -> NOW show the processing animation
+                setStatus('processing');
                 router.refresh();
                 // Draping generation will auto-trigger via existing useEffect
             } else {
                 const errorText = await res.text();
                 console.error("Unlock failed", res.status, errorText);
-                alert("Something went wrong unlocking the report. Please try again.");
-                setStatus('protected');
+                setShowPricingModal(true); // Fallback to pricing for any error
             }
         } catch (e) {
             console.error("Unlock error", e);
-            setStatus('protected');
+            setShowPricingModal(true);
         }
     };
 
@@ -274,7 +272,7 @@ export default function PageComponent({
                     body: JSON.stringify({ 
                         sessionId, 
                         prompt: report.virtual_draping_prompts.best_color_prompt, 
-                        makeup_prompt: report.virtual_draping_prompts.best_makeup_prompt,
+                        makeup_prompt: null, // Removed makeup to keep original portrait
                         type: 'best' 
                     })
                 }),
@@ -284,7 +282,7 @@ export default function PageComponent({
                     body: JSON.stringify({ 
                         sessionId, 
                         prompt: report.virtual_draping_prompts.worst_color_prompt, 
-                        makeup_prompt: report.virtual_draping_prompts.worst_makeup_prompt,
+                        makeup_prompt: null, // Ensure worst version also has no makeup added
                         type: 'worst' 
                     })
                 })
@@ -595,27 +593,41 @@ export default function PageComponent({
                         Personal Analysis
                     </div>
                     
-                    <h1 className="font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg">
+                    <h1 
+                        className={`font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg ${isLocked ? 'cursor-pointer hover:opacity-90' : ''}`}
+                        onClick={isLocked ? handleUnlockClick : undefined}
+                    >
                         You are a <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">{dSeason}</span>
                     </h1>
                     
-                    <p className="text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80">
+                    <p 
+                        className={`text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80 ${isLocked ? 'cursor-pointer hover:text-white' : ''}`}
+                        onClick={isLocked ? handleUnlockClick : undefined}
+                    >
                         &quot;{isLocked ? 'Unlock to reveal your true style persona.' : (dHeadline || 'Discover your true colors.')}&quot;
                     </p>
                     
-                    {/* Quick Traits Grid */}
-                    <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8 backdrop-blur-sm bg-[#1A1A2E]/20 rounded-xl p-4 -mx-4 md:mx-0">
+                    {/* Quick Traits Grid - Interactive if Locked */}
+                    <div 
+                        className={`grid grid-cols-3 gap-4 border-t border-white/10 pt-8 backdrop-blur-sm bg-[#1A1A2E]/20 rounded-xl p-4 -mx-4 md:mx-0 transition-all ${isLocked ? 'cursor-pointer hover:bg-white/10 group/traits' : ''}`}
+                        onClick={isLocked ? handleUnlockClick : undefined}
+                    >
                         {dCharacteristics && Object.entries(dCharacteristics).map(([key, value]) => (
-                            <div key={key}>
+                            <div key={key} className="relative">
                                 <p className="text-accent-gold uppercase text-[10px] tracking-widest mb-1.5 font-bold opacity-80">{key}</p>
                                 <p className="font-medium text-white text-sm md:text-base leading-snug">
                                     {isLocked ? (
-                                        <span className="blur-sm select-none opacity-50">Hidden</span>
+                                        <span className="blur-sm select-none opacity-50 group-hover/traits:opacity-80 transition-opacity">Hidden</span>
                                     ) : (
                                         value as string
                                     )}
                                 </p>
+                                {isLocked && (
+                                    <div className="absolute top-0 right-0 opacity-0 group-hover/traits:opacity-100 transition-opacity">
+                                        <svg className="w-3 h-3 text-accent-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
@@ -685,7 +697,7 @@ export default function PageComponent({
 
             {/* Draping: If Locked, show mock images. Else show real or loading */}
             {isLocked ? (
-                 <div className="relative max-w-5xl mx-auto cursor-pointer group overflow-hidden rounded-[2.5rem] shadow-2xl border border-white/20" onClick={handleUnlockClick}>
+                 <div className="relative max-w-5xl mx-auto cursor-pointer group overflow-hidden rounded-[3rem] shadow-2xl border border-white/20 transition-all duration-700 hover:scale-[1.01] hover:shadow-primary/20" onClick={handleUnlockClick}>
                     {/* Background Grid */}
                     <div className="grid grid-cols-2 h-[400px] md:h-[500px] relative">
                         {/* Left: Best Match Preview */}
@@ -887,10 +899,10 @@ export default function PageComponent({
                                 ))}
 
                                 {isLocked && (
-                                     <div className="absolute inset-0 left-[25%] flex items-center justify-center z-10" onClick={handleUnlockClick}>
-                                        <div className="bg-[#1A1A2E] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 cursor-pointer hover:bg-black transition-all transform hover:scale-105 ring-4 ring-white/50">
-                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                            <span className="text-xs font-bold tracking-wide uppercase">Unlock Personalized Palette</span>
+                                     <div className="absolute inset-0 flex items-center justify-center z-10 cursor-pointer bg-black/5 hover:bg-black/10 transition-colors" onClick={handleUnlockClick}>
+                                        <div className="bg-[#1A1A2E] text-white px-8 py-4 rounded-full shadow-2xl flex items-center gap-3 transform transition-all group-hover:scale-110 hover:bg-black ring-8 ring-white/30">
+                                            <svg className="w-5 h-5 text-accent-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                            <span className="text-sm font-bold tracking-wide uppercase">Unlock Full Power Palette</span>
                                         </div>
                                      </div>
                                 )}
