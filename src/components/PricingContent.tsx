@@ -29,7 +29,7 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
             <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">$19.90</span>
         </div>
         <div className="mt-2 inline-block bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
-            {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '75% OFF')}
+            {isDiscounted ? 'EXTRA DISCOUNT APPLIED' : (isAds75 ? '✨ 90% OFF APPLIED' : '90% OFF')}
         </div>
         
         <button

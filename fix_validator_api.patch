@@ -1,0 +1,12 @@
+--- src/app/api/color-lab/validator/upload/route.ts
++++ src/app/api/color-lab/validator/upload/route.ts
+@@ -28,7 +28,7 @@
+         // Try to find completed sessions for this user
+         const sessionRes = await db.query(`
+-            SELECT s.id, r.season, r.payload->>'headline' as headline, i.url as image_url 
++            SELECT s.id, r.season, r.payload->>'headline' as headline, i.url as image_url
+             FROM color_lab_sessions s
+             JOIN color_lab_reports r ON s.id = r.session_id
+             LEFT JOIN color_lab_images i ON s.id = i.session_id AND i.image_type = 'original'
+             WHERE s.email = $1 AND s.status IN ('completed', 'analyzed') 
+             ORDER BY s.created_at DESC
