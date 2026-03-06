@@ -25,8 +25,8 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         <h3 className="text-lg font-semibold leading-8 text-gray-900">Single Report</h3>
         <p className="mt-4 text-sm leading-6 text-gray-600">Perfect for one person.</p>
         <div className="mt-6 flex items-baseline gap-x-1">
-            <span className="text-4xl font-bold tracking-tight text-gray-900">${isDiscounted ? '2.45' : '4.90'}</span>
-            <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">${isDiscounted ? '4.90' : '19.90'}</span>
+            <span className="text-4xl font-bold tracking-tight text-gray-900">${isDiscounted ? '0.90' : '1.90'}</span>
+            <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">$19.90</span>
         </div>
         <div className="mt-2 inline-block bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
             {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '75% OFF')}
@@ -73,15 +73,15 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         <h3 className="text-lg font-semibold leading-8 text-white">Style Pack</h3>
         <p className="mt-4 text-sm leading-6 text-gray-300">Share with family or test different photos.</p>
         <div className="mt-6 flex items-baseline gap-x-1">
-            <span className="text-4xl font-bold tracking-tight text-white">${isDiscounted ? '4.95' : '9.90'}</span>
-            <span className="text-sm font-semibold leading-6 text-gray-300 line-through ml-2">${isDiscounted ? '9.90' : '29.90'}</span>
+            <span className="text-4xl font-bold tracking-tight text-white">${isDiscounted ? '2.45' : '4.90'}</span>
+            <span className="text-sm font-semibold leading-6 text-gray-300 line-through ml-2">$49.90</span>
         </div>
         
         <button 
             onClick={() => onCheckout('pack')}
             className="mt-6 block w-full rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary animate-pulse transition-colors"
         >
-            Get 3 Credits (${isDiscounted ? '1.65' : '3.30'}/each)
+            Get 3 Credits (${isDiscounted ? '0.81' : '1.63'}/each)
         </button>
 
         <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300">

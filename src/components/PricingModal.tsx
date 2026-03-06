@@ -136,7 +136,7 @@ export default function PricingModal({
                 <span className={`w-2 h-2 rounded-full ${timeLeft === '00:00' ? 'bg-yellow-400 animate-ping' : 'bg-red-500 animate-pulse'}`}></span>
                 <span className="text-xs font-bold uppercase tracking-wider">
                     {timeLeft === '00:00' 
-                        ? "LAST CHANCE: Discount Expired! Secure $4.90 before price reverts." 
+                        ? "LAST CHANCE: Discount Expired! Secure $1.90 before price reverts." 
                         : `${isFromGoogle ? 'Google Search Exclusive' : 'Limited Time Special'} Offer Expires In: ${timeLeft}`
                     }
                 </span>
