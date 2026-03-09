@@ -598,7 +598,11 @@ export default function PageComponent({
                         onClick={isLocked ? handleUnlockClick : undefined}
                     >
                         You are a <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">{dSeason}</span>
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">
+                            {isLocked ? (
+                                dCharacteristics ? `${dCharacteristics['Undertone'] || 'Unique'} & ${dCharacteristics['Contrast'] || 'Special'} Type` : 'Special Color Type'
+                            ) : dSeason}
+                        </span>
                     </h1>
                     
                     <p 

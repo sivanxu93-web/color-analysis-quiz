@@ -78,11 +78,11 @@ export async function GET(req: NextRequest) {
               <p>Our AI has finished analyzing your photo. You've been identified as a <strong>${season_name || 'unique season'}</strong>.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Extra 50% VIP Discount</h2>
+                <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Special Stylist Credit</h2>
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
-                  We've already discounted our reports by 90% for our flash sale ($1.90). But as a special thank you, we're taking an <strong>additional 50% OFF</strong> just for you.
+                  We noticed you haven't unlocked your official 12-season profile. As a one-time gesture, we've applied a <strong>$5.00 Stylist Credit</strong> to your account.
                 </p>
-                <p style="font-size: 22px; color: #E88D8D; font-weight: bold;">Only $0.90 to unlock everything.</p>
+                <p style="font-size: 22px; color: #E88D8D; font-weight: bold;">Only $14.90 to unlock everything.</p>
               </div>
 
               <p style="text-align: center; margin-top: 30px;">
@@ -95,26 +95,26 @@ export async function GET(req: NextRequest) {
             </div>`;
         } else {
             // --- COPY FOR NEW LEADS (Stacked Discount Logic) ---
-            subject = `Result Ready: Get an EXTRA 50% OFF your analysis 🎨`;
+            subject = `Result Ready: Claim your $5.00 Stylist Credit 🎨`;
             htmlContent = `
             <div style="font-family: sans-serif; color: #333; max-width: 600px; margin: 0 auto;">
               <p>Hi ${firstName},</p>
               <p>Great news! Our AI has finished your personal color analysis. Based on your features, you are a <strong>${season_name || 'unique seasonal type'}</strong>.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <p style="margin: 0 0 5px 0; font-weight: bold; color: #1A1A2E; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Limited Time Stacked Offer</p>
-                <h2 style="margin: 0 0 5px 0; color: #E88D8D; font-size: 32px;">90% + EXTRA 50% OFF</h2>
+                <p style="margin: 0 0 5px 0; font-weight: bold; color: #1A1A2E; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">Exclusive Stylist Credit Applied</p>
+                <h2 style="margin: 0 0 5px 0; color: #E88D8D; font-size: 32px;">SAVE $5.00</h2>
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
-                  We've automatically applied an <strong>additional 50% discount</strong> on top of our $1.90 flash sale price.
+                  Unlock your full professional profile today using your one-time stylist credit.
                 </p>
                 <div style="display: flex; justify-content: space-around; margin-top: 20px;">
                     <div style="text-align: center;">
-                        <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Single Report</p>
-                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$1.90</span> $0.90</p>
+                        <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Professional Report</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$19.90</span> $14.90</p>
                     </div>
                     <div style="text-align: center;">
                         <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Style Pack (3x)</p>
-                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$4.90</span> $2.45</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$49.90</span> $39.90</p>
                     </div>
                 </div>
               </div>
