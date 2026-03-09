@@ -401,17 +401,9 @@ export default function PageComponent({
   } = displayReport || {};
 
   // --- LOCKED CONTENT LOGIC ---
-  // 1. Mask Season Name (e.g. "Deep Winter" -> "**** Winter")
-  const baseSeason = rawSeason?.split(' ').pop();
-  const dSeason = isLocked ? (
-      <span className="inline-flex items-baseline gap-2">
-          <span className="text-white/40 tracking-widest animate-pulse font-mono text-4xl">****</span> 
-          <span>{baseSeason}</span>
-          <span className="bg-white/10 p-1.5 rounded-full ml-2 self-center">
-            <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-          </span>
-      </span>
-  ) : rawSeason;
+  // 1. Mask Season Name (e.g. "Deep Winter" -> "Deep ****")
+  const firstWord = rawSeason?.split(' ')[0] || 'Special';
+  const dSeason = isLocked ? `${firstWord} ****` : rawSeason;
 
   // --- BACKWARDS COMPATIBILITY LOGIC ---
   const normalizePalette = (group: any) => {
@@ -597,19 +589,32 @@ export default function PageComponent({
                         className={`font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg ${isLocked ? 'cursor-pointer hover:opacity-90' : ''}`}
                         onClick={isLocked ? handleUnlockClick : undefined}
                     >
-                        You are a <br/>
+                        {isLocked ? 'Your Profile:' : 'You are a'} <br/>
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">
                             {isLocked ? (
-                                dCharacteristics ? `${dCharacteristics['Undertone'] || 'Unique'} & ${dCharacteristics['Contrast'] || 'Special'} Type` : 'Special Color Type'
+                                <span className="text-4xl md:text-6xl tracking-tighter uppercase font-sans font-black">
+                                    {dSeason}
+                                </span>
                             ) : dSeason}
                         </span>
                     </h1>
+                    
+                    {isLocked && (
+                        <div className="flex items-center gap-3 mb-8 animate-pulse" onClick={handleUnlockClick}>
+                            <div className="h-px flex-1 bg-white/20"></div>
+                            <span className="text-accent-gold text-xs font-bold uppercase tracking-[0.3em] flex items-center gap-2">
+                                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                                12-Season ID: Locked
+                            </span>
+                            <div className="h-px flex-1 bg-white/20"></div>
+                        </div>
+                    )}
                     
                     <p 
                         className={`text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80 ${isLocked ? 'cursor-pointer hover:text-white' : ''}`}
                         onClick={isLocked ? handleUnlockClick : undefined}
                     >
-                        &quot;{isLocked ? 'Unlock to reveal your true style persona.' : (dHeadline || 'Discover your true colors.')}&quot;
+                        &quot;{isLocked ? 'Our AI has mapped your precise color coordinates. Unlock to reveal your official 12-season match.' : (dHeadline || 'Discover your true colors.')}&quot;
                     </p>
                     
                     {/* Quick Traits Grid - Interactive if Locked */}
@@ -640,6 +645,53 @@ export default function PageComponent({
 
             {/* 1.5 The Profile (Deep Dive) - New Section */}
             <div id="profile" className="max-w-4xl mx-auto px-6 text-center space-y-12">
+                {isLocked && (
+                    <div className="bg-white rounded-[2.5rem] p-10 md:p-16 border border-[#E8E1D9] shadow-sm relative overflow-hidden group cursor-pointer" onClick={handleUnlockClick}>
+                        <div className="text-center mb-12">
+                            <span className="text-xs font-bold uppercase tracking-[0.3em] text-accent-gold mb-4 block">Official 12-Season Identification</span>
+                            <h3 className="font-serif text-3xl md:text-4xl font-bold text-[#1A1A2E] mb-4">Your Premium Style Manual</h3>
+                            <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto italic leading-relaxed">
+                                AI has mapped your precise skin tone, contrast, and sub-tone coordinates. Unlock the full professional report to receive:
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12 text-left max-w-3xl mx-auto">
+                            {[
+                                { title: 'Official Classification', text: 'Defined placement in the 12-season system.', path: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+                                { title: 'AI Virtual Draping', text: 'High-res proof of your best vs worst matches.', path: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
+                                { title: 'Power Palette', text: '30+ curated shades for your specific radiance.', path: 'M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01' },
+                                { title: 'Makeup & Hair Map', text: 'Precise lipstick and hair color recommendations.', path: 'M14.828 14.828a4 4 0 01-5.656 0L2.828 8.485a4 4 0 015.656-5.656L14.828 9.172a4 4 0 010 5.656z' },
+                                { title: 'Jewelry & Metals', text: 'Expert guide for silver, gold, and accessories.', path: 'M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745V6c0-1.105.895-2 2-2h14c1.105 0 2 .895 2 2v7.255z' },
+                                { title: 'Universal Access', text: 'Lifetime access to your personal style portal.', path: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' }
+                            ].map((item, i) => (
+                                <div key={i} className="flex items-start gap-4 group/item">
+                                    <div className="mt-1 p-2 bg-gray-50 rounded-lg group-hover/item:bg-accent-gold/10 transition-colors">
+                                        <svg className="w-5 h-5 text-[#1A1A2E]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={item.path} />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-[#1A1A2E] mb-1">{item.title}</h4>
+                                        <p className="text-gray-400 text-xs leading-relaxed">{item.text}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-6">
+                            <div className="flex items-center gap-4 text-[10px] font-bold text-gray-300 uppercase tracking-[0.2em]">
+                                <span>SSL Secured</span>
+                                <div className="w-1 h-1 bg-gray-200 rounded-full"></div>
+                                <span>Stripe Verified</span>
+                            </div>
+                            <button className="w-full md:w-auto bg-[#1A1A2E] text-white px-12 py-5 rounded-full font-bold hover:bg-black transition-all shadow-[0_20px_50px_rgba(0,0,0,0.15)] flex items-center justify-center gap-3 uppercase tracking-widest text-sm">
+                                Unlock Premium Manual — $19.90
+                                <span className="text-lg">&rarr;</span>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
                 {/* Analysis Text */}
                 <BlurLock label="Unlock Full Analysis">
                     <div className="relative">
@@ -1201,16 +1253,15 @@ export default function PageComponent({
         {isLocked && (
              <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up">
                 <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
-                    <div className="hidden md:block">
-                        <p className="text-sm font-bold text-[#1A1A2E]">Your analysis is complete!</p>
-                        <p className="text-xs text-gray-500">Unlock your personalized palette & style guide.</p>
+                    <div>
+                        <p className="text-sm font-bold text-[#1A1A2E]">Your Analysis is Ready</p>
+                        <p className="text-xs text-gray-500">Unlock your official colors & premium manual.</p>
                     </div>
                     <button 
                         onClick={handleUnlockClick}
-                        className="flex-1 md:flex-none bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-lg flex items-center justify-center gap-2"
+                        className="flex-1 md:flex-none bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-all shadow-xl flex items-center justify-center gap-2 uppercase tracking-widest"
                     >
-                        <span>Unlock full {baseSeason || 'Report'}</span>
-                        <span className="text-accent-gold bg-white/10 px-2 py-0.5 rounded">1 Credit</span>
+                        <span>Unlock Full Expert Guide</span>
                     </button>
                 </div>
              </div>
