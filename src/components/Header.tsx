@@ -95,11 +95,23 @@ export default function Header({
             className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
             {menuText.header1}
           </Link>
+          <Link
+            href={getLinkHref(locale, 'examples')}
+            onClick={() => checkPageAndLoading('examples')}
+            className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
+            {menuText.header5}
+          </Link>
+          <Link
+            href={getLinkHref(locale, 'blog')}
+            onClick={() => checkPageAndLoading('blog')}
+            className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
+            {menuText.header4}
+          </Link>
            {
             userData.email ?
             <Link
-                href={getLinkHref(locale, 'analysis')} 
-                onClick={() => checkPageAndLoading('analysis')}
+                href={getLinkHref(locale, 'profile')} 
+                onClick={() => checkPageAndLoading('profile')}
                 className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
                 {menuText.header2}
             </Link> : null
@@ -192,12 +204,29 @@ export default function Header({
                 >
                   {menuText.header1}
                 </Link>
+                <Link
+                  href={getLinkHref(locale, 'examples')}
+                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {menuText.header5}
+                </Link>
+                <Link
+                  href={getLinkHref(locale, 'blog')}
+                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {menuText.header4}
+                </Link>
                  {
                   userData.email ?
                     <Link
                       href={getLinkHref(locale, 'profile')}
                       className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
-                      onClick={() => setMobileMenuOpen(false)}
+                      onClick={() => {
+                        checkPageAndLoading('profile');
+                        setMobileMenuOpen(false);
+                      }}
                     >
                       {menuText.header2}
                     </Link> : null

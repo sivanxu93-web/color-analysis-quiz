@@ -23,22 +23,20 @@ export default function Footer({
     const requestData = {
       user_id: user_id
     }
-    setShowLoadingModal(true);
+    // Removed setShowLoadingModal(true)
     const responseData = await fetch(`/api/stripe/create-portal-link`, {
       method: 'POST',
       body: JSON.stringify(requestData)
     });
     const result = await responseData.json();
-    setShowLoadingModal(false);
+    // Removed setShowLoadingModal(false)
     if (result.url) {
       window.location.href = result.url;
     }
   }
 
   const checkPageAndLoading = (toPage) => {
-    if (page != toPage) {
-      setShowLoadingModal(true);
-    }
+    // Removed setShowLoadingModal(true) to avoid intrusive popups on simple navigation
   }
 
   return (
@@ -67,81 +65,91 @@ export default function Footer({
                 </a>
             </div>
           </div>
-          <div className="mt-2 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <div className="text-sm font-semibold leading-6 text-white"></div>
-                <ul role="list" className="mt-6 space-y-4">
-
-                </ul>
-              </div>
-              <div className="mt-10 md:mt-0">
-                <div className="text-sm font-semibold leading-6 text-white"></div>
-                <ul role="list" className="mt-6 space-y-4">
-                  <span className="text-sm leading-6 text-gray-500">
-                    &copy; {new Date().getFullYear()} Color Analysis Quiz. All rights reserved.
-                  </span>
-                </ul>
-              </div>
+          <div className="mt-2 grid grid-cols-2 md:grid-cols-3 gap-8 xl:col-span-2 xl:mt-0">
+            <div>
+              <div className="text-sm font-semibold leading-6 text-white">{menuText.footerResources}</div>
+              <ul role="list" className="mt-6 space-y-4">
+                <li>
+                  <Link
+                    href={getLinkHref(locale, 'blog')}
+                    className="text-sm leading-6 text-gray-300 hover:text-primary-light"
+                    onClick={() => checkPageAndLoading('blog')}
+                  >
+                    {menuText.header4}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={getLinkHref(locale, 'examples')}
+                    className="text-sm leading-6 text-gray-300 hover:text-primary-light"
+                    onClick={() => checkPageAndLoading('examples')}
+                  >
+                    {menuText.header5}
+                  </Link>
+                </li>
+              </ul>
             </div>
-            <div className="md:grid md:grid-cols-2 md:gap-8">
-              <div>
-                <div
-                  className="text-sm font-semibold leading-6 text-white">
-                  {process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME == '0' ? '' : menuText.footerSupport}
-                </div>
-                <ul role="list" className="mt-6 space-y-4">
-                  {
-                    process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
-                      <li>
-                        <Link
-                          href={getLinkHref(locale, 'pricing')}
-                          className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                          onClick={()=>checkPageAndLoading('pricing')}
-                        >
-                          {menuText.footerSupport0}
-                        </Link>
-                      </li>
-                      :
-                      null
-                  }
-                  {
-                    userData && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
-                      <li>
-                        <a
-                          onClick={() => manageSubscribe()}
-                          className="cursor-pointer text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]">
-                          {menuText.footerSupport1}
-                        </a>
-                      </li>
-                      :
-                      null
-                  }
-                </ul>
+            <div>
+              <div
+                className="text-sm font-semibold leading-6 text-white">
+                {process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME == '0' ? '' : menuText.footerSupport}
               </div>
-              <div className="mt-10 md:mt-0">
-                <div className="text-sm font-semibold leading-6 text-white">{menuText.footerLegal}</div>
-                <ul role="list" className="mt-6 space-y-4">
-                  <li>
-                    <Link
-                      href={getLinkHref(locale, 'privacy-policy')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('privacy-policy')}
-                    >
-                      {menuText.footerLegal0}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={getLinkHref(locale, 'terms-of-service')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('terms-of-service')}
-                    >
-                      {menuText.footerLegal1}
-                    </Link>
-                  </li>
-                </ul>
-              </div>
+              <ul role="list" className="mt-6 space-y-4">
+                {
+                  process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
+                    <li>
+                      <Link
+                        href={getLinkHref(locale, 'pricing')}
+                        className="text-sm leading-6 text-gray-300 hover:text-primary-light"
+                        onClick={()=>checkPageAndLoading('pricing')}
+                      >
+                        {menuText.footerSupport0}
+                      </Link>
+                    </li>
+                    :
+                    null
+                }
+                {
+                  userData && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
+                    <li>
+                      <a
+                        onClick={() => manageSubscribe()}
+                        className="cursor-pointer text-sm leading-6 text-gray-300 hover:text-primary-light">
+                        {menuText.footerSupport1}
+                      </a>
+                    </li>
+                    :
+                    null
+                }
+              </ul>
+            </div>
+            <div className="mt-10 md:mt-0">
+              <div className="text-sm font-semibold leading-6 text-white">{menuText.footerLegal}</div>
+              <ul role="list" className="mt-6 space-y-4">
+                <li>
+                  <Link
+                    href={getLinkHref(locale, 'privacy-policy')}
+                    className="text-sm leading-6 text-gray-300 hover:text-primary-light"
+                    onClick={()=>checkPageAndLoading('privacy-policy')}
+                  >
+                    {menuText.footerLegal0}
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href={getLinkHref(locale, 'terms-of-service')}
+                    className="text-sm leading-6 text-gray-300 hover:text-primary-light"
+                    onClick={()=>checkPageAndLoading('terms-of-service')}
+                  >
+                    {menuText.footerLegal1}
+                  </Link>
+                </li>
+                <li className="pt-4">
+                  <span className="text-xs leading-6 text-gray-500">
+                    &copy; {new Date().getFullYear()} Color Analysis Quiz.
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
         </div>

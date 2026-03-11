@@ -62,21 +62,21 @@ export default function PageComponent({
                             Learn More
                         </a>
                     </div>
-                    <div className="mt-8 flex items-center justify-center md:justify-start gap-4 text-sm text-text-secondary">
+                    <div className="mt-8 flex items-center justify-center md:justify-start gap-4 text-sm text-text-secondary min-h-[32px]">
                         <div className="flex -space-x-2">
                             {userAvatars.length > 0 ? (
                                 userAvatars.slice(0, 3).map((src, i) => (
-                                    <img key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src={src} alt="User"/>
+                                    <img key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src={src} alt="User avatar"/>
                                 ))
                             ) : (
-                                <>
-                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=64&h=64" alt=""/>
-                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=64&h=64" alt=""/>
-                                    <img className="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=64&h=64" alt=""/>
-                                </>
+                                <div className="flex -space-x-2 animate-pulse">
+                                    <div className="h-8 w-8 rounded-full bg-gray-200 ring-2 ring-white"></div>
+                                    <div className="h-8 w-8 rounded-full bg-gray-100 ring-2 ring-white"></div>
+                                    <div className="h-8 w-8 rounded-full bg-gray-50 ring-2 ring-white"></div>
+                                </div>
                             )}
                         </div>
-                        <p>Trusted by {reportCount.toLocaleString()} beauties</p>
+                        <p>{reportCount > 0 ? `Trusted by ${reportCount.toLocaleString()} beauties` : 'Trusted by thousands of beauties'}</p>
                     </div>
                 </div>
                 
@@ -85,7 +85,7 @@ export default function PageComponent({
                     <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
                         <img 
                             src="/seasonal_color_analysis.jpg" 
-                            alt="AI Color Analysis Quiz - Seasonal Palette Results" 
+                            alt="Professional AI Seasonal Color Analysis Quiz - Discover your 12-season palette with our AI Stylist" 
                             className="w-full h-auto object-cover" 
                         />
                     </div>
@@ -109,7 +109,7 @@ export default function PageComponent({
                             className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1"
                         >
                             <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
-                                <img src={item.imageUrl} alt={item.season} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                <img src={item.imageUrl} alt={`AI Color Analysis Result for ${item.season} - ${item.headline}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                                     <h3 className="text-2xl font-serif font-bold leading-tight">
@@ -212,14 +212,31 @@ export default function PageComponent({
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 "@context": "https://schema.org",
+                "@type": "WebSite",
+                "name": "Color Analysis Quiz",
+                "url": process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app',
+                "potentialAction": {
+                  "@type": "SearchAction",
+                  "target": `${process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app'}/search?q={search_term_string}`,
+                  "query-input": "required name=search_term_string"
+                }
+              })
+            }}
+          />
+         <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
                 "@type": "WebApplication",
-                "name": "AI Color Analysis Quiz",
-                "url": "https://coloranalysisquiz.app",
+                "name": colorLabText.Landing.h1,
+                "description": colorLabText.Landing.description,
+                "url": process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app',
                 "applicationCategory": "LifestyleApplication",
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "4.90",
+                  "price": "19.90",
                   "priceCurrency": "USD"
                 }
               })
@@ -233,24 +250,24 @@ export default function PageComponent({
                 "@type": "FAQPage",
                 "mainEntity": [{
                   "@type": "Question",
-                  "name": "How does the Color Analysis Quiz work?",
+                  "name": colorLabText.Landing.Schema?.faqQuestion1 || "How does the Color Analysis Quiz work?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report."
+                    "text": colorLabText.Landing.Schema?.faqAnswer1 || "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report."
                   }
                 }, {
                   "@type": "Question",
-                  "name": "How accurate is AI color analysis?",
+                  "name": colorLabText.Landing.Schema?.faqQuestion2 || "How accurate is AI color analysis?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias."
+                    "text": colorLabText.Landing.Schema?.faqAnswer2 || "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias."
                   }
                 }, {
                   "@type": "Question",
-                  "name": "Is the analysis free?",
+                  "name": colorLabText.Landing.Schema?.faqQuestion3 || "Is the analysis free?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a small one-time fee."
+                    "text": colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."
                   }
                 }]
               })

@@ -1,14 +1,30 @@
 import { getColorLabText } from '~/i18n/languageText';
 import LandingPage from '~/components/home/LandingPage';
 import { Metadata } from 'next';
+import { locales } from '~/i18n/config';
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({
+  params: { locale }
+}: {
+  params: { locale: string }
+}): Promise<Metadata> {
   const colorLabText = await getColorLabText();
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  
+  const languages: Record<string, string> = {};
+  locales.forEach((l) => {
+    languages[l] = `${baseUrl}/${l}`;
+  });
+
   return {
     title: colorLabText.Landing.title,
     description: colorLabText.Landing.description,
     alternates: {
-        canonical: `${process.env.NEXT_PUBLIC_SITE_URL}`,
+      canonical: `${baseUrl}/${locale}`,
+      languages: {
+        ...languages,
+        'x-default': `${baseUrl}/en`,
+      },
     }
   }
 }

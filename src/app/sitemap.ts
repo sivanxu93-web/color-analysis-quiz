@@ -1,12 +1,16 @@
 import { MetadataRoute } from 'next';
 import { locales } from '~/i18n/config';
 import { EXAMPLE_MAP } from '~/libs/examples';
+import { blogPosts } from '~/libs/blogData';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
   
   // Example Routes
   const exampleRoutes = Object.keys(EXAMPLE_MAP).map(slug => `/examples/${slug}`);
+  
+  // Blog Routes
+  const blogRoutes = blogPosts.map(post => `/blog/${post.slug}`);
 
   // Key static routes
   const routes = [
@@ -18,7 +22,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/privacy-policy',
     '/terms-of-service',
     '/examples',
-    ...exampleRoutes
+    '/blog',
+    ...exampleRoutes,
+    ...blogRoutes
   ];
 
   const sitemapEntry: MetadataRoute.Sitemap = [];
@@ -33,8 +39,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       sitemapEntry.push({
         url: url,
         lastModified: new Date(),
-        changeFrequency: route === '' ? 'daily' : 'weekly',
-        priority: route === '' ? 1 : 0.8,
+        changeFrequency: route.includes('/blog') ? 'monthly' : (route === '' ? 'daily' : 'weekly'),
+        priority: route === '' ? 1 : (route.includes('/blog') ? 0.7 : 0.8),
       });
     });
   });
