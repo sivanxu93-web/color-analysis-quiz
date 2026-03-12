@@ -3,9 +3,10 @@ import { Metadata } from 'next';
 import PageComponent from './PageComponent';
 
 export async function generateMetadata(): Promise<Metadata> {
+  const colorLabText = await getColorLabText();
   return {
-    title: 'Style Validator | Check Your Clothing Colors',
-    description: 'Upload a clothing item to see if it matches your seasonal color profile.',
+    title: colorLabText.Validator.seoTitle,
+    description: colorLabText.Validator.seoDescription,
   }
 }
 

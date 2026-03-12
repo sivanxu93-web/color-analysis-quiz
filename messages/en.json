@@ -131,8 +131,8 @@
   },
   "ColorLab": {
     "Landing": {
-      "title": "Free Color Analysis Quiz | 100% Accurate AI Seasonal Palette Test",
-      "description": "Discover 'What season am I?' with our accurate Color Analysis Quiz online. Find your 12-season personal color palette (Spring, Summer, Autumn, or Winter) instantly with our AI Stylist. Free results.",
+      "title": "Free AI Color Analysis Quiz | 100% Accurate Seasonal Palette Test",
+      "description": "Discover your perfect colors with our free AI seasonal color analysis quiz. Find your 12-season palette (Spring, Summer, Autumn, or Winter) instantly. 100% accurate online test.",
       "h1": "Free AI Seasonal Color Analysis Quiz",
       "h2": "How Our Color Season Analysis Works",
       "h2_2": "Why AI Color Analysis Beats a Human Stylist",
@@ -168,6 +168,45 @@
         "faqAnswer3": "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."
       }
     },
+    "MenLanding": {
+      "title": "Men's Color Analysis Quiz | Free AI Seasonal Palette for Men",
+      "description": "Discover the best colors for men. Our AI color analysis quiz for males finds your seasonal palette instantly. Improve your wardrobe, skin tone, and style today.",
+      "h1": "Free AI Color Analysis Quiz for Men",
+      "h2": "Precision Color Analysis for the Modern Man",
+      "h2_2": "Upgrade your professional image and wardrobe with AI-powered color theory.",
+      "feature1Title": "Professional Image",
+      "feature1Desc": "Find colors that command respect. Our AI identifies the shades that make you look more energetic, professional, and authoritative in any setting.",
+      "feature2Title": "Grooming & Hair",
+      "feature2Desc": "Get precise recommendations for hair color, beard grooming, and eyewear frames based on your natural undertones.",
+      "feature3Title": "Wardrobe Built for You",
+      "feature3Desc": "Build a capsule wardrobe that actually works. Learn which suit, tie, and casual wear colors enhance your natural features."
+    },
+    "KoreanLanding": {
+      "title": "Korean Color Analysis Quiz | Get Your K-Beauty Seasonal Palette",
+      "description": "Experience the Korean personal color analysis trend online. Our AI quiz finds your seasonal palette using K-beauty standards for skin clarity and glow.",
+      "h1": "Free Korean Personal Color Analysis Quiz",
+      "h2": "Unlock Your K-Idol Glow",
+      "h2_2": "Discover the 'Personal Color' secrets used by K-pop stars and K-drama actresses.",
+      "feature1Title": "Tone-Up Detection",
+      "feature1Desc": "The Korean system prioritizes skin clarity. Our AI identifies the exact shades that give you that 'Tone-Up' effect, making your skin look brighter and more translucent.",
+      "feature2Title": "Detailed Sub-Seasons",
+      "feature2Desc": "Go beyond the basics. We use the sophisticated Korean sub-typing system to identify if you are 'Pale', 'Dull', 'Vivid', or 'Deep' within your season.",
+      "feature3Title": "K-Beauty Makeup Map",
+      "feature3Desc": "Get specific makeup recommendations for lip tints, blushes, and cushions that match the latest Seoul beauty trends and your seasonal profile."
+    },
+    "SixteenSeasonLanding": {
+      "title": "16-Season Color Analysis Quiz | Most Accurate AI Precision",
+      "description": "Go beyond the standard 12 seasons. Our 16-season color analysis quiz provides the ultimate precision for finding your perfect personal palette.",
+      "h1": "Advanced 16-Season Color Analysis Quiz",
+      "h2": "Unmatched Precision: The 16-Season System",
+      "h2_2": "Standard 12 seasons not enough? Our AI leverages the expanded 16-season theory for high-fidelity color matching.",
+      "feature1Title": "Ultimate Accuracy",
+      "feature1Desc": "By dividing the traditional 4 seasons into 16 hyper-specific categories, we identify the subtle nuances that 12-season systems miss.",
+      "feature2Title": "Flow Seasons Mapping",
+      "feature2Desc": "Our AI identifies your 'Flow'—the overlapping characteristics between seasons—to find the exact bridge colors that make you shine.",
+      "feature3Title": "HD Color Reports",
+      "feature3Desc": "Receive a high-density color report with expanded neutral ranges and specific metallic finishes tailored to your 16-season profile."
+    },
     "Analysis": {
       "title": "Upload Your Photo",
       "description": "Our AI Stylist is ready. For the most precise analysis, please use a photo with good lighting and no heavy filters.",
@@ -197,6 +236,8 @@
     },
     "Validator": {
       "title": "Style Validator",
+      "seoTitle": "AI Style Validator — Does Your Outfit Match Your Color Season? | Free Check",
+      "seoDescription": "Upload your outfit photo and instantly see if the colors match your personal 12-season palette. Free to try, no appointment needed.",
       "subtitle": "Will this look good on me?",
       "uploadTitle": "Upload Clothing Item",
       "uploadDesc": "Take a photo of the garment in good lighting.",
