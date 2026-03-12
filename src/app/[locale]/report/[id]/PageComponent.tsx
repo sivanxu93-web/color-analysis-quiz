@@ -16,6 +16,7 @@ export default function PageComponent({
   report,
   status: initialStatus,
   userImage,
+  shareCardUrl,
   colorLabText,
   sessionId,
   drapingImages: initialDrapingImages,
@@ -26,6 +27,7 @@ export default function PageComponent({
   report: any; 
   status: string;
   userImage: string | null;
+  shareCardUrl?: string | null;
   colorLabText: any;
   sessionId?: string;
   drapingImages?: { best: string | null; worst: string | null };
@@ -586,20 +588,19 @@ export default function PageComponent({
                         Personal Analysis
                     </div>
                     
-                    <h1 
-                        className={`font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg ${isLocked ? 'cursor-pointer hover:opacity-90' : ''}`}
-                        onClick={isLocked ? handleUnlockClick : undefined}
+                    <h1
+                       className={`font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg ${isLocked ? 'cursor-pointer hover:opacity-90' : ''}`}
+                       onClick={isLocked ? handleUnlockClick : undefined}
                     >
-                        {isLocked ? 'Your Profile:' : 'You are a'} <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">
-                            {isLocked ? (
-                                <span className="text-4xl md:text-6xl tracking-tighter uppercase font-sans font-black">
-                                    {dSeason}
-                                </span>
-                            ) : dSeason}
-                        </span>
-                    </h1>
-                    
+                       {colorLabText.Report.yourSeason} <br/>
+                       <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">
+                           {isLocked ? (
+                               <span className="text-4xl md:text-6xl tracking-tighter uppercase font-sans font-black">
+                                   {dSeason}
+                               </span>
+                           ) : dSeason}
+                       </span>
+                    </h1>                    
                     {isLocked && (
                         <div className="flex items-center gap-3 mb-8 animate-pulse" onClick={handleUnlockClick}>
                             <div className="h-px flex-1 bg-white/20"></div>
@@ -1218,16 +1219,18 @@ export default function PageComponent({
                             </svg>
                         </Link>
                         
-                        {/* Share Button (P3-1) */}
-                        <button 
-                            onClick={() => setIsShareModalOpen(true)}
-                            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#1A1A2E] border-2 border-[#1A1A2E] rounded-full text-lg font-bold hover:bg-gray-50 transition-colors shadow-lg w-full sm:w-auto justify-center"
-                        >
-                            <span>✨ Share My Result</span>
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                        </button>
+                        {/* Share Button (P3-1) - Only for Owner */}
+                        {isOwner && (
+                            <button 
+                                onClick={() => setIsShareModalOpen(true)}
+                                className="inline-flex items-center gap-3 px-8 py-4 bg-white text-[#1A1A2E] border-2 border-[#1A1A2E] rounded-full text-lg font-bold hover:bg-gray-50 transition-colors shadow-lg w-full sm:w-auto justify-center"
+                            >
+                                <span>✨ Share My Result</span>
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
                 </div>
 
@@ -1244,6 +1247,7 @@ export default function PageComponent({
             userImage={userImage}
             locale={locale}
             sessionId={sessionId || report.session_id}
+            initialShareCardUrl={shareCardUrl}
         />
 
         {/* Sticky Bottom Feedback Bar */}

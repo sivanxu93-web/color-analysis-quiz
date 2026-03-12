@@ -42,6 +42,8 @@ pnpm-lock.yaml
 package-lock.json
 jp
 .env
-scripts
-viewport
-analyze
+/scripts
+/viewport
+/analyze
+/gsc
+analyze/semrush

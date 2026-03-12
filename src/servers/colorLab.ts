@@ -86,6 +86,7 @@ export const getColorLabReport = async (
     rating?: string;
     ownerEmail?: string;
     imageUrl: string | null;
+    shareCardUrl?: string | null;
     drapingImages: { best: string | null; worst: string | null };
 } | null> => {
   const db = getDb();
@@ -106,6 +107,15 @@ export const getColorLabReport = async (
   }
 
   const sessionRow = sessionRes.rows[0];
+
+  // Robustly fetch share_card_url if it exists, otherwise null
+  let shareCardUrl = null;
+  try {
+      const extraRes = await db.query("SELECT share_card_url FROM color_lab_reports WHERE session_id = $1", [sessionId]);
+      shareCardUrl = extraRes.rows[0]?.share_card_url || null;
+  } catch (e) {
+      // Column doesn't exist yet, ignore
+  }
 
   // 2. Get All Images
   const imagesRes = await db.query(
@@ -143,6 +153,7 @@ export const getColorLabReport = async (
     rating: sessionRow.rating,
     ownerEmail: sessionRow.owner_email,
     imageUrl: userImageUrl,
+    shareCardUrl: sessionRow.share_card_url,
     drapingImages: {
         best: bestDraping,
         worst: worstDraping

@@ -7,9 +7,19 @@ import { authOptions } from "~/libs/authOptions";
 
 export async function generateMetadata({ params: { id } }: { params: { id: string } }): Promise<Metadata> {
   const colorLabText = await getColorLabText();
+  const data = await getColorLabReport(id);
+  const shareImage = data?.shareCardUrl || 'https://coloranalysisquiz.app/website.png';
+
   return {
     title: `My Color Analysis Report | ${colorLabText.Landing.title}`,
-    description: "Here is my personalized seasonal color palette.",
+    description: "I just found my professional seasonal color palette! Check yours for free.",
+    openGraph: {
+        images: [shareImage],
+    },
+    twitter: {
+        card: 'summary_large_image',
+        images: [shareImage],
+    }
   }
 }
 
@@ -58,6 +68,7 @@ export default async function ReportPage({
         status={data.status || (data.report ? 'completed' : 'draft')} 
         userImage={data.imageUrl}
         drapingImages={data.drapingImages}
+        shareCardUrl={data.shareCardUrl}
         colorLabText={colorLabText} 
         sessionId={id}
         rating={data.rating}

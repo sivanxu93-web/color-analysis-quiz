@@ -28,24 +28,24 @@ Return ONLY valid JSON. No markdown formatting. No code blocks.
   "celebrities": ["string (Name of a famous celebrity sharing this season)", "string", "string"],
   "palette": {
     "neutrals": {
-      "colors": [{"hex": "#...", "name": "string"}],
+      "colors": [{"hex": "#...", "name": "string (Provide 8-10 essential neutral shades)"}],
       "usage_advice": "string (How to use these as the foundation of a wardrobe.)"
     },
     "power": {
-      "colors": [{"hex": "#...", "name": "string (The most impactful, soul-matching shades of the season. Can be deep, rich, or vibrant depending on the season.)"}],
+      "colors": [{"hex": "#...", "name": "string (Provide 12-15 most impactful, soul-matching shades. This is the core value of the report.)"}],
       "usage_advice": "string (How to wear these for maximum impact, e.g., 'Best for dresses or near-face accessories'.)"
     },
     "pastels": {
-      "colors": [{"hex": "#...", "name": "string"}],
+      "colors": [{"hex": "#...", "name": "string (Provide 8-10 approachable pastel shades)"}],
       "usage_advice": "string (How to use these for a softer, more approachable look.)"
     }
   },
   "makeup": {
     "lips": [
-      {"hex": "#...", "name": "string", "brand_hint": "string"}
+      {"hex": "#...", "name": "string (Provide 5 distinct lipstick shades)", "brand_hint": "string"}
     ],
-    "blush": [{"hex": "#...", "name": "string", "brand_hint": "string"}],
-    "eyes": [{"hex": "#...", "name": "string", "brand_hint": "string"}]
+    "blush": [{"hex": "#...", "name": "string (Provide 3 distinct blush shades)", "brand_hint": "string"}],
+    "eyes": [{"hex": "#...", "name": "string (Provide 4 distinct eyeshadow shades)", "brand_hint": "string"}]
   },
   "makeup_recommendations": {
     "summary": "string (A paragraph guiding their overall makeup strategy focusing on natural enhancement.)",
@@ -70,7 +70,7 @@ Return ONLY valid JSON. No markdown formatting. No code blocks.
     "accessories": "string"
   },
   "worst_colors": [
-    {"hex": "#...", "name": "string", "reason": "string"}
+    {"hex": "#...", "name": "string (Provide 6 colors to avoid)", "reason": "string"}
   ],
   "virtual_draping_prompts": {
     "best_color_prompt": "string (Focus ONLY on the garment. Instruction: Replace the existing top with a high-quality [Color Name] [Fabric, e.g., silk/cotton] top. Keep the person's face, expression, and pose EXACTLY as in the original photo.)",
