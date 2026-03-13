@@ -9,24 +9,40 @@ import { getSeoAlternates, getSeoImages } from '~/libs/seo';
 export async function generateMetadata({ params: { id, locale } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const colorLabText = await getColorLabText();
   const data = await getColorLabReport(id);
-
-  const shareImage = data?.shareCardUrl;
+  
+  const baseUrl = 'https://coloranalysisquiz.app';
+  // Fallback to high-quality hero if specific card is missing
+  const shareImage = data?.shareCardUrl || `${baseUrl}/seasonal_color_analysis.jpg`;
+  const canonicalPath = `/report/${id}`;
 
   return {
-    title: `My Color Analysis Result | ${colorLabText.Landing.title}`,
-    description: "I just found my professional seasonal color palette using AI! Check yours for free.",
-    alternates: getSeoAlternates(`/report/${id}`, locale),
+    metadataBase: new URL(baseUrl),
+    title: `My Style Reveal: ${data?.report?.season || 'Color Analysis'}`,
+    description: "I just found my perfect 12-season color palette using AI! See my results.",
+    alternates: {
+        canonical: canonicalPath,
+    },
     openGraph: {
         title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
         description: "Discover your perfect colors with AI. Get your personal palette instantly.",
-        images: getSeoImages(shareImage),
+        url: canonicalPath,
+        siteName: 'Color Analysis Quiz',
+        images: [
+            {
+                url: shareImage,
+                width: 1200,
+                height: 630,
+                alt: 'My Seasonal Color Identity Card',
+            }
+        ],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
+        site: '@ColorQuizAI',
         title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
         description: "I just found my professional seasonal color palette using AI!",
-        images: shareImage ? [shareImage] : ['https://coloranalysisquiz.app/seasonal_color_analysis.jpg'],
+        images: [shareImage], // Twitter handles absolute URLs in arrays well too
     }
   }
 }
