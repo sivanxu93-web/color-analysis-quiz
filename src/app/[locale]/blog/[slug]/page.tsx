@@ -5,13 +5,15 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
+import { getSeoAlternates } from '~/libs/seo';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = getBlogPost(params.slug);
+export async function generateMetadata({ params: { slug, locale } }: { params: { slug: string, locale: string } }): Promise<Metadata> {
+  const post = getBlogPost(slug);
   if (!post) return {};
   return {
     title: `${post.title} | Color Analysis Quiz`,
     description: post.description,
+    alternates: getSeoAlternates(`/blog/${slug}`, locale),
   }
 }
 

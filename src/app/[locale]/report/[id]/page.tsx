@@ -4,47 +4,29 @@ import PageComponent from './PageComponent';
 import { Metadata } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/libs/authOptions";
+import { getSeoAlternates, getSeoImages } from '~/libs/seo';
 
 export async function generateMetadata({ params: { id, locale } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const colorLabText = await getColorLabText();
   const data = await getColorLabReport(id);
-  
-  const baseUrl = 'https://coloranalysisquiz.app';
-  // Use the generated card if it exists, otherwise use the high-quality seasonal hero image
-  const shareImage = data?.shareCardUrl || `${baseUrl}/seasonal_color_analysis.jpg`;
-  
-  // Canonical should always point to the clean URL (no /en for default locale)
-  const canonicalPath = locale === 'en' ? `/report/${id}` : `/${locale}/report/${id}`;
-  const pageUrl = `${baseUrl}${canonicalPath}`;
+
+  const shareImage = data?.shareCardUrl;
 
   return {
-    metadataBase: new URL(baseUrl),
     title: `My Color Analysis Result | ${colorLabText.Landing.title}`,
     description: "I just found my professional seasonal color palette using AI! Check yours for free.",
-    alternates: {
-        canonical: canonicalPath,
-    },
+    alternates: getSeoAlternates(`/report/${id}`, locale),
     openGraph: {
         title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
         description: "Discover your perfect colors with AI. Get your personal palette instantly.",
-        url: pageUrl,
-        siteName: 'Color Analysis Quiz',
-        images: [
-            {
-                url: shareImage,
-                width: 1200,
-                height: 630,
-                alt: 'My Seasonal Color Identity Card',
-            }
-        ],
+        images: getSeoImages(shareImage),
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
         title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
         description: "I just found my professional seasonal color palette using AI!",
-        images: [shareImage],
-        creator: '@ColorQuizAI', // Feel free to update this to your new X handle
+        images: shareImage ? [shareImage] : ['https://coloranalysisquiz.app/seasonal_color_analysis.jpg'],
     }
   }
 }

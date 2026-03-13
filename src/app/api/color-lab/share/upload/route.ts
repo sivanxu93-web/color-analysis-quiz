@@ -33,15 +33,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "FORBIDDEN" }, { status: 403 });
     }
 
-    // 2. Ensure column exists (one-time check/fix)
-    await db.query(`ALTER TABLE color_lab_reports ADD COLUMN IF NOT EXISTS share_card_url varchar;`);
-
-    // 3. Process Base64 Image
+    // 2. Process Base64 Image
     const base64Data = imageData.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, 'base64');
     const fileName = `share-cards/${sessionId}.png`;
 
-    // 4. Upload to R2
+    // 3. Upload to R2 (Public Read)
     await R2.putObject({
         Bucket: r2Bucket!,
         Key: fileName,
@@ -52,7 +49,8 @@ export async function POST(req: NextRequest) {
 
     const fullUrl = `${storageURL}/${fileName}`;
 
-    // 5. Update Database
+    // 4. Update Database
+    // Note: Ensure add_share_card_and_rewards.sql migration is applied to the DB!
     await db.query(
         "UPDATE color_lab_reports SET share_card_url = $1 WHERE session_id = $2",
         [fullUrl, sessionId]

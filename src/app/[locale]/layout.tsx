@@ -11,6 +11,7 @@ import { Metadata } from 'next';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import MicrosoftClarity from '~/components/MicrosoftClarity';
 import Script from 'next/script';
+import { getSeoAlternates } from '~/libs/seo';
 
 // Font Setup: Inter for Body, Playfair Display for Headings
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -26,7 +27,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  const baseUrl = 'https://coloranalysisquiz.app';
   
   return {
     metadataBase: new URL(baseUrl),
@@ -57,13 +58,7 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
       description: 'Discover your seasonal color palette instantly with AI.',
       images: ['/seasonal_color_analysis.jpg'],
     },
-    alternates: {
-      canonical: locale === 'en' ? `${baseUrl}` : `${baseUrl}/${locale}`,
-      languages: {
-        'en': `${baseUrl}`,
-        'zh': `${baseUrl}/zh`,
-      }
-    },
+    alternates: getSeoAlternates('/', locale),
     icons: {
       icon: '/favicon.ico',
       shortcut: '/appicon.png',
