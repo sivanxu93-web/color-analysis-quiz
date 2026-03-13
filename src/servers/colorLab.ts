@@ -153,7 +153,7 @@ export const getColorLabReport = async (
     rating: sessionRow.rating,
     ownerEmail: sessionRow.owner_email,
     imageUrl: userImageUrl,
-    shareCardUrl: sessionRow.share_card_url,
+    shareCardUrl: shareCardUrl,
     drapingImages: {
         best: bestDraping,
         worst: worstDraping

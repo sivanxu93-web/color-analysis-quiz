@@ -1,5 +1,5 @@
 'use client'
-import { Fragment, useRef, useState } from 'react'
+import { Fragment, useRef, useState, useEffect } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { toPng } from 'html-to-image'
 
@@ -27,6 +27,17 @@ export default function ShareModal({
   const cardRef = useRef<HTMLDivElement>(null);
   const [isCapturing, setIsCapturing] = useState(false);
   const [shareCardUrl, setShareCardUrl] = useState<string | null>(initialShareCardUrl || null);
+
+  // Pre-upload the card as soon as it's likely to be needed
+  useEffect(() => {
+    if (isOpen && !shareCardUrl) {
+        // Delay slightly to ensure fonts/images are rendered
+        const timer = setTimeout(() => {
+            ensureImageUploaded();
+        }, 1000);
+        return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
 
   const triggerReward = async () => {
     if (!sessionId) return;
