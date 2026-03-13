@@ -105,14 +105,17 @@ export default function ShareModal({
   const shareToX = async () => {
     await ensureImageUploaded();
     const text = `I just found my seasonal color: ${season}! Discover yours at ColorAnalysisQuiz.app`;
-    const url = `https://coloranalysisquiz.app/${locale}/report/${sessionId}`;
+    const baseUrl = "https://coloranalysisquiz.app";
+    const url = locale === 'en' ? `${baseUrl}/report/${sessionId}` : `${baseUrl}/${locale}/report/${sessionId}`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     triggerReward();
   };
 
   const handleCopyLink = async () => {
     await ensureImageUploaded();
-    navigator.clipboard.writeText(`https://coloranalysisquiz.app/${locale}/report/${sessionId}`);
+    const baseUrl = "https://coloranalysisquiz.app";
+    const url = locale === 'en' ? `${baseUrl}/report/${sessionId}` : `${baseUrl}/${locale}/report/${sessionId}`;
+    navigator.clipboard.writeText(url);
     alert("Link copied! When you share this link on social media, your result card will automatically appear. 🎁 You've earned 3 free Style Validator scans!");
     triggerReward();
   };

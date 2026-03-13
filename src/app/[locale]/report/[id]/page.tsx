@@ -8,34 +8,43 @@ import { authOptions } from "~/libs/authOptions";
 export async function generateMetadata({ params: { id, locale } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const colorLabText = await getColorLabText();
   const data = await getColorLabReport(id);
-  const shareImage = data?.shareCardUrl || 'https://coloranalysisquiz.app/website.png';
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
-  const pageUrl = locale === 'en' ? `${baseUrl}/report/${id}` : `${baseUrl}/${locale}/report/${id}`;
+  
+  const baseUrl = 'https://coloranalysisquiz.app';
+  // Use the generated card if it exists, otherwise use the high-quality seasonal hero image
+  const shareImage = data?.shareCardUrl || `${baseUrl}/seasonal_color_analysis.jpg`;
+  
+  // Canonical should always point to the clean URL (no /en for default locale)
+  const canonicalPath = locale === 'en' ? `/report/${id}` : `/${locale}/report/${id}`;
+  const pageUrl = `${baseUrl}${canonicalPath}`;
 
   return {
-    title: `My Color Analysis Report | ${colorLabText.Landing.title}`,
-    description: "I just found my professional seasonal color palette! Check yours for free.",
+    metadataBase: new URL(baseUrl),
+    title: `My Color Analysis Result | ${colorLabText.Landing.title}`,
+    description: "I just found my professional seasonal color palette using AI! Check yours for free.",
     alternates: {
-        canonical: pageUrl,
+        canonical: canonicalPath,
     },
     openGraph: {
-        title: `My Color Analysis Report | Color Analysis Quiz`,
-        description: "I just found my professional seasonal color palette! Check yours for free.",
+        title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
+        description: "Discover your perfect colors with AI. Get your personal palette instantly.",
         url: pageUrl,
+        siteName: 'Color Analysis Quiz',
         images: [
             {
                 url: shareImage,
                 width: 1200,
                 height: 630,
-                alt: 'My Seasonal Color Result',
+                alt: 'My Seasonal Color Identity Card',
             }
         ],
+        type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        title: `My Color Analysis Report | Color Analysis Quiz`,
-        description: "I just found my professional seasonal color palette! Check yours for free.",
+        title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
+        description: "I just found my professional seasonal color palette using AI!",
         images: [shareImage],
+        creator: '@ColorQuizAI', // Feel free to update this to your new X handle
     }
   }
 }
