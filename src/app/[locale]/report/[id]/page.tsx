@@ -10,35 +10,23 @@ export async function generateMetadata({ params: { id } }: { params: { id: strin
   const data = await getColorLabReport(id);
   
   const baseUrl = 'https://coloranalysisquiz.app';
-  // Fallback to hero image if specific card is missing. Using absolute URL directly.
   const shareImage = data?.shareCardUrl || `${baseUrl}/seasonal_color_analysis.jpg`;
   const pageUrl = `${baseUrl}/report/${id}`;
 
   return {
-    title: `My Style Reveal: ${data?.report?.season || 'Color Analysis'}`,
-    description: "I found my perfect colors using AI! See my 12-season palette results here.",
-    alternates: {
-        canonical: pageUrl,
-    },
+    title: `Style Identity: ${data?.report?.season || 'Color Analysis'}`,
+    description: "Get your professional seasonal color palette using AI instantly.",
+    alternates: { canonical: pageUrl },
     openGraph: {
         title: `My Style Identity: ${data?.report?.season || 'Seasonal Color'}`,
-        description: "Discover your perfect colors with AI. Get your personal palette instantly.",
+        description: "Discover your perfect colors with AI.",
         url: pageUrl,
-        siteName: 'Color Analysis Quiz',
-        images: [
-            {
-                url: shareImage,
-                width: 1200,
-                height: 630,
-            }
-        ],
+        images: [{ url: shareImage, width: 1200, height: 630 }],
         type: 'website',
     },
     twitter: {
         card: 'summary_large_image',
-        site: '@ColorQuizAI',
         title: `My Style Identity: ${data?.report?.season || 'Color Analysis'}`,
-        description: "I just found my professional seasonal color palette using AI!",
         images: [shareImage],
     }
   }
