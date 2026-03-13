@@ -6,33 +6,30 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "~/libs/authOptions";
 import { getSeoAlternates, getSeoImages } from '~/libs/seo';
 
-export async function generateMetadata({ params: { id, locale } }: { params: { id: string, locale: string } }): Promise<Metadata> {
-  const colorLabText = await getColorLabText();
+export async function generateMetadata({ params: { id } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const data = await getColorLabReport(id);
   
   const baseUrl = 'https://coloranalysisquiz.app';
-  // Fallback to high-quality hero if specific card is missing
+  // Fallback to hero image if specific card is missing. Using absolute URL directly.
   const shareImage = data?.shareCardUrl || `${baseUrl}/seasonal_color_analysis.jpg`;
-  const canonicalPath = `/report/${id}`;
+  const pageUrl = `${baseUrl}/report/${id}`;
 
   return {
-    metadataBase: new URL(baseUrl),
     title: `My Style Reveal: ${data?.report?.season || 'Color Analysis'}`,
-    description: "I just found my perfect 12-season color palette using AI! See my results.",
+    description: "I found my perfect colors using AI! See my 12-season palette results here.",
     alternates: {
-        canonical: canonicalPath,
+        canonical: pageUrl,
     },
     openGraph: {
-        title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
+        title: `My Style Identity: ${data?.report?.season || 'Seasonal Color'}`,
         description: "Discover your perfect colors with AI. Get your personal palette instantly.",
-        url: canonicalPath,
+        url: pageUrl,
         siteName: 'Color Analysis Quiz',
         images: [
             {
                 url: shareImage,
                 width: 1200,
                 height: 630,
-                alt: 'My Seasonal Color Identity Card',
             }
         ],
         type: 'website',
@@ -40,9 +37,9 @@ export async function generateMetadata({ params: { id, locale } }: { params: { i
     twitter: {
         card: 'summary_large_image',
         site: '@ColorQuizAI',
-        title: `My Style Identity: ${data?.report?.season || 'Seasonal Color Analysis'}`,
+        title: `My Style Identity: ${data?.report?.season || 'Color Analysis'}`,
         description: "I just found my professional seasonal color palette using AI!",
-        images: [shareImage], // Twitter handles absolute URLs in arrays well too
+        images: [shareImage],
     }
   }
 }
