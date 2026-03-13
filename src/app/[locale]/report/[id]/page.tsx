@@ -5,19 +5,36 @@ import { Metadata } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/libs/authOptions";
 
-export async function generateMetadata({ params: { id } }: { params: { id: string } }): Promise<Metadata> {
+export async function generateMetadata({ params: { id, locale } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const colorLabText = await getColorLabText();
   const data = await getColorLabReport(id);
   const shareImage = data?.shareCardUrl || 'https://coloranalysisquiz.app/website.png';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  const pageUrl = `${baseUrl}/${locale}/report/${id}`;
 
   return {
     title: `My Color Analysis Report | ${colorLabText.Landing.title}`,
     description: "I just found my professional seasonal color palette! Check yours for free.",
+    alternates: {
+        canonical: pageUrl,
+    },
     openGraph: {
-        images: [shareImage],
+        title: `My Color Analysis Report | Color Analysis Quiz`,
+        description: "I just found my professional seasonal color palette! Check yours for free.",
+        url: pageUrl,
+        images: [
+            {
+                url: shareImage,
+                width: 1200,
+                height: 630,
+                alt: 'My Seasonal Color Result',
+            }
+        ],
     },
     twitter: {
         card: 'summary_large_image',
+        title: `My Color Analysis Report | Color Analysis Quiz`,
+        description: "I just found my professional seasonal color palette! Check yours for free.",
         images: [shareImage],
     }
   }
