@@ -8,13 +8,16 @@ import { EXAMPLE_MAP } from '~/libs/examples';
 // Mapping Slug -> UUID moved to src/libs/examples.ts
 
 // SEO Metadata Generator
-export async function generateMetadata({ params: { slug } }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params: { slug, locale } }: { params: { slug: string, locale: string } }): Promise<Metadata> {
   const prettyName = slug.replace('-analysis', '').replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  const pageUrl = locale === 'en' ? `${baseUrl}/examples/${slug}` : `${baseUrl}/${locale}/examples/${slug}`;
+
   return {
     title: `${prettyName} Color Analysis — Your Complete Seasonal Palette Guide`,
     description: `See a professional ${prettyName} seasonal color analysis example. Explore the AI-generated power palette, makeup suggestions, and wardrobe guide.`,
     alternates: {
-        canonical: `/examples/${slug}`
+        canonical: pageUrl
     }
   }
 }

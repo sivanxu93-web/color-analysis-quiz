@@ -58,9 +58,9 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
       images: ['/seasonal_color_analysis.jpg'],
     },
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
+      canonical: locale === 'en' ? `${baseUrl}` : `${baseUrl}/${locale}`,
       languages: {
-        'en': `${baseUrl}/en`,
+        'en': `${baseUrl}`,
         'zh': `${baseUrl}/zh`,
       }
     },

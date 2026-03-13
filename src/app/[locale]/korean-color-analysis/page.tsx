@@ -13,17 +13,17 @@ export async function generateMetadata({
   
   const languages: Record<string, string> = {};
   locales.forEach((l) => {
-    languages[l] = `${baseUrl}/${l}/korean-color-analysis`;
+    languages[l] = l === 'en' ? `${baseUrl}/korean-color-analysis` : `${baseUrl}/${l}/korean-color-analysis`;
   });
 
   return {
     title: colorLabText.KoreanLanding.title,
     description: colorLabText.KoreanLanding.description,
     alternates: {
-      canonical: `${baseUrl}/${locale}/korean-color-analysis`,
+      canonical: locale === 'en' ? `${baseUrl}/korean-color-analysis` : `${baseUrl}/${locale}/korean-color-analysis`,
       languages: {
         ...languages,
-        'x-default': `${baseUrl}/en/korean-color-analysis`,
+        'x-default': `${baseUrl}/korean-color-analysis`,
       },
     }
   }

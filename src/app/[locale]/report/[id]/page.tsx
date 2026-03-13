@@ -10,7 +10,7 @@ export async function generateMetadata({ params: { id, locale } }: { params: { i
   const data = await getColorLabReport(id);
   const shareImage = data?.shareCardUrl || 'https://coloranalysisquiz.app/website.png';
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
-  const pageUrl = `${baseUrl}/${locale}/report/${id}`;
+  const pageUrl = locale === 'en' ? `${baseUrl}/report/${id}` : `${baseUrl}/${locale}/report/${id}`;
 
   return {
     title: `My Color Analysis Report | ${colorLabText.Landing.title}`,

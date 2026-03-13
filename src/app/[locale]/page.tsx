@@ -13,17 +13,17 @@ export async function generateMetadata({
   
   const languages: Record<string, string> = {};
   locales.forEach((l) => {
-    languages[l] = `${baseUrl}/${l}`;
+    languages[l] = l === 'en' ? `${baseUrl}` : `${baseUrl}/${l}`;
   });
 
   return {
     title: colorLabText.Landing.title,
     description: colorLabText.Landing.description,
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
+      canonical: locale === 'en' ? `${baseUrl}` : `${baseUrl}/${locale}`,
       languages: {
         ...languages,
-        'x-default': `${baseUrl}/en`,
+        'x-default': `${baseUrl}`,
       },
     }
   }
