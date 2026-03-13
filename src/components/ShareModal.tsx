@@ -106,7 +106,9 @@ export default function ShareModal({
     await ensureImageUploaded();
     const text = `I just found my seasonal color: ${season}! Discover yours at ColorAnalysisQuiz.app`;
     const baseUrl = "https://coloranalysisquiz.app";
-    const url = locale === 'en' ? `${baseUrl}/report/${sessionId}` : `${baseUrl}/${locale}/report/${sessionId}`;
+    // Crucial: Use /en (or specific locale) explicitly to bypass middleware redirects for crawlers
+    const finalLocale = locale === 'default' ? 'en' : locale;
+    const url = `${baseUrl}/${finalLocale}/report/${sessionId}`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     triggerReward();
   };
@@ -114,7 +116,8 @@ export default function ShareModal({
   const handleCopyLink = async () => {
     await ensureImageUploaded();
     const baseUrl = "https://coloranalysisquiz.app";
-    const url = locale === 'en' ? `${baseUrl}/report/${sessionId}` : `${baseUrl}/${locale}/report/${sessionId}`;
+    const finalLocale = locale === 'default' ? 'en' : locale;
+    const url = `${baseUrl}/${finalLocale}/report/${sessionId}`;
     navigator.clipboard.writeText(url);
     alert("Link copied! When you share this link on social media, your result card will automatically appear. 🎁 You've earned 3 free Style Validator scans!");
     triggerReward();
