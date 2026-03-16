@@ -79,14 +79,21 @@ export default function ShareModal({
     if (cardRef.current === null) return;
     setIsCapturing(true);
     try {
-        const dataUrl = await toPng(cardRef.current, { cacheBust: true, pixelRatio: 2 });
+        // Give extra time for images and fonts to settle
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const dataUrl = await toPng(cardRef.current, { 
+            cacheBust: true, 
+            pixelRatio: 2,
+            skipFonts: false
+        });
+        
         const link = document.createElement('a');
         link.download = `my-color-season-${season.replace(/\s+/g, '-').toLowerCase()}.png`;
         link.href = dataUrl;
         link.click();
         triggerReward(); 
         
-        // Also upload in background if not already there to enable future link previews
         if (!shareCardUrl) {
             fetch('/api/color-lab/share/upload', {
                 method: 'POST',
@@ -96,7 +103,8 @@ export default function ShareModal({
             }).catch(e => console.error("BG upload failed", e));
         }
     } catch (err) {
-        console.error('oops, something went wrong!', err);
+        console.error('Download failed:', err);
+        alert("Oops! Something went wrong while saving. Please try again or take a screenshot.");
     } finally {
         setIsCapturing(false);
     }
@@ -106,11 +114,13 @@ export default function ShareModal({
     await ensureImageUploaded();
     const text = `I just found my seasonal color: ${season}! Discover yours at ColorAnalysisQuiz.app`;
     const baseUrl = "https://coloranalysisquiz.app";
-    // Using base path without /en to match canonical and avoid redirect confusion for crawlers
     const url = `${baseUrl}/report/${sessionId}`;
     window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
     triggerReward();
   };
+
+  // Create a CORS-safe image URL
+  const corsSafeUserImage = userImage ? `${userImage}${userImage.includes('?') ? '&' : '?'}cors=${Date.now()}` : null;
 
   const handleCopyLink = async () => {
     await ensureImageUploaded();
@@ -191,8 +201,16 @@ export default function ShareModal({
                             {/* Card Footer */}
                             <div className="mt-auto pt-10 border-t border-gray-100 flex items-center justify-between">
                                 <div className="flex items-center gap-4">
-                                    {userImage ? (
-                                        <img src={userImage} className="w-12 h-12 rounded-full object-cover border-4 border-[#FFFBF7] shadow-sm" alt="Analysis Target" />
+                                    {corsSafeUserImage ? (
+                                        <img 
+                                            src={corsSafeUserImage} 
+                                            crossOrigin="anonymous"
+                                            className="w-12 h-12 rounded-full object-cover border-4 border-[#FFFBF7] shadow-sm" 
+                                            alt="Analysis Target" 
+                                            onError={(e) => {
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
                                     ) : (
                                         <div className="w-12 h-12 rounded-full bg-gray-50 flex items-center justify-center text-2xl border-2 border-primary-light">✨</div>
                                     )}

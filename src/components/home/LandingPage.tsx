@@ -204,6 +204,25 @@ export default function PageComponent({
                         <p>{colorLabText.Landing.seoContent?.section3Body}</p>
                     </div>
                 </div>
+
+                {/* FAQ Section for AIO (AI Optimization) */}
+                <div className="mt-20 pt-16 border-t border-gray-100">
+                    <h2 className="text-3xl font-serif font-bold text-gray-900 mb-10 text-center">Frequently Asked Questions</h2>
+                    <div className="space-y-8 prose prose-lg mx-auto text-text-secondary">
+                        <div className="bg-[#FFFBF7] p-6 rounded-2xl">
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 mt-0">{colorLabText.Landing.Schema?.faqQuestion1 || "How does the Color Analysis Quiz work?"}</h3>
+                            <p className="mb-0">{colorLabText.Landing.Schema?.faqAnswer1 || "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report."}</p>
+                        </div>
+                        <div className="bg-[#FFFBF7] p-6 rounded-2xl">
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 mt-0">{colorLabText.Landing.Schema?.faqQuestion2 || "How accurate is AI color analysis?"}</h3>
+                            <p className="mb-0">{colorLabText.Landing.Schema?.faqAnswer2 || "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias."}</p>
+                        </div>
+                        <div className="bg-[#FFFBF7] p-6 rounded-2xl">
+                            <h3 className="text-xl font-bold text-gray-900 mb-3 mt-0">{colorLabText.Landing.Schema?.faqQuestion3 || "Is the analysis free?"}</h3>
+                            <p className="mb-0">{colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
          </section>
 

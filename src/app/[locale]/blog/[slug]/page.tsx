@@ -28,10 +28,36 @@ export default function BlogPost({
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.description,
+    "datePublished": post.date,
+    "dateModified": post.date,
+    "author": {
+      "@type": "Organization",
+      "name": "Color Analysis Quiz",
+      "url": "https://coloranalysisquiz.app"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Color Analysis Quiz",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://coloranalysisquiz.app/appicon.png"
+      }
+    }
+  };
+
   return (
     <>
       <Header locale={locale} page={'blog'} />
       <main className="min-h-screen bg-background py-20 px-6">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <article className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
             <div className="mb-8">
                 <Link href={getLinkHref(locale, 'blog')} className="text-sm text-gray-400 hover:text-primary mb-4 inline-block">
