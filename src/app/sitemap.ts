@@ -23,6 +23,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/terms-of-service',
     '/examples',
     '/blog',
+    '/men',
+    '/korean-color-analysis',
+    '/16-season-color-analysis',
     ...exampleRoutes,
     ...blogRoutes
   ];
