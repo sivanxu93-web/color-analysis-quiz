@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "~/libs/db";
 import { saveColorLabReport, checkIpLimit } from "~/servers/colorLab";
 import { deductUserCredits } from "~/servers/manageUserTimes";
+import { deductCreditsForAnalysis } from "~/servers/colorLabCredits";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const maxDuration = 60; // Allow longer timeout for AI analysis
@@ -130,32 +131,23 @@ export async function POST(req: NextRequest) {
     }
     const userId = userRes.rows[0].user_id;
 
-    // 2. Prevent Double Deduction (Check if already processing/completed)
-    const sessionRes = await db.query(
-        "select status from color_lab_sessions where id = $1",
-        [sessionId]
-    );
-    if (sessionRes.rowCount > 0) {
-        const currentStatus = sessionRes.rows[0].status;
-        if (currentStatus === 'analyzing' || currentStatus === 'protected' || currentStatus === 'completed' || currentStatus === 'analyzed') {
-            return NextResponse.json({ success: true, message: "Analysis already in progress or completed.", status: currentStatus });
+    // 2. ATOMIC DEDUCTION & STATUS CHECK
+    // This handles double-deduction protection in a single transaction
+    const deduction = await deductCreditsForAnalysis(userId, sessionId);
+    if (!deduction.success) {
+        if (deduction.message === "Insufficient credits") {
+            return NextResponse.json(
+                { error: "Insufficient credits. Please top up to continue.", code: "INSUFFICIENT_CREDITS" }, 
+                { status: 402 }
+            );
         }
+        return NextResponse.json({ error: deduction.message }, { status: 400 });
     }
 
-    // 3. Deduct 1 Credit for the basic Analysis
-    const hasCredits = await deductUserCredits(userId, 1);
-    if (!hasCredits) {
-        return NextResponse.json(
-            { error: "Insufficient credits. Please top up to continue.", code: "INSUFFICIENT_CREDITS" }, 
-            { status: 402 }
-        );
+    // If it was already deducted/processing, just return success
+    if (deduction.message === "Already deducted") {
+        return NextResponse.json({ success: true, message: "Analysis already in progress." });
     }
-
-    // Log the usage
-    await db.query(
-        "insert into credit_logs(user_id, amount, type, description) values($1, -1, 'usage', $2)",
-        [userId, `Analysis: ${sessionId}`]
-    );
 
     // If email is provided (from the lead magnet modal), save it!
     if (email) {
@@ -174,12 +166,6 @@ export async function POST(req: NextRequest) {
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY is not configured");
     }
-
-    // Update session status
-    await db.query("update color_lab_sessions set status = $1 where id = $2", [
-      "analyzing",
-      sessionId,
-    ]);
 
     // Fetch image data
     const imageResp = await fetch(imageUrl);
