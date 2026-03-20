@@ -78,11 +78,11 @@ const LoginModal = ({
                               </span>
                           </div>
                           <div className="flex items-baseline justify-center gap-3">
-                              <span className="text-gray-400 line-through text-lg decoration-gray-400/50 decoration-1">$19.90</span>
+                              <span className="text-gray-400 line-through text-lg decoration-gray-400/50 decoration-1">PAID</span>
                               <span className="text-3xl font-bold text-orange-600 font-serif">FREE</span>
                           </div>
                           <p className="text-xs text-gray-600 mt-2 font-medium">
-                              Login now to claim <span className="text-orange-700 font-bold">1 Full Analysis</span> on us.
+                              Login now to claim <span className="text-orange-700 font-bold">Free Credits</span> on us.
                           </p>
                       </div>
                   </div>

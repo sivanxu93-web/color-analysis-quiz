@@ -219,7 +219,7 @@ export default function PageComponent({
                         </div>
                         <div className="bg-[#FFFBF7] p-6 rounded-2xl">
                             <h3 className="text-xl font-bold text-gray-900 mb-3 mt-0">{colorLabText.Landing.Schema?.faqQuestion3 || "Is the analysis free?"}</h3>
-                            <p className="mb-0">{colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."}</p>
+                            <p className="mb-0">{colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for a free basic analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a subscription or a credit pack."}</p>
                         </div>
                     </div>
                 </div>
@@ -255,7 +255,7 @@ export default function PageComponent({
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "19.90",
+                  "price": "8.90",
                   "priceCurrency": "USD"
                 }
               })
@@ -286,7 +286,7 @@ export default function PageComponent({
                   "name": colorLabText.Landing.Schema?.faqQuestion3 || "Is the analysis free?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."
+                    "text": colorLabText.Landing.Schema?.faqAnswer3 || "You can start the quiz and upload your photo for a free basic analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a subscription or a credit pack."
                   }
                 }]
               })

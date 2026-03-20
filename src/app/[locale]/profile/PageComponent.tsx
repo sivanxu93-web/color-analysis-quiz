@@ -15,12 +15,17 @@ export default function PageComponent({
   locale: string;
   colorLabText: any;
 }) {
-  const { userData, setShowLoginModal, setShowLogoutModal } = useCommonContext();
+  const { userData, setShowLoginModal, setShowLogoutModal, refreshAvailableTimes } = useCommonContext();
   const { status } = useSession();
   const [history, setHistory] = useState<any[]>([]);
-  const [credits, setCredits] = useState<number | null>(null);
+  const [subscriptionCredits, setSubscriptionCredits] = useState<number | null>(null);
+  const [permanentCredits, setPermanentCredits] = useState<number | null>(null);
+  const [subStatus, setSubStatus] = useState<string | null>(null);
+  const [expiry, setExpiry] = useState<string | null>(null);
   const [validatorCredits, setValidatorCredits] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [isResuming, setIsResuming] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -55,13 +60,68 @@ export default function PageComponent({
   const fetchCredits = async () => {
       if (!userData?.user_id) return;
       try {
+          // 获取升级后的详细积分接口
           const res = await fetch(`/api/user/getAvailableTimes?userId=${userData.user_id}`);
           const json = await res.json();
-          setCredits(json.available_times);
+          setSubscriptionCredits(json.subscription_credits || 0);
+          setPermanentCredits(json.permanent_credits || 0);
+          setSubStatus(json.subscription_status);
+          setExpiry(json.current_period_end);
           setValidatorCredits(json.validator_times);
       } catch (e) {
           console.error(e);
       }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!userData?.user_id) return;
+    if (!confirm("Are you sure you want to cancel your subscription? You will still have access until the end of the current billing period.")) return;
+
+    setIsCancelling(true);
+    try {
+        const res = await fetch('/api/creem/cancel-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userData.user_id })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Your subscription has been scheduled for cancellation.");
+            refreshAvailableTimes(userData.user_id);
+            fetchCredits();
+        } else {
+            alert(data.error || "Failed to cancel subscription.");
+        }
+    } catch (e) {
+        console.error("Cancellation error", e);
+    } finally {
+        setIsCancelling(false);
+    }
+  };
+
+  const handleResumeSubscription = async () => {
+    if (!userData?.user_id) return;
+    
+    setIsResuming(true);
+    try {
+        const res = await fetch('/api/creem/resume-subscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId: userData.user_id })
+        });
+        const data = await res.json();
+        if (data.success) {
+            alert("Welcome back! Your subscription has been reactivated.");
+            refreshAvailableTimes(userData.user_id);
+            fetchCredits();
+        } else {
+            alert(data.error || "Failed to resume subscription.");
+        }
+    } catch (e) {
+        console.error("Resume error", e);
+    } finally {
+        setIsResuming(false);
+    }
   };
 
       const handleDelete = async (e: React.MouseEvent, sessionId: string) => {
@@ -108,18 +168,60 @@ export default function PageComponent({
                       <p className="text-gray-500 text-sm md:text-base">{userData?.email}</p>
                       
                       <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start pt-2 w-full">
-                          <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold text-sm md:text-base flex items-center gap-2">
-                              <span className="text-lg">💎</span> {credits !== null ? credits : '-'} Analysis Credits
+                          {/* Monthly Credits Pool */}
+                          <div className="flex-1 max-w-[200px] p-4 bg-[#FAF9F6] rounded-2xl border border-gray-100 flex flex-col items-center md:items-start group hover:border-primary/20 transition-all">
+                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Monthly Credits</span>
+                              <div className="flex items-baseline gap-1">
+                                  <span className="text-2xl font-serif font-bold text-[#2D2D2D]">{subscriptionCredits !== null ? subscriptionCredits : '-'}</span>
+                                  <span className="text-[8px] font-mono text-gray-300 uppercase">Available</span>
+                              </div>
+                              {expiry && (
+                                  <p className="text-[8px] text-primary/60 font-medium mt-2 italic">Expires: {new Date(expiry).toLocaleDateString()}</p>
+                              )}
                           </div>
-                          <div className="px-6 py-2 bg-accent-gold/5 rounded-full border border-accent-gold/10 text-[#B8860B] font-bold text-sm md:text-base flex items-center gap-2">
-                              <span className="text-lg">👗</span> {validatorCredits !== null ? validatorCredits : '-'} Style Validations
+
+                          {/* Permanent Credits Pool */}
+                          <div className="flex-1 max-w-[200px] p-4 bg-[#FAF9F6] rounded-2xl border border-gray-100 flex flex-col items-center md:items-start group hover:border-[#C5A059]/20 transition-all">
+                              <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Permanent Packs</span>
+                              <div className="flex items-baseline gap-1">
+                                  <span className="text-2xl font-serif font-bold text-[#2D2D2D]">{permanentCredits !== null ? permanentCredits : '-'}</span>
+                                  <span className="text-[8px] font-mono text-gray-300 uppercase">Tokens</span>
+                              </div>
+                              <Link href={getLinkHref(locale, 'pricing')} className="text-[8px] text-[#C5A059] font-black uppercase mt-2 border-b border-[#C5A059]/20 pb-0.5 hover:border-[#C5A059]">Top Up Pack</Link>
                           </div>
-                          <button 
-                              onClick={() => setShowLogoutModal(true)}
-                              className="px-6 py-2 rounded-full border border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-red-500 transition-colors text-sm font-medium w-full md:w-auto"
-                          >
-                              Log Out
-                          </button>
+
+                          <div className="flex flex-col gap-2 justify-center">
+                            {subStatus === 'active' ? (
+                                <div className="flex flex-col gap-2 items-center md:items-start">
+                                    <span className="px-4 py-1.5 bg-green-50 text-green-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-green-100 flex items-center gap-2 w-max">
+                                        <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div> Active Sub
+                                    </span>
+                                    <div className="flex gap-4">
+                                        <button onClick={handleCancelSubscription} disabled={isCancelling} className="text-gray-400 hover:text-red-500 text-[9px] font-bold uppercase tracking-tight">{isCancelling ? '...' : 'Cancel Subscription'}</button>
+                                    </div>
+                                </div>
+                            ) : subStatus === 'scheduled_cancel' ? (
+                                <div className="flex flex-col gap-2 items-center md:items-start">
+                                    <span className="px-4 py-1.5 bg-orange-50 text-orange-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-orange-100 w-max">
+                                        Scheduled to end
+                                    </span>
+                                    <div className="flex gap-4">
+                                        <button onClick={handleResumeSubscription} disabled={isResuming} className="text-primary hover:underline text-[9px] font-bold uppercase tracking-tight">{isResuming ? 'Resuming...' : 'Resume Subscription'}</button>
+                                    </div>
+                                    <p className="text-[9px] text-gray-400 font-medium italic">Expires on {expiry ? new Date(expiry).toLocaleDateString() : 'period end'}</p>
+                                </div>
+                            ) : (
+                                <Link href={getLinkHref(locale, 'pricing')} className="px-4 py-1.5 bg-[#2D2D2D] text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all w-max mx-auto md:mx-0">
+                                    Upgrade to Sub
+                                </Link>
+                            )}
+                            <button 
+                                onClick={() => setShowLogoutModal(true)}
+                                className="px-4 py-1.5 rounded-full border border-gray-200 text-gray-400 hover:bg-gray-50 hover:text-red-500 transition-colors text-[10px] font-black uppercase tracking-widest w-max mx-auto md:mx-0"
+                            >
+                                Log Out
+                            </button>
+                          </div>
                       </div>
                   </div>
               </div>

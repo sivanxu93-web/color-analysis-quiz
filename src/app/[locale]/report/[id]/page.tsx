@@ -67,9 +67,6 @@ export default async function ReportPage({
       return <div>Report not found</div> // Simple fallback
   }
 
-  // In demo mode, treat as owner so all UI features are visible for testing
-  const isOwner = isDemo || (session?.user?.email === data.ownerEmail);
-
   return (
     <PageComponent 
         locale={locale} 
@@ -81,7 +78,7 @@ export default async function ReportPage({
         colorLabText={colorLabText} 
         sessionId={id}
         rating={data.rating}
-        isOwner={isOwner}
+        ownerEmail={data.ownerEmail}
     />
   )
 }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "~/libs/db";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { R2, r2Bucket, storageDomain } from "~/libs/R2";
+import { deductUserCredits } from "~/servers/manageUserTimes";
 import { v4 as uuidv4 } from "uuid";
 
 export const maxDuration = 60;
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
     }
-    const { sessionId, prompt, type, makeup_prompt } = body; // type: 'best' or 'worst'
+    const { sessionId, prompt, type, makeup_prompt, isRegenerate, email } = body; // type: 'best' or 'worst'
 
     if (!sessionId || !prompt) {
       return NextResponse.json(
@@ -31,6 +32,28 @@ export async function POST(req: NextRequest) {
 
     // 1. Get User Image from DB
     const db = getDb();
+
+    // If regenerating, deduct 5 credits first
+    if (isRegenerate && email) {
+      const userRes = await db.query("select user_id from user_info where email = $1", [email]);
+      if (userRes.rows.length === 0) {
+        return NextResponse.json({ error: "User not found" }, { status: 401 });
+      }
+      const userId = userRes.rows[0].user_id;
+
+      const hasCredits = await deductUserCredits(userId, 5);
+      if (!hasCredits) {
+        return NextResponse.json(
+          { error: "Insufficient credits to regenerate draping.", code: "INSUFFICIENT_CREDITS" }, 
+          { status: 402 }
+        );
+      }
+      // Log the usage
+      await db.query(
+        "insert into credit_logs(user_id, amount, type, description) values($1, -5, 'usage', $2)", 
+        [userId, `Regenerate Draping (${type}): ${sessionId}`]
+      );
+    }
 
     // SECURITY CHECK: Verify session status is 'completed' (Paid) 
     // OR if it's one of our public example sessions
@@ -68,18 +91,22 @@ export async function POST(req: NextRequest) {
     }
 
     // CHECK CACHE: Check if draping image already exists
+    // Only return cached image if NOT regenerating
     const imageType = type === "best" ? "best_draping" : "worst_draping";
-    const existingRes = await db.query(
-      "select url from color_lab_images where session_id = $1 and image_type = $2 limit 1",
-      [sessionId, imageType],
-    );
+    
+    if (!isRegenerate) {
+      const existingRes = await db.query(
+        "select url from color_lab_images where session_id = $1 and image_type = $2 limit 1",
+        [sessionId, imageType],
+      );
 
-    if (existingRes.rowCount > 0) {
-      console.log(`Image (${type}) already exists, returning cached URL.`);
-      return NextResponse.json({
-        success: true,
-        imageUrl: existingRes.rows[0].url,
-      });
+      if (existingRes.rowCount > 0) {
+        console.log(`Image (${type}) already exists, returning cached URL.`);
+        return NextResponse.json({
+          success: true,
+          imageUrl: existingRes.rows[0].url,
+        });
+      }
     }
 
     const imageRes = await db.query(
@@ -212,6 +239,14 @@ export async function POST(req: NextRequest) {
     console.log(`Generated image uploaded to: ${publicUrl}`);
 
     // Save to DB for persistence
+    if (isRegenerate) {
+      // Clear the old cache entry so the new one takes precedence
+      await db.query(
+        "delete from color_lab_images where session_id = $1 and image_type = $2",
+        [sessionId, imageType]
+      );
+    }
+
     await db.query(
       "insert into color_lab_images(session_id, url, image_type) values($1, $2, $3) on conflict do nothing",
       [sessionId, publicUrl, imageType],

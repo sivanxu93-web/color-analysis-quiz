@@ -17,9 +17,12 @@ export const checkAndSaveUser = async (name: string, email: string, image: strin
     await db.query('insert into user_info(user_id,name,email,image,last_login_ip) values($1,$2,$3,$4,$5)',
       [strUUID, name, email, image, last_login_ip]);
 
-    // 免费生成次数
-    const freeTimes = Number(process.env.FREE_TIMES);
-    await db.query('insert into user_available(user_id,stripe_customer_id,available_times) values($1, $2, $3)', [strUUID, '', freeTimes]);
+    // 免费赠送4个永久积分 (Free 4 permanent credits for new users)
+    const freeTimes = 4;
+    await db.query('insert into user_available(user_id,stripe_customer_id,available_times,permanent_credits) values($1, $2, $3, $3)', [strUUID, '', freeTimes]);
+
+    // 记录赠送日志
+    await db.query("insert into credit_logs(user_id, amount, type, description) values($1, $2, 'bonus', 'Welcome bonus credits')", [strUUID, freeTimes]);
 
     result.user_id = strUUID;
     result.name = name;

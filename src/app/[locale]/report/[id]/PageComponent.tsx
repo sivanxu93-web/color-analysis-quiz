@@ -22,7 +22,8 @@ export default function PageComponent({
   sessionId,
   drapingImages: initialDrapingImages,
   rating,
-  isOwner = false
+  ownerEmail,
+  isOwner: explicitIsOwner
 }: {
   locale: string;
   report: any;
@@ -33,10 +34,15 @@ export default function PageComponent({
   sessionId?: string;
   drapingImages?: { best: string | null; worst: string | null };
   rating?: string;
+  ownerEmail?: string;
   isOwner?: boolean;
-}) {
+  }) {
   const { userData, setShowLoginModal, setShowPricingModal } = useCommonContext();
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+  const isDemo = searchParams?.get('demo') === 'true';
+  const isOwner = explicitIsOwner !== undefined ? explicitIsOwner : (isDemo || (userData?.email === ownerEmail));
 
   const [status, setStatus] = useState(initialStatus);
   const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
@@ -46,8 +52,8 @@ export default function PageComponent({
   const [progress, setProgress] = useState(0);
   const [drapingError, setDrapingError] = useState<string | null>(null);
   const [generationError, setGenerationError] = useState<string | null>(null);
-  const [existingSessionId, setExistingSessionId] = useState<string | null>(null);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
 
   const LOADING_TIPS = [
     "Analyzing your skin undertones...",
@@ -80,8 +86,6 @@ export default function PageComponent({
   }, [status]);
 
   const [viewMode, setViewMode] = useState<'draping' | 'fan'>('draping');
-  const searchParams = useSearchParams();
-  const isDemo = searchParams?.get('demo') === 'true';
   const mockStatus = searchParams?.get('mock_status') || 'protected';
 
   useEffect(() => {
@@ -126,19 +130,15 @@ export default function PageComponent({
     if (!sessionId || !userData?.email) return;
     setStatus('processing');
     setGenerationError(null);
-    setExistingSessionId(null);
     try {
       const res = await fetch('/api/color-lab/analyze', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ sessionId, imageUrl: userImage, email: userData.email })
       });
-      if (res.status === 402) { setStatus('protected'); return; }
-      if (res.status === 409) {
-        const data = await res.json();
-        setExistingSessionId(data.sessionId);
-        setGenerationError("PENDING_REPORT_EXISTS");
-        return;
+      if (res.status === 402) { 
+        setGenerationError("INSUFFICIENT_CREDITS");
+        return; 
       }
       if (res.ok) router.refresh(); else setGenerationError("Analysis failed.");
     } catch (e) { setGenerationError("Connection error."); }
@@ -146,6 +146,8 @@ export default function PageComponent({
 
   const handleUnlockClick = async () => {
     if (!userData?.user_id) { setShowPricingModal(true); return; }
+    if (isUnlocking) return;
+    setIsUnlocking(true);
     try {
       const res = await fetch('/api/color-lab/unlock', {
         method: 'POST',
@@ -154,24 +156,42 @@ export default function PageComponent({
       });
       if (res.status === 402) { setShowPricingModal(true); return; }
       if (res.ok) { setStatus('processing'); router.refresh(); } else setShowPricingModal(true);
-    } catch (e) { setShowPricingModal(true); }
+    } catch (e) { 
+        setShowPricingModal(true); 
+    } finally {
+        setIsUnlocking(false);
+    }
   };
 
-  useEffect(() => {
-    if ((status === 'completed' || status === 'protected') && report && !drapingImages.best && !isGeneratingDraping && sessionId && !drapingError && !hasTriggeredDraping.current) {
-      handleGenerateDraping();
-    }
-  }, [status, sessionId, report, drapingImages.best, drapingError]);
+  const fetchedStatus = useRef<Set<string>>(new Set());
 
-  const handleGenerateDraping = async () => {
-    if ((status !== 'completed' && status !== 'protected') || !sessionId || !report?.virtual_draping_prompts) return;
+  useEffect(() => {
+    const currentStatus = (status === 'analyzed') ? 'completed' : status;
+    
+    if ((currentStatus === 'completed' || currentStatus === 'protected') && report && sessionId && !isGeneratingDraping && !drapingError) {
+        if (!fetchedStatus.current.has(currentStatus)) {
+            // Check if we actually need to generate anything
+            const needsWorst = currentStatus === 'protected' && !drapingImages.worst;
+            const needsBestOrWorst = currentStatus === 'completed' && (!drapingImages.best || !drapingImages.worst);
+            
+            if (needsWorst || needsBestOrWorst) {
+                fetchedStatus.current.add(currentStatus);
+                handleGenerateDraping(currentStatus);
+            } else {
+                fetchedStatus.current.add(currentStatus);
+            }
+        }
+    }
+  }, [status, sessionId, report, drapingImages.best, drapingImages.worst, drapingError, isGeneratingDraping]);
+
+  const handleGenerateDraping = async (currentStatus: string) => {
+    if ((currentStatus !== 'completed' && currentStatus !== 'protected') || !sessionId || !report?.virtual_draping_prompts) return;
     setDrapingError(null);
     setIsGeneratingDraping(true);
-    hasTriggeredDraping.current = true;
     
     try {
-      if (isLocked) {
-        // Locked mode: Only bait with the 'worst' color
+      if (currentStatus === 'protected') {
+        if (drapingImages.worst) return; // Safety check
         const res = await fetch('/api/color-lab/draping', { 
           method: 'POST', 
           headers: {'Content-Type': 'application/json'}, 
@@ -181,20 +201,29 @@ export default function PageComponent({
         const data = await res.json();
         setDrapingImages(prev => ({ ...prev, worst: data.imageUrl }));
       } else {
-        // Full mode: Request both
-        const [bestRes, worstRes] = await Promise.all([
-          fetch('/api/color-lab/draping', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sessionId, prompt: report.virtual_draping_prompts.best_color_prompt, type: 'best' }) }),
-          fetch('/api/color-lab/draping', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sessionId, prompt: report.virtual_draping_prompts.worst_color_prompt, type: 'worst' }) })
-        ]);
+        const requests = [];
+        if (!drapingImages.best) {
+            requests.push(fetch('/api/color-lab/draping', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sessionId, prompt: report.virtual_draping_prompts.best_color_prompt, type: 'best' }) }));
+        } else {
+            requests.push(Promise.resolve(null)); // Mock resolved
+        }
         
-        let bestUrl = null;
-        let worstUrl = null;
+        if (!drapingImages.worst) {
+            requests.push(fetch('/api/color-lab/draping', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ sessionId, prompt: report.virtual_draping_prompts.worst_color_prompt, type: 'worst' }) }));
+        } else {
+            requests.push(Promise.resolve(null));
+        }
+
+        const [bestRes, worstRes] = await Promise.all(requests);
         
-        if (bestRes.ok) {
+        let bestUrl = drapingImages.best;
+        let worstUrl = drapingImages.worst;
+        
+        if (bestRes && bestRes.ok) {
           const d = await bestRes.json();
           bestUrl = d.imageUrl;
         }
-        if (worstRes.ok) {
+        if (worstRes && worstRes.ok) {
           const d = await worstRes.json();
           worstUrl = d.imageUrl;
         }
@@ -204,9 +233,53 @@ export default function PageComponent({
     } catch (error) {
       console.error("Draping generation error", error);
       setDrapingError("AI is busy, please try again.");
-      hasTriggeredDraping.current = false;
+      fetchedStatus.current.delete(currentStatus); // allow retry
     } finally { 
       setIsGeneratingDraping(false); 
+    }
+  };
+
+  const [isRegeneratingDraping, setIsRegeneratingDraping] = useState<{best: boolean, worst: boolean}>({ best: false, worst: false });
+
+  const handleRegenerateDraping = async (type: 'best' | 'worst') => {
+    if (!sessionId || !report?.virtual_draping_prompts || !userData?.email) return;
+    
+    if (!confirm(`Are you sure you want to try another pose/style? This will consume 5 credits.`)) return;
+    
+    setIsRegeneratingDraping(prev => ({ ...prev, [type]: true }));
+    setDrapingError(null);
+    
+    try {
+      const prompt = type === 'best' ? report.virtual_draping_prompts.best_color_prompt : report.virtual_draping_prompts.worst_color_prompt;
+      
+      const res = await fetch('/api/color-lab/draping', { 
+        method: 'POST', 
+        headers: {'Content-Type': 'application/json'}, 
+        body: JSON.stringify({ 
+            sessionId, 
+            prompt, 
+            type,
+            isRegenerate: true,
+            email: userData.email
+        }) 
+      });
+      
+      if (res.status === 402) {
+          setDrapingError("Insufficient credits. Please top up to try again.");
+          setShowPricingModal(true);
+          return;
+      }
+      
+      if (!res.ok) throw new Error("AI_BUSY");
+      
+      const data = await res.json();
+      setDrapingImages(prev => ({ ...prev, [type]: data.imageUrl }));
+      
+    } catch (error) {
+      console.error("Draping regeneration error", error);
+      setDrapingError("AI is busy, please try again.");
+    } finally { 
+      setIsRegeneratingDraping(prev => ({ ...prev, [type]: false })); 
     }
   };
 
@@ -237,10 +310,19 @@ export default function PageComponent({
     celebrities: ["Anne Hathaway", "Kendall Jenner"]
   };
 
-  const isLocked = status === 'protected';
+  // Backwards compatibility for old reports that were saved as 'analyzed' instead of 'completed'
+  const effectiveStatus = (status === 'analyzed') ? 'completed' : status;
+  const isLocked = effectiveStatus === 'protected';
+  
   const displayReport = isDemo ? MOCK_REPORT : report;
   const displayUserImage = (isDemo && !userImage) ? '/seasonal_color_analysis.jpg' : userImage;
-  const displayDraping = isDemo && status === 'completed' ? { best: displayUserImage, worst: displayUserImage } : (isLocked ? { best: displayUserImage, worst: displayUserImage } : drapingImages);
+  
+  let displayDraping = drapingImages;
+  if (isDemo && effectiveStatus === 'completed') {
+      displayDraping = { best: displayUserImage, worst: displayUserImage };
+  } else if (isLocked) {
+      displayDraping = { best: displayUserImage, worst: drapingImages.worst };
+  }
 
   const { season: rawSeason, headline: dHeadline, description: dDescription, characteristics: dCharacteristics, palette: dPalette, makeup_recommendations: dMakeup, styling: dStyling, worst_colors: dWorst, celebrities: dCelebs, hair_color_recommendations: dHair } = displayReport || {};
   const dSeason = rawSeason;
@@ -278,27 +360,27 @@ export default function PageComponent({
           {generationError ? (
             <div className="max-w-md w-full space-y-8 animate-fade-in">
               <div className="text-6xl mb-6">
-                {generationError === "PENDING_REPORT_EXISTS" ? "⏳" : "🤔"}
+                {generationError === "INSUFFICIENT_CREDITS" ? "💎" : "🤔"}
               </div>
               
               <div className="space-y-4">
                 <h2 className="text-3xl font-serif font-bold text-[#2D2D2D] tracking-tight">
-                  {generationError === "PENDING_REPORT_EXISTS" ? "One Report at a Time" : "Analysis Interrupted"}
+                  {generationError === "INSUFFICIENT_CREDITS" ? "Out of Credits" : "Analysis Interrupted"}
                 </h2>
                 <p className="text-gray-500 font-medium leading-relaxed">
-                  {generationError === "PENDING_REPORT_EXISTS" 
-                    ? "Our AI is already busy curating a masterpiece for you. Please check your existing analysis before starting a new one."
+                  {generationError === "INSUFFICIENT_CREDITS" 
+                    ? "You need at least 1 credit to generate a new basic analysis. Please top up to continue."
                     : "We hit a small snag connecting to our AI stylist. Don't worry, your progress is saved."}
                 </p>
               </div>
 
               <div className="pt-6">
-                {generationError === "PENDING_REPORT_EXISTS" && existingSessionId ? (
+                {generationError === "INSUFFICIENT_CREDITS" ? (
                   <Link 
-                    href={getLinkHref(locale, `report/${existingSessionId}`)}
+                    href={getLinkHref(locale, `pricing`)}
                     className="inline-flex items-center justify-center px-10 py-4 bg-[#2D2D2D] text-white rounded-full font-bold text-sm uppercase tracking-widest hover:bg-black transition-all shadow-xl active:scale-95"
                   >
-                    View My Analysis
+                    Top Up Credits
                   </Link>
                 ) : (
                   <button 
@@ -454,9 +536,18 @@ export default function PageComponent({
 
                 {isLocked && (
                     <div className="pt-6 flex flex-col items-center lg:items-start gap-6 px-4 md:px-0">
-                        <button onClick={handleUnlockClick} className="w-full md:w-auto group relative bg-[#2D2D2D] text-white px-12 py-5 rounded-full font-bold text-xs tracking-[0.3em] uppercase overflow-hidden shadow-2xl transition-all active:scale-95">
-                            <span className="relative z-10">Reveal My Full Report</span>
-                            <div className="absolute inset-0 bg-[#E88D8D] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+                        <button onClick={handleUnlockClick} disabled={isUnlocking} className="w-full md:w-auto group relative bg-[#2D2D2D] text-white px-12 py-5 rounded-full font-bold text-xs tracking-[0.3em] uppercase overflow-hidden shadow-2xl transition-all active:scale-95 disabled:opacity-80 disabled:cursor-not-allowed">
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                                {isUnlocking ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin"></div>
+                                        Unlocking...
+                                    </>
+                                ) : (
+                                    "Reveal My Full Report"
+                                )}
+                            </span>
+                            {!isUnlocking && <div className="absolute inset-0 bg-[#E88D8D] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>}
                         </button>
                     </div>
                 )}
@@ -505,8 +596,15 @@ export default function PageComponent({
                                         Unlock to eliminate shadows and visualize your peak radiance.
                                     </p>
                                 </div>
-                                <button onClick={handleUnlockClick} className="px-5 py-2 bg-[#E88D8D] text-white rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all">
-                                    Discover
+                                <button onClick={handleUnlockClick} disabled={isUnlocking} className="px-5 py-2 bg-[#E88D8D] text-white rounded-full text-[8px] font-black uppercase tracking-widest shadow-lg hover:scale-105 transition-all disabled:opacity-80 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                    {isUnlocking ? (
+                                        <>
+                                            <div className="w-2.5 h-2.5 border border-white/30 border-t-white rounded-full animate-spin"></div>
+                                            Unlocking
+                                        </>
+                                    ) : (
+                                        "Discover"
+                                    )}
                                 </button>
                             </div>
                         }
@@ -534,13 +632,81 @@ export default function PageComponent({
                 </div>
               ) : (
                 <div className="w-full flex flex-col lg:flex-row items-center justify-center gap-12 md:gap-24 min-h-[600px] md:min-h-[800px]">
-                  <div className="hidden lg:flex flex-col gap-16 w-48 opacity-20 text-white font-mono text-[9px] tracking-widest"><div>[ RAW_SIGNAL_01 ]</div><div>[ MATRIX_CALIBRATION ]</div></div>
+                  <div className="hidden lg:flex flex-col gap-16 w-48 text-white font-mono text-[9px] tracking-widest">
+                    <div className="opacity-20">[ RAW_SIGNAL_01 ]</div>
+                    <div className="opacity-20">[ MATRIX_CALIBRATION ]</div>
+                    {isOwner && (
+                        <button 
+                            onClick={() => handleRegenerateDraping('worst')} 
+                            disabled={isRegeneratingDraping.worst} 
+                            className="mt-8 px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-all opacity-70 hover:opacity-100 cursor-pointer text-center group"
+                        >
+                            {isRegeneratingDraping.worst ? "CALIBRATING..." : (
+                                <span className="flex flex-col gap-1">
+                                    <span>REGENERATE VOID</span>
+                                    <span className="text-red-400/80 group-hover:text-red-400">-5 Credits</span>
+                                </span>
+                            )}
+                        </button>
+                    )}
+                  </div>
+                  
                   <div className="flex-1 max-w-sm md:max-w-xl w-full">
                     <div className="relative aspect-[4/5] overflow-hidden shadow-[0_80px_150px_-40px_rgba(0,0,0,0.9)] bg-black border border-white/10 group">
-                      <BeforeAfterSlider beforeImage={displayDraping.worst || ''} afterImage={displayDraping.best || ''} beforeLabel="VOID" afterLabel="VITAL" />
+                      {(isRegeneratingDraping.best || isRegeneratingDraping.worst || (!displayDraping.best || !displayDraping.worst)) ? (
+                         <div className="absolute inset-0 z-50 bg-[#1A1A1A] flex flex-col items-center justify-center border border-white/5">
+                            <div className="relative w-12 h-12 mb-6">
+                                <div className="absolute inset-0 border-2 border-[#C5A059]/10 rounded-full"></div>
+                                <div className="absolute inset-0 border-2 border-t-[#C5A059] rounded-full animate-spin"></div>
+                            </div>
+                            <p className="font-mono text-[8px] text-[#C5A059] uppercase tracking-[0.4em]">Rendering Truth...</p>
+                        </div>
+                      ) : (
+                         <BeforeAfterSlider beforeImage={displayDraping.worst || ''} afterImage={displayDraping.best || ''} beforeLabel="VOID" afterLabel="VITAL" />
+                      )}
                     </div>
+                    
+                    {/* Mobile buttons */}
+                    {isOwner && (
+                        <div className="flex lg:hidden justify-between mt-6 gap-4">
+                            <button 
+                                onClick={() => handleRegenerateDraping('worst')} 
+                                disabled={isRegeneratingDraping.worst} 
+                                className="flex-1 px-4 py-3 bg-white/5 text-white/70 text-[8px] font-mono tracking-widest rounded-lg uppercase hover:bg-white/10 border border-white/10 flex flex-col items-center gap-1"
+                            >
+                                <span>{isRegeneratingDraping.worst ? "..." : "Regen Void"}</span>
+                                <span className="text-red-400/80">-5 Credits</span>
+                            </button>
+                            <button 
+                                onClick={() => handleRegenerateDraping('best')} 
+                                disabled={isRegeneratingDraping.best} 
+                                className="flex-1 px-4 py-3 bg-white/5 text-white/70 text-[8px] font-mono tracking-widest rounded-lg uppercase hover:bg-white/10 border border-white/10 flex flex-col items-center gap-1"
+                            >
+                                <span>{isRegeneratingDraping.best ? "..." : "Regen Vital"}</span>
+                                <span className="text-[#C5A059]">-5 Credits</span>
+                            </button>
+                        </div>
+                    )}
                   </div>
-                  <div className="hidden lg:flex flex-col gap-16 w-48 opacity-20 text-white font-mono text-[9px] tracking-widest text-right"><div>[ NEURAL_SYNC_100% ]</div><div>[ OUTPUT_READY ]</div></div>
+
+                  <div className="hidden lg:flex flex-col gap-16 w-48 text-white font-mono text-[9px] tracking-widest text-right">
+                    <div className="opacity-20">[ NEURAL_SYNC_100% ]</div>
+                    <div className="opacity-20">[ OUTPUT_READY ]</div>
+                    {isOwner && (
+                        <button 
+                            onClick={() => handleRegenerateDraping('best')} 
+                            disabled={isRegeneratingDraping.best} 
+                            className="mt-8 px-4 py-3 border border-white/20 rounded-lg hover:bg-white/10 transition-all opacity-70 hover:opacity-100 cursor-pointer text-center group"
+                        >
+                            {isRegeneratingDraping.best ? "SYNCING..." : (
+                                <span className="flex flex-col gap-1">
+                                    <span>REGENERATE VITAL</span>
+                                    <span className="text-[#C5A059] group-hover:text-[#E88D8D]">-5 Credits</span>
+                                </span>
+                            )}
+                        </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -601,10 +767,19 @@ export default function PageComponent({
                 </div>
                 {isLocked && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center z-20 px-6 bg-white/5 backdrop-blur-[1px]">
-                        <button onClick={handleUnlockClick} className="bg-[#2D2D2D] text-white px-10 py-5 md:px-16 md:py-7 rounded-full font-mono text-[10px] md:text-[12px] uppercase tracking-[0.4em] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] active:scale-95 transition-all group/btn hover:bg-black ring-8 ring-white/50">
+                        <button onClick={handleUnlockClick} disabled={isUnlocking} className="bg-[#2D2D2D] text-white px-10 py-5 md:px-16 md:py-7 rounded-full font-mono text-[10px] md:text-[12px] uppercase tracking-[0.4em] shadow-[0_30px_60px_-15px_rgba(0,0,0,0.4)] active:scale-95 transition-all group/btn hover:bg-black ring-8 ring-white/50 disabled:opacity-80 disabled:cursor-not-allowed">
                             <span className="flex items-center gap-4">
-                                <svg className="w-4 h-4 text-accent-gold" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
-                                Unlock Full Professional Palette
+                                {isUnlocking ? (
+                                    <>
+                                        <div className="w-4 h-4 border-2 border-accent-gold/30 border-t-accent-gold rounded-full animate-spin"></div>
+                                        Unlocking...
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-4 h-4 text-accent-gold" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
+                                        Unlock Full Professional Palette
+                                    </>
+                                )}
                             </span>
                         </button>
                         <p className="mt-6 font-mono text-[8px] text-gray-400 uppercase tracking-widest bg-white/80 px-4 py-1 rounded-full border border-gray-100 shadow-sm">Personalized Material & Hue Analysis</p>
@@ -789,15 +964,22 @@ export default function PageComponent({
             <div className="text-center md:text-left">
                 <p className="text-xs font-black uppercase tracking-[0.2em] text-[#2D2D2D]">Personal Style Blueprint Ready</p>
                 <div className="flex items-center gap-3 mt-1">
-                    <span className="text-[10px] text-gray-400 line-through">Stylist Office: $300</span>
-                    <span className="w-1 h-1 bg-gray-200 rounded-full"></span>
-                    <span className="text-[10px] text-[#C5A059] font-bold uppercase tracking-widest italic">Full Digital Access: $19.90</span>
+                    <span className="text-[10px] text-gray-400 uppercase tracking-widest italic">Discover your true colors and style</span>
                 </div>
             </div>
-            <button onClick={handleUnlockClick} className="w-full md:w-auto bg-[#2D2D2D] text-white px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg hover:bg-black group/btn">
+            <button onClick={handleUnlockClick} disabled={isUnlocking} className="w-full md:w-auto bg-[#2D2D2D] text-white px-10 py-4 rounded-full font-black text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-lg hover:bg-black group/btn disabled:opacity-80 disabled:cursor-not-allowed">
                 <span className="flex items-center justify-center gap-3">
-                    Unlock All 24 Pages
-                    <span className="bg-[#E88D8D] px-2 py-0.5 rounded text-[8px]">1 Credit</span>
+                    {isUnlocking ? (
+                        <>
+                            <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                            Unlocking...
+                        </>
+                    ) : (
+                        <>
+                            Unlock Full Report
+                            <span className="bg-[#E88D8D] px-2 py-0.5 rounded text-[8px]">40 Credits</span>
+                        </>
+                    )}
                 </span>
             </button>
         </div>

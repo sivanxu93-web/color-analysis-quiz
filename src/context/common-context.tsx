@@ -19,6 +19,27 @@ export const CommonProvider = ({
   const [showLoadingModal, setShowLoadingModal] = useState(false);
   const [showGeneratingModal, setShowGeneratingModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [availableTimes, setAvailableTimes] = useState({
+    available_times: 0,
+    subscription_credits: 0,
+    permanent_credits: 0,
+    subscription_status: 'none',
+    subscription_plan: null,
+    subscription_billing_cycle: null,
+    current_period_end: null,
+    validator_times: 0,
+  });
+
+  const refreshAvailableTimes = async (userId) => {
+    if (!userId) return;
+    try {
+      const response = await fetch(`/api/user/getAvailableTimes?userId=${userId}`);
+      const data = await response.json();
+      setAvailableTimes(data);
+    } catch (e) {
+      console.error("Error fetching credits", e);
+    }
+  };
 
   // Capture coupon and UTMs from URL and persist them
   useEffect(() => {
@@ -61,8 +82,21 @@ export const CommonProvider = ({
       
       // Auto-close login modal if it was open
       if (showLoginModal) setShowLoginModal(false);
+
+      // Fetch available times
+      refreshAvailableTimes(sessionUserId);
     } else if (status === 'unauthenticated') {
         setUserData({});
+        setAvailableTimes({
+          available_times: 0,
+          subscription_credits: 0,
+          permanent_credits: 0,
+          subscription_status: 'none',
+          subscription_plan: null,
+          subscription_billing_cycle: null,
+          current_period_end: null,
+          validator_times: 0,
+        });
     }
   }, [session, status]);
 
@@ -71,6 +105,8 @@ export const CommonProvider = ({
       value={{
         userData,
         setUserData,
+        availableTimes,
+        refreshAvailableTimes,
         showLoginModal,
         setShowLoginModal,
         showLogoutModal,

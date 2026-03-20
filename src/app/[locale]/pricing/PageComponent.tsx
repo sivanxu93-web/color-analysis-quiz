@@ -4,7 +4,6 @@ import Header from "~/components/Header";
 import Footer from "~/components/Footer";
 import Pricing from "~/components/PricingComponent";
 import {useEffect, useRef, useState, Suspense} from "react";
-import TopBlurred from "~/components/TopBlurred";
 import {useCommonContext} from "~/context/common-context";
 import { useSearchParams } from 'next/navigation';
 
@@ -51,10 +50,8 @@ const PricingPageInner = ({
         page={pagePath}
       />
       <div className={"mt-8 my-auto min-h-[90vh]"}>
-        <TopBlurred/>
         <Pricing
           redirectUrl={redirectParam || `${locale}/pricing`}
-          isPricing={true}
         />
       </div>
       <Footer

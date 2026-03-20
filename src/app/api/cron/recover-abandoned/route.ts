@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
                 <div style="display: flex; justify-content: space-around; margin-top: 20px;">
                     <div style="text-align: center;">
                         <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Professional Report</p>
-                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$19.90</span> $14.90</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$12.90</span> $8.90</p>
                     </div>
                     <div style="text-align: center;">
                         <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Style Pack (3x)</p>

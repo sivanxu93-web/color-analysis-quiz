@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "~/libs/db";
+import { deductUserCredits } from "~/servers/manageUserTimes";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,26 +18,18 @@ export async function POST(req: NextRequest) {
       [email]
     );
     if (userRes.rows.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "User not found. Please login." }, { status: 404 });
     }
     const userId = userRes.rows[0].user_id;
 
-    // 2. Check Credits
-    const creditRes = await db.query("select available_times from user_available where user_id = $1", [userId]);
-    let credits = 0;
-    if (creditRes.rows.length > 0) {
-        credits = creditRes.rows[0].available_times;
+    // 2 & 3. Deduct 40 Credits using prioritized logic
+    const hasCredits = await deductUserCredits(userId, 40);
+    if (!hasCredits) {
+        return NextResponse.json({ error: "Insufficient credits to unlock the professional report." }, { status: 402 });
     }
-
-    if (credits <= 0) {
-        return NextResponse.json({ error: "Insufficient credits" }, { status: 402 });
-    }
-
-    // 3. Deduct Credit
-    await db.query("update user_available set available_times = available_times - 1 where user_id = $1", [userId]);
     
     // 4. Log Transaction
-    await db.query("insert into credit_logs(user_id, amount, type, description) values($1, -1, 'usage', $2)", [userId, `Unlock Report: ${sessionId}`]);
+    await db.query("insert into credit_logs(user_id, amount, type, description) values($1, -40, 'usage', $2)", [userId, `Unlock Report: ${sessionId}`]);
 
     // 5. Update Session Status to 'completed'
     await db.query("update color_lab_sessions set status = 'completed' where id = $1", [sessionId]);

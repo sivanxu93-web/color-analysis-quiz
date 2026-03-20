@@ -185,7 +185,7 @@ export default function PageComponent({
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "19.90",
+                  "price": "8.90",
                   "priceCurrency": "USD"
                 }
               })

@@ -1,5 +1,5 @@
 import { getUserById } from "~/servers/user";
-import { checkUserTimes, countDownUserTimes } from "~/servers/manageUserTimes";
+import { getUserCredits, deductUserCredits } from "~/servers/manageUserTimes";
 import { v4 as uuidv4 } from "uuid";
 import { getReplicateClient } from "~/libs/replicateClient";
 import { getInput } from "~/libs/replicate";
@@ -34,7 +34,8 @@ export async function POST(req: Request, res: Response) {
   }
 
   if (!checkSubscribeStatus) {
-    const check = await checkUserTimes(user_id);
+    const { total: totalCredits } = await getUserCredits(user_id);
+    const check = totalCredits > 0;
     if (!check && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != "0") {
       return Response.json({ msg: "Pricing to continue.", status: 602 });
     }
@@ -81,7 +82,7 @@ export async function POST(req: Request, res: Response) {
   // 需要登录，且需要支付时，才操作该项
   if (process.env.NEXT_PUBLIC_CHECK_GOOGLE_LOGIN != "0" && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != "0" && !checkSubscribeStatus) {
     // 减少用户次数
-    await countDownUserTimes(user_id);
+    await deductUserCredits(user_id, 1);
   }
 
   const resultInfo = {
