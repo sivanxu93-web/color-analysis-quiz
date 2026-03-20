@@ -1,0 +1,39 @@
+diff --git a/tailwind.config.ts b/tailwind.config.ts
+index 8c05985..5e8598e 100644
+--- a/tailwind.config.ts
++++ b/tailwind.config.ts
+@@ -18,24 +18,25 @@ module.exports = {
+     },
+     extend: {
+       colors: {
+-        // New Palette based on 'Color Analysis App' aesthetic
++        // Refined Luxury Beauty Palette
+         primary: {
+-            DEFAULT: "#D67474", // Dusty Rose
+-            hover: "#C05F5F",
+-            light: "#FADADD",
++            DEFAULT: "#E88D8D", // A slightly more vibrant, 'Expensive' Rose
++            hover: "#D67474",
++            light: "#FFF0F0",
+         },
+         background: {
+-            DEFAULT: "#FFFBF7", // Warm Cream
++            DEFAULT: "#FAF9F6", // Pearl/Alabaster background (more modern than Cream)
+             paper: "#FFFFFF",
+         },
+         text: {
+-            primary: "#1A1A2E", // Soft Black/Navy
+-            secondary: "#6B6B7F",
+-            accent: "#D67474",
++            primary: "#2D2D2D", // Deep Charcoal instead of Navy for a softer, fashion-editor look
++            secondary: "#8E8E8E",
++            accent: "#E88D8D",
+         },
+         accent: {
+-            gold: "#D4AF37",
++            gold: "#C5A059", // Muted Satin Gold
+             sage: "#A3C9A8",
++            silk: "#F8F6F4", // New Silk accent for secondary surfaces
+         }
+       },
+       backgroundImage: {

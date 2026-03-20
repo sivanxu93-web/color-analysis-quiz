@@ -55,12 +55,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
+    // NEW LOGIC: Allow 'worst' generation for protected sessions as a hook
     if (!isExample && sessionRes.rows[0].status !== 'completed') {
-        console.warn(`Blocked draping attempt for unpaid session: ${sessionId}`);
-        return NextResponse.json(
-            { error: "Payment required to unlock virtual draping." }, 
-            { status: 403 }
-        );
+        if (type !== 'worst') {
+            console.warn(`Blocked premium draping attempt (${type}) for unpaid session: ${sessionId}`);
+            return NextResponse.json(
+                { error: "Payment required to unlock premium virtual draping." }, 
+                { status: 403 }
+            );
+        }
+        console.log(`Allowing teaser draping (worst) for unpaid session: ${sessionId}`);
     }
 
     // CHECK CACHE: Check if draping image already exists
