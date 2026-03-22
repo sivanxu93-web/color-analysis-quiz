@@ -41,7 +41,7 @@ export const getTotalLinkHref = (locale = 'en', page = '') => {
   return process.env.NEXT_PUBLIC_SITE_URL + `/${locale}/${page}`;
 }
 
-export const getShareToPinterest = (locale = 'en', page = '', sticker:string) => {
+export const getShareToPinterest = (locale = 'en', page = '', descriptionText:string) => {
   const pinterestUrl = 'https://pinterest.com/pin/create/button/';
-  return pinterestUrl + `?description=${encodeURIComponent(sticker)}` + `&url=` + encodeURIComponent(getTotalLinkHref(locale, page));
+  return pinterestUrl + `?description=${encodeURIComponent(descriptionText)}` + `&url=` + encodeURIComponent(getTotalLinkHref(locale, page));
 }

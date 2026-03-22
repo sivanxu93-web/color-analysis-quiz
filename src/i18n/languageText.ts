@@ -143,7 +143,7 @@ export const getWorksText = async () => {
   }
 }
 
-export const getExploreText = async (countSticker: string, page) => {
+export const getExploreText = async (countAnalysis: string, page) => {
   const tExplore = await getTranslations('ExploreText');
   let title = tExplore('title');
   let description = tExplore('description');
@@ -152,8 +152,8 @@ export const getExploreText = async (countSticker: string, page) => {
   let pageText = tExplore('pageText');
   let h2Text = tExplore('h2Text');
 
-  title = title.replace(/%countSticker%/g, countSticker);
-  description = description.replace(/%countSticker%/g, countSticker);
+  title = title.replace(/%countAnalysis%/g, countAnalysis);
+  description = description.replace(/%countAnalysis%/g, countAnalysis);
   pageText = pageText.replace(/%pageNumber%/g, page);
 
   if (page != '1') {
@@ -161,7 +161,7 @@ export const getExploreText = async (countSticker: string, page) => {
   } else {
     title = title + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
   }
-  h2Text = h2Text.replace(/%countSticker%/g, countSticker);
+  h2Text = h2Text.replace(/%countAnalysis%/g, countAnalysis);
 
   return {
     title: title,
@@ -341,7 +341,7 @@ export const getMenuText = async () => {
   }
 }
 
-export const getSearchText = async (countSticker, sticker: string, countStickerAll) => {
+export const getSearchText = async (countAnalysis, keyword: string, countAnalysisAll) => {
   const tSearch = await getTranslations('SearchText');
   let title = tSearch('title');
   let description = tSearch('description');
@@ -350,19 +350,19 @@ export const getSearchText = async (countSticker, sticker: string, countStickerA
   let titleSearch = tSearch('titleSearch');
   let h2TextSearch = tSearch('h2TextSearch');
 
-  title = title.replace(/%countSticker%/g, countSticker);
-  description = description.replace(/%countStickerAll%/g, countStickerAll);
-  h2Text = h2Text.replace(/%countSticker%/g, countSticker);
+  title = title.replace(/%countAnalysis%/g, countAnalysis);
+  description = description.replace(/%countAnalysisAll%/g, countAnalysisAll);
+  h2Text = h2Text.replace(/%countAnalysis%/g, countAnalysis);
 
   title = title + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
 
-  if (sticker) {
-    titleSearch = titleSearch.replace(/%countSticker%/g, countSticker);
-    let promptResult = sticker.slice(0, 20);
+  if (keyword) {
+    titleSearch = titleSearch.replace(/%countAnalysis%/g, countAnalysis);
+    let promptResult = keyword.slice(0, 20);
     titleSearch = titleSearch.replace(/%prompt%/g, promptResult);
     title = titleSearch + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
 
-    h2TextSearch = h2TextSearch.replace(/%countSticker%/g, countSticker);
+    h2TextSearch = h2TextSearch.replace(/%countAnalysis%/g, countAnalysis);
     h2TextSearch = h2TextSearch.replace(/%prompt%/g, promptResult);
     h2Text = h2TextSearch;
   }

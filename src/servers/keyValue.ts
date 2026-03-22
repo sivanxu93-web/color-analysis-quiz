@@ -1,7 +1,7 @@
 import {getDb} from "~/libs/db";
 
 
-export const countSticker = async (key, addCount) => {
+export const countAnalysis = async (key, addCount) => {
   const db = getDb();
 
   const results = await db.query('select * from key_value where key=$1 limit 1', [key]);
@@ -17,10 +17,10 @@ export const countSticker = async (key, addCount) => {
 
 }
 
-export const getCountSticker = async () => {
+export const getCountAnalysis = async () => {
   const db = getDb();
 
-  const results = await db.query('select * from key_value where key=$1 limit 1', ['countSticker']);
+  const results = await db.query('select * from key_value where key=$1 limit 1', ['countAnalysis']);
   const rows = results.rows;
   if (rows.length > 0) {
     const origin = rows[0];
