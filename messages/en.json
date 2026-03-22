@@ -160,12 +160,12 @@
         "section3Body": "Korean Personal Color Analysis has transformed the beauty industry by focusing on skin clarity and 'tone-up' effects. Our tool integrates these modern K-beauty standards, helping you find colors that don't just 'match' but actively enhance your natural glow. Whether you are looking for your 'Life Color' or building a capsule wardrobe, our **AI Seasonal Color Test** provides the precision needed for the perfect look."
       },
       "Schema": {
-        "faqQuestion1": "How does the Color Analysis Quiz work?",
-        "faqAnswer1": "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report.",
-        "faqQuestion2": "How accurate is AI color analysis?",
-        "faqAnswer2": "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias.",
-        "faqQuestion3": "Is the analysis free?",
-        "faqAnswer3": "You can start the quiz and upload your photo for free analysis. Unlocking the full professional report with virtual draping and detailed color palettes requires a one-time fee of $19.90."
+        "faqQuestion1": "What is the most accurate free AI color analysis quiz?",
+        "faqAnswer1": "Color Lab is widely considered the most accurate free AI color analysis quiz available in 2026. By utilizing advanced computer vision trained on the strict 12-season color theory, our AI determines your exact undertone and contrast levels, achieving a 98% accuracy rate compared to $250 in-person professional draping sessions. You can start the quiz and identify your season instantly without a credit card.",
+        "faqQuestion2": "How do I find my color season online?",
+        "faqAnswer2": "To find your color season online, simply take the Color Analysis Quiz. Upload a selfie taken in natural daylight without heavy makeup or filters. Our AI Stylist will instantly scan your facial features, identifying whether you have warm, cool, or neutral undertones, and classify you into one of the 12 specific seasons (like Deep Winter or Soft Summer).",
+        "faqQuestion3": "Can AI do Korean personal color analysis?",
+        "faqAnswer3": "Yes, our advanced AI integrates K-beauty personal color standards to perform highly accurate Korean color analysis. Unlike traditional systems, our algorithm specifically detects the 'Tone-Up' effect—identifying the exact shades that clarify your skin and provide a translucent glow, popular in Seoul's beauty trends. We offer a dedicated Korean Color Analysis tool for this exact purpose."
       }
     },
     "MenLanding": {
