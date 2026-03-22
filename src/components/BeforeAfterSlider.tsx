@@ -88,7 +88,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           <img
             src={afterImage}
             alt="After"
-            className="block w-full h-full object-cover object-top pointer-events-none"
+            className="block w-full h-full object-contain pointer-events-none"
             draggable={false}
           />
         )}
@@ -98,7 +98,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
       <img
         src={beforeImage}
         alt="Before"
-        className="absolute top-0 left-0 w-full h-full object-cover object-top pointer-events-none"
+        className="absolute top-0 left-0 w-full h-full object-contain pointer-events-none"
         style={{ clipPath: `inset(0px ${100 - position}% 0px 0px)` }}
         draggable={false}
       />

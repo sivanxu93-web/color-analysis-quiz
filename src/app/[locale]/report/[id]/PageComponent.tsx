@@ -457,7 +457,7 @@ export default function PageComponent({
               <div className="w-full md:w-[70%] lg:w-[42%] relative order-1 lg:order-2 overflow-hidden lg:overflow-visible">
                 <div className="relative w-full aspect-[3/4] md:aspect-[4/5] rounded-t-full rounded-b-[2.5rem] md:rounded-b-[4rem] overflow-hidden shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border-[10px] md:border-[15px] border-white bg-white group z-10">
                   {displayUserImage ? (
-                      <img src={displayUserImage} alt="User Muse" className="w-full h-full object-cover object-top transition-transform duration-[5000ms] group-hover:scale-110" />
+                      <img src={displayUserImage} alt="User Muse" className="w-full h-full object-contain transition-transform duration-[5000ms] group-hover:scale-110" />
                   ) : (
                       <div className="w-full h-full bg-[#F8F6F4] flex items-center justify-center text-gray-300 font-serif italic text-2xl">The Muse...</div>
                   )}
