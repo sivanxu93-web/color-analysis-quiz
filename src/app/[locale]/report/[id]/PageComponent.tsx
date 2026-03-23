@@ -549,6 +549,17 @@ export default function PageComponent({
                             </span>
                             {!isUnlocking && <div className="absolute inset-0 bg-[#E88D8D] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>}
                         </button>
+                        
+                        {/* Scroll indicator to guide users to the draping section */}
+                        <div 
+                            className="mt-2 flex flex-col items-center lg:items-start gap-2 text-[#C5A059] opacity-80 cursor-pointer hover:opacity-100 transition-opacity" 
+                            onClick={() => document.getElementById('draping')?.scrollIntoView({behavior: 'smooth'})}
+                        >
+                            <span className="text-[9px] uppercase tracking-[0.2em] font-mono font-bold">Scroll to see Virtual Draping</span>
+                            <svg className="w-4 h-4 animate-bounce lg:ml-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                            </svg>
+                        </div>
                     </div>
                 )}
               </div>
