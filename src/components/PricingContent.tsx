@@ -321,7 +321,7 @@ const PricingContent = ({ locale, isModal = false }: { locale: string, isModal?:
                   <span className="font-bold text-[#2D2D2D]">$8.90</span>
                 </div>
                 <div className="flex justify-between items-end">
-                  <p className="text-[10px] font-black text-[#E88D8D] uppercase tracking-widest">30 Credits</p>
+                  <p className="text-[10px] font-black text-[#E88D8D] uppercase tracking-widest">50 Credits</p>
                   <button
                     onClick={() => handleBuyPack('starter')}
                     className="text-[9px] font-black uppercase tracking-widest bg-white border border-gray-200 px-3 py-1.5 rounded-full hover:bg-[#2D2D2D] hover:text-white transition-all"
@@ -338,7 +338,7 @@ const PricingContent = ({ locale, isModal = false }: { locale: string, isModal?:
                   <span className="font-bold text-[#2D2D2D]">$14.90</span>
                 </div>
                 <div className="flex justify-between items-end">
-                  <p className="text-[10px] font-black text-[#E88D8D] uppercase tracking-widest">60 Credits</p>
+                  <p className="text-[10px] font-black text-[#E88D8D] uppercase tracking-widest">100 Credits</p>
                   <button
                     onClick={() => handleBuyPack('plus')}
                     className="text-[9px] font-black uppercase tracking-widest bg-[#2D2D2D] text-white px-3 py-1.5 rounded-full hover:bg-black transition-all shadow-sm"
