@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "~/libs/db";
-import { saveColorLabReport, checkIpLimit } from "~/servers/colorLab";
-import { deductUserCredits } from "~/servers/manageUserTimes";
+import { saveColorLabReport } from "~/servers/colorLab";
 import { deductCreditsForAnalysis } from "~/servers/colorLabCredits";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
@@ -90,82 +89,53 @@ Return ONLY valid JSON. No markdown formatting. No code blocks.
 `;
 
 export async function POST(req: NextRequest) {
+  let sessionId: string | undefined;
   try {
-    const ip = req.headers.get("x-forwarded-for") || req.ip || "unknown";
+    const body = await req.json();
+    sessionId = body.sessionId;
+    const { email } = body;
+    let { imageUrl } = body;
 
-    let body;
-    try {
-      body = await req.json();
-    } catch (e) {
-      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
-    }
-    const { sessionId, imageUrl, email } = body;
-
-    if (!sessionId || !imageUrl) {
-      return NextResponse.json(
-        { error: "Missing required fields" },
-        { status: 400 }
-      );
+    if (!sessionId || !email) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
     const db = getDb();
 
-    // CREDIT CHECK SYSTEM
-    if (!email) {
-      return NextResponse.json(
-        { error: "Please login to continue." },
-        { status: 401 }
-      );
-    }
-
     // 1. Get User ID
-    const userRes = await db.query(
-      "select user_id from user_info where email = $1",
-      [email]
-    );
+    const userRes = await db.query("select user_id from user_info where email = $1", [email]);
     if (userRes.rows.length === 0) {
-      return NextResponse.json(
-        { error: "User not found. Please login again." },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "User not found" }, { status: 401 });
     }
     const userId = userRes.rows[0].user_id;
 
-    // 2. ATOMIC DEDUCTION & STATUS CHECK
-    // This handles double-deduction protection in a single transaction
+    // 2. ATOMIC DEDUCTION & RECOVERY (Idempotent)
     const deduction = await deductCreditsForAnalysis(userId, sessionId);
     if (!deduction.success) {
         if (deduction.message === "Insufficient credits") {
-            return NextResponse.json(
-                { error: "Insufficient credits. Please top up to continue.", code: "INSUFFICIENT_CREDITS" }, 
-                { status: 402 }
-            );
+            return NextResponse.json({ error: "Insufficient credits", code: "INSUFFICIENT_CREDITS" }, { status: 402 });
         }
         return NextResponse.json({ error: deduction.message }, { status: 400 });
     }
 
-    // If it was already deducted/processing, just return success
-    if (deduction.message === "Already deducted") {
-        return NextResponse.json({ success: true, message: "Analysis already in progress." });
+    // 3. Resolve Image URL
+    if (!imageUrl) {
+        const imgRes = await db.query(
+            "SELECT url FROM color_lab_images WHERE session_id = $1 AND image_type = 'user_upload' ORDER BY created_at DESC LIMIT 1",
+            [sessionId]
+        );
+        imageUrl = imgRes.rows[0]?.url;
+        if (!imageUrl) return NextResponse.json({ error: "No image found for this session." }, { status: 400 });
     }
 
-    // If email is provided (from the lead magnet modal), save it!
-    if (email) {
-      await db.query("update color_lab_sessions set email = $1 where id = $2", [
-        email,
-        sessionId,
-      ]);
-      // Also add to waitlist for marketing
-      await db.query(
-        "insert into color_lab_waitlist(email, locale, interest) values($1, $2, $3) ON CONFLICT (email) DO NOTHING",
-        [email, "en", "color-lab-report"]
-      );
+    // 4. CHECK IF ALREADY COMPLETED (Avoid re-running if already done)
+    const checkRes = await db.query("SELECT status FROM color_lab_reports WHERE session_id = $1", [sessionId]);
+    if (checkRes.rows[0]?.status === 'completed') {
+        return NextResponse.json({ success: true, message: "Analysis already completed." });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is not configured");
-    }
+    if (!apiKey) throw new Error("GEMINI_API_KEY is not configured");
 
     // Fetch image data
     const imageResp = await fetch(imageUrl);
@@ -174,18 +144,27 @@ export async function POST(req: NextRequest) {
     const base64Image = Buffer.from(imageBuffer).toString("base64");
     const mimeType = imageResp.headers.get("content-type") || "image/jpeg";
 
+    // Fetch quiz data if any
+    const sessionInfoRes = await db.query("select quiz_data from color_lab_sessions where id = $1", [sessionId]);
+    const quizData = sessionInfoRes.rows[0]?.quiz_data;
+
+    let finalPrompt = SYSTEM_PROMPT;
+    if (quizData) {
+        finalPrompt += `\n\n**USER SELF-REPORTED DATA (from Quiz):**\nThe user provided this self-assessment. Use it to heavily inform your analysis, especially their goals and known traits:\n${JSON.stringify(quizData, null, 2)}\n`;
+    }
+
     // Call Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
       model: "gemini-3.1-pro-preview",
       generationConfig: { 
           responseMimeType: "application/json",
-          temperature: 0.0 // Reduce randomness
+          temperature: 0.0 
       },
     });
 
     const result = await model.generateContent([
-      SYSTEM_PROMPT,
+      finalPrompt,
       {
         inlineData: {
           data: base64Image,
@@ -195,36 +174,16 @@ export async function POST(req: NextRequest) {
     ]);
 
     const responseText = result.response.text();
+    const analysisResult = JSON.parse(responseText);
 
-    let analysisResult;
-    try {
-      analysisResult = JSON.parse(responseText);
-    } catch (e) {
-      console.error("JSON Parse Error:", responseText);
-      throw new Error("Invalid JSON response from AI");
-    }
-
-    // Save report to DB with 'protected' status (Teaser Mode)
-    await saveColorLabReport(
-        sessionId, 
-        analysisResult.season, 
-        analysisResult, 
-        'protected', 
-        imageUrl
-    );
-
-    // Update session status to 'protected' explicitly
-    await db.query("update color_lab_sessions set status = $1 where id = $2", [
-      "protected",
-      sessionId,
-    ]);
-
-    // *** NO DEDUCTION HERE ***
-    // Deduction happens in /api/color-lab/unlock
+    // 6. SAVE & UPDATE STATUS
+    await saveColorLabReport(sessionId, analysisResult.season, analysisResult, 'completed', imageUrl);
+    await db.query("update color_lab_sessions set status = 'analyzed', updated_at = now() where id = $1", [sessionId]);
 
     return NextResponse.json({ success: true, reportId: sessionId });
+
   } catch (error: any) {
-    console.error("Analysis Error:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Analysis API Error:", error);
+    return NextResponse.json({ error: error.message || "AI Analysis failed" }, { status: 500 });
   }
 }

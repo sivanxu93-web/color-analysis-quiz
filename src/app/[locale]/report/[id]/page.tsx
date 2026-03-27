@@ -5,6 +5,8 @@ import { Metadata } from 'next';
 import { getServerSession } from "next-auth";
 import { authOptions } from "~/libs/authOptions";
 import { getSeoAlternates, getSeoImages } from '~/libs/seo';
+import { redirect } from 'next/navigation';
+import { getLinkHref } from '~/configs/buildLink';
 
 export async function generateMetadata({ params: { id } }: { params: { id: string, locale: string } }): Promise<Metadata> {
   const data = await getColorLabReport(id);
@@ -41,12 +43,13 @@ export default async function ReportPage({
 }) {
   const colorLabText = await getColorLabText();
   const isDemo = searchParams?.demo === 'true';
+  const fromQuiz = searchParams?.from_quiz === 'true';
   let data;
 
   if (isDemo) {
       data = {
-          report: null, // PageComponent handles mock report if null in demo mode
-          status: 'draft', // Default, overridden by PageComponent logic
+          report: null, 
+          status: 'draft', 
           imageUrl: null,
           drapingImages: { best: null, worst: null },
           rating: undefined,
@@ -64,14 +67,23 @@ export default async function ReportPage({
   const session = await getServerSession(authOptions);
 
   if (!data) {
-      return <div>Report not found</div> // Simple fallback
+      return <div>Report not found</div> 
+  }
+
+  const currentStatus = data.status || (data.report ? 'completed' : 'draft');
+  const paymentSuccess = searchParams?.payment_success === 'true';
+
+  // REDIRECT TO PAYWALL IF DRAFT (Not Paid/Analyzed Yet)
+  // Only redirect if it's literally 'draft' or 'created', not in any progressing state, and not just returned from payment
+  if ((currentStatus === 'draft' || currentStatus === 'created') && !isDemo && !fromQuiz && !paymentSuccess) {
+      redirect(`/${locale}/quiz/paywall/${id}`);
   }
 
   return (
     <PageComponent 
         locale={locale} 
         report={data.report} 
-        status={data.status || (data.report ? 'completed' : 'draft')} 
+        status={currentStatus} 
         userImage={data.imageUrl}
         drapingImages={data.drapingImages}
         shareCardUrl={data.shareCardUrl}

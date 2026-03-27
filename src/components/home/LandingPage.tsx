@@ -53,13 +53,13 @@ export default function PageComponent({
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start w-full">
                         <Link
-                            href={getLinkHref(locale, 'analysis')}
-                            className="inline-flex items-center justify-center rounded-full bg-primary px-8 py-4 text-lg font-semibold text-white shadow-lg hover:bg-primary-hover transition-all transform hover:-translate-y-1 w-full sm:w-auto"
+                            href={getLinkHref(locale, 'quiz')}
+                            className="inline-flex items-center justify-center rounded-full bg-[#2D2D2D] px-10 py-5 text-lg font-bold text-white shadow-2xl hover:bg-black transition-all transform hover:-translate-y-1 w-full sm:w-auto uppercase tracking-widest text-xs"
                         >
-                            {colorLabText.Landing.uploadBtn}
+                            Start My Style Diagnostic
                         </Link>
-                        <a href="#how-it-works" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto">
-                            Learn More
+                        <a href="#how-it-works" className="inline-flex items-center justify-center rounded-full bg-white px-10 py-5 text-lg font-bold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto uppercase tracking-widest text-xs">
+                            View Methodology
                         </a>
                     </div>
                     <div className="mt-8 flex items-center justify-center md:justify-start gap-4 text-sm text-text-secondary min-h-[32px]">

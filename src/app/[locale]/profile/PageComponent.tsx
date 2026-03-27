@@ -245,10 +245,13 @@ export default function PageComponent({
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                           {history.map((item) => {
                               const isLocked = item.status === 'draft' || item.status === 'protected';
+                              const targetHref = item.status === 'draft' 
+                                  ? getLinkHref(locale, `quiz/paywall/${item.sessionId}`) 
+                                  : getLinkHref(locale, `report/${item.sessionId}`);
                               return (
                                   <Link 
                                       key={item.sessionId} 
-                                      href={getLinkHref(locale, `report/${item.sessionId}`)}
+                                      href={targetHref}
                                       className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1 relative"
                                   >
                                       {/* Delete Button */}

@@ -79,9 +79,13 @@ export async function POST(req: NextRequest) {
     }
 
     // NEW LOGIC: Allow 'worst' generation for protected sessions as a hook
-    if (!isExample && sessionRes.rows[0].status !== 'completed') {
+    // Also allow FULL generation if the session is progressing (paid/analyzing)
+    const currentStatus = sessionRes.rows[0].status;
+    const isAuthorized = isExample || ['completed', 'analyzed', 'paid', 'analyzing', 'protected'].includes(currentStatus);
+
+    if (!isAuthorized) {
         if (type !== 'worst') {
-            console.warn(`Blocked premium draping attempt (${type}) for unpaid session: ${sessionId}`);
+            console.warn(`Blocked premium draping attempt (${type}) for unpaid session: ${sessionId} (Status: ${currentStatus})`);
             return NextResponse.json(
                 { error: "Payment required to unlock premium virtual draping." }, 
                 { status: 403 }

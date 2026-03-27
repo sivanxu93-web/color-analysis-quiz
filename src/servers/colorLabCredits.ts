@@ -12,7 +12,7 @@ export async function deductCreditsForAnalysis(userId: string, sessionId: string
 
         // 1. 锁住会话行，防止并发请求绕过状态检查
         const sessionRes = await db.query(
-            "SELECT status FROM color_lab_sessions WHERE id = $1 FOR UPDATE",
+            "SELECT status, updated_at FROM color_lab_sessions WHERE id = $1 FOR UPDATE",
             [sessionId]
         );
 
@@ -22,10 +22,28 @@ export async function deductCreditsForAnalysis(userId: string, sessionId: string
         }
 
         const currentStatus = sessionRes.rows[0].status;
-        // 如果状态已经是分析中或已完成，说明积分已经扣过了
-        if (['analyzing', 'protected', 'completed', 'analyzed'].includes(currentStatus)) {
+        const updatedAt = new Date(sessionRes.rows[0].updated_at || 0).getTime();
+        const now = Date.now();
+        const fiveMinutes = 5 * 60 * 1000;
+
+        // 如果状态已经是已完成，说明积分已经扣过了
+        if (['protected', 'completed', 'analyzed'].includes(currentStatus)) {
             await db.query("ROLLBACK");
             return { success: true, message: "Already deducted" }; 
+        }
+
+        // 如果处于 'analyzing' 状态：
+        if (currentStatus === 'analyzing') {
+            // 如果是在 5 分钟内更新的，说明可能还在跑，让它继续
+            if (now - updatedAt < fiveMinutes) {
+                await db.query("ROLLBACK");
+                return { success: true, message: "Already deducted" }; 
+            }
+            // 如果超过 5 分钟还在 'analyzing'，说明之前的分析崩了
+            // 我们不重新扣费（因为之前扣过了），但允许流程继续往下走重新触发 AI
+            console.log(`Session ${sessionId} stuck in analyzing for >5m. Re-triggering...`);
+            await db.query("COMMIT"); // 提交当前事务，允许 analyze 接口继续
+            return { success: true }; 
         }
 
         // 2. 锁住用户积分行并检查余额
@@ -41,7 +59,7 @@ export async function deductCreditsForAnalysis(userId: string, sessionId: string
 
         const subCredits = userRes.rows[0].subscription_credits || 0;
         const permCredits = userRes.rows[0].permanent_credits || 0;
-        const amount = 1;
+        const amount = 40;
 
         if (subCredits + permCredits < amount) {
             await db.query("ROLLBACK");
@@ -66,7 +84,7 @@ export async function deductCreditsForAnalysis(userId: string, sessionId: string
 
         // 5. 插入日志
         await db.query(
-            "INSERT INTO credit_logs(user_id, amount, type, description) VALUES($1, -1, 'usage', $2)",
+            "INSERT INTO credit_logs(user_id, amount, type, description) VALUES($1, -40, 'usage', $2)",
             [userId, `Analysis: ${sessionId}`]
         );
 

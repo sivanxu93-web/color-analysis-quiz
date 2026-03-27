@@ -140,11 +140,13 @@ export const getColorLabReport = async (
   // Determine status: Report status > Session status > Fallback
   let status = sessionRow.report_status || sessionRow.session_status || (sessionRow.payload ? 'completed' : 'draft');
   
-  // Map backend status to frontend status
-  if (status === 'analyzing') {
+  // Map internal database statuses to public frontend statuses
+  if (status === 'analyzing' || status === 'paid' || status === 'protected') {
       status = 'processing';
   } else if (status === 'created') {
       status = 'draft';
+  } else if (status === 'analyzed') {
+      status = 'completed';
   }
 
   return {
@@ -174,7 +176,8 @@ export const getColorLabReportsByEmail = async (email: string) => {
     SELECT 
       s.id as session_id,
       s.created_at,
-      r.status,
+      s.status as session_status,
+      r.status as report_status,
       r.season,
       r.input_image_url,
       (SELECT url FROM color_lab_images WHERE session_id = s.id AND (image_type = 'user_upload' OR image_type IS NULL) LIMIT 1) as backup_image_url
@@ -186,13 +189,19 @@ export const getColorLabReportsByEmail = async (email: string) => {
   
   const res = await db.query(query, [email]);
   
-  return res.rows.map((row: any) => ({
-      sessionId: row.session_id,
-      createdAt: row.created_at,
-      status: row.status || 'draft', // If no report record, it's effectively a draft/created session
-      season: row.season,
-      imageUrl: row.input_image_url || row.backup_image_url
-  }));
+  return res.rows.map((row: any) => {
+      let status = row.report_status || row.session_status || 'draft';
+      if (status === 'analyzing') status = 'processing';
+      if (status === 'created') status = 'draft';
+
+      return {
+          sessionId: row.session_id,
+          createdAt: row.created_at,
+          status: status,
+          season: row.season,
+          imageUrl: row.input_image_url || row.backup_image_url
+      };
+  });
 };
 
 export const addToColorLabWaitlist = async (params: {

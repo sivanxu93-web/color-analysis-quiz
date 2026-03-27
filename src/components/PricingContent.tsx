@@ -6,10 +6,20 @@ import { useParams } from 'next/navigation';
 import BaseModal from '~/components/BaseModal';
 
 const PricingContent = ({ locale, isModal = false }: { locale: string, isModal?: boolean }) => {
-  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('yearly'); // Default to yearly
+  const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly' | 'packs'>('yearly'); // Default to yearly
   const { setShowLoginModal, userData, setShowPricingModal, availableTimes, refreshAvailableTimes } = useCommonContext();
   const params = useParams();
   const sessionId = params?.id as string;
+  
+  // Ref for scrolling to packs
+  const packsRef = React.useRef<HTMLDivElement>(null);
+
+  const handleToggleChange = (cycle: 'monthly' | 'yearly' | 'packs') => {
+    setBillingCycle(cycle);
+    if (cycle === 'packs') {
+      packsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
   
   // Custom Modal State
   const [confirmModalState, setConfirmModalState] = useState<{
@@ -171,16 +181,22 @@ const PricingContent = ({ locale, isModal = false }: { locale: string, isModal?:
         <div className="flex justify-center mb-8">
           <div className="bg-white p-1 rounded-full border border-gray-100 shadow-sm inline-flex">
             <button
-              onClick={() => setBillingCycle('monthly')}
-              className={`px-6 md:px-8 py-2 rounded-full text-[10px] font-black transition-all tracking-widest ${billingCycle === 'monthly' ? 'bg-[#2D2D2D] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'}`}
+              onClick={() => handleToggleChange('monthly')}
+              className={`px-4 md:px-8 py-2 rounded-full text-[9px] md:text-[10px] font-black transition-all tracking-widest ${billingCycle === 'monthly' ? 'bg-[#2D2D2D] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'}`}
             >
               MONTHLY
             </button>
             <button
-              onClick={() => setBillingCycle('yearly')}
-              className={`px-6 md:px-8 py-2 rounded-full text-[10px] font-black transition-all tracking-widest ${billingCycle === 'yearly' ? 'bg-[#2D2D2D] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'}`}
+              onClick={() => handleToggleChange('yearly')}
+              className={`px-4 md:px-8 py-2 rounded-full text-[9px] md:text-[10px] font-black transition-all tracking-widest ${billingCycle === 'yearly' ? 'bg-[#2D2D2D] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'}`}
             >
               YEARLY <span className={`ml-1 text-[8px] font-bold ${billingCycle === 'yearly' ? 'text-[#E88D8D]' : 'text-[#E88D8D]/70'}`}>(-50%)</span>
+            </button>
+            <button
+              onClick={() => handleToggleChange('packs')}
+              className={`px-4 md:px-8 py-2 rounded-full text-[9px] md:text-[10px] font-black transition-all tracking-widest ${billingCycle === 'packs' ? 'bg-[#E88D8D] text-white shadow-lg' : 'text-gray-400 hover:text-gray-600'}`}
+            >
+              PACKS
             </button>
           </div>
         </div>
@@ -306,7 +322,7 @@ const PricingContent = ({ locale, isModal = false }: { locale: string, isModal?:
           </div>
 
           {/* Column 3: Pay-as-you-go Packs */}
-          <div className="bg-white p-8 md:p-10 border border-gray-100 shadow-sm rounded-2xl flex flex-col hover:shadow-xl transition-all duration-500 text-left relative">
+          <div ref={packsRef} className={`bg-white p-8 md:p-10 border border-gray-100 shadow-sm rounded-2xl flex flex-col hover:shadow-xl transition-all duration-500 text-left relative ${billingCycle === 'packs' ? 'ring-2 ring-[#E88D8D]' : ''}`}>
             <div className="space-y-2 mb-6">
               <h3 className="font-serif text-2xl font-bold text-[#2D2D2D]">Pay As You Go</h3>
               <p className="text-[#C5A059] text-[11px] font-black uppercase tracking-widest">Not ready to subscribe?</p>

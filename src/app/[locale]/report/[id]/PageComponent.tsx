@@ -42,11 +42,56 @@ export default function PageComponent({
 
   const searchParams = useSearchParams();
   const isDemo = searchParams?.get('demo') === 'true';
+  const paymentSuccess = searchParams?.get('payment_success') === 'true';
   const isOwner = explicitIsOwner !== undefined ? explicitIsOwner : (isDemo || (userData?.email === ownerEmail));
 
-  const [status, setStatus] = useState(initialStatus);
+  const [status, setStatus] = useState(paymentSuccess && (initialStatus === 'draft' || initialStatus === 'created') ? 'processing' : initialStatus);
   const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
-  const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
+  
+  // AUTO-TRIGGER ANALYSIS & REFRESH
+  useEffect(() => {
+    let refreshTimeout: any;
+
+    const startAnalysis = async () => {
+      // If payment just succeeded, we should always ensure it's in processing state locally
+      if (paymentSuccess && (status === 'draft' || status === 'created')) {
+          setStatus('processing');
+          return; // The next effect cycle will pick it up
+      }
+
+      if (status === 'processing' && !isDemo && userData?.email && sessionId) {
+        try {
+          const res = await fetch('/api/color-lab/analyze', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ sessionId, email: userData.email, imageUrl: userImage })
+          });
+          
+          if (res.ok) {
+            // Analysis finished synchronously! Refresh to show content
+            router.refresh();
+            setStatus('completed');
+          } else {
+            const data = await res.json();
+            setGenerationError(data.error || "Analysis failed.");
+            setStatus('failed');
+          }
+        } catch (e) {
+          console.error("Auto-analysis failed", e);
+          setGenerationError("Connection error.");
+          setStatus('failed');
+        }
+      }
+    };
+
+    startAnalysis();
+    return () => clearTimeout(refreshTimeout);
+  }, [status, sessionId, userData?.email, userImage, router, isDemo]);
+
+  // REMOVED POLLING - Purely driven by the initial request or manual refresh
+  const isGeneratingDraping = useState(false)[0]; // Placeholder for removed logic
+  const setIsGeneratingDraping = useState(false)[1]; 
+
   const hasTriggeredDraping = useRef(false);
   const [currentTipIndex, setCurrentTipIndex] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -219,6 +264,15 @@ export default function PageComponent({
         let bestUrl = drapingImages.best;
         let worstUrl = drapingImages.worst;
         
+        if (bestRes && !bestRes.ok) {
+            const errorData = await bestRes.json();
+            throw new Error(errorData.error || "AI_BUSY");
+        }
+        if (worstRes && !worstRes.ok) {
+            const errorData = await worstRes.json();
+            throw new Error(errorData.error || "AI_BUSY");
+        }
+        
         if (bestRes && bestRes.ok) {
           const d = await bestRes.json();
           bestUrl = d.imageUrl;
@@ -230,9 +284,9 @@ export default function PageComponent({
         
         setDrapingImages({ best: bestUrl, worst: worstUrl });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Draping generation error", error);
-      setDrapingError("AI is busy, please try again.");
+      setDrapingError(error.message || "AI is busy, please try again.");
       fetchedStatus.current.delete(currentStatus); // allow retry
     } finally { 
       setIsGeneratingDraping(false); 
@@ -544,7 +598,7 @@ export default function PageComponent({
                                         Unlocking...
                                     </>
                                 ) : (
-                                    "Reveal My Full Report"
+                                    <>Reveal My Full Report <span className="bg-white/20 px-2 py-0.5 rounded-full text-[9px] font-black border border-white/30 tracking-widest">-40 Credits</span></>
                                 )}
                             </span>
                             {!isUnlocking && <div className="absolute inset-0 bg-[#E88D8D] translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>}
@@ -614,7 +668,7 @@ export default function PageComponent({
                                             Unlocking
                                         </>
                                     ) : (
-                                        "Discover"
+                                        "Discover (-40 Credits)"
                                     )}
                                 </button>
                             </div>
@@ -664,7 +718,27 @@ export default function PageComponent({
                   
                   <div className="flex-1 max-w-sm md:max-w-xl w-full">
                     <div className="relative aspect-[4/5] overflow-hidden shadow-[0_80px_150px_-40px_rgba(0,0,0,0.9)] bg-black border border-white/10 group">
-                      {(isRegeneratingDraping.best || isRegeneratingDraping.worst || (!displayDraping.best || !displayDraping.worst)) ? (
+                      {drapingError ? (
+                        <div className="absolute inset-0 z-50 bg-[#1A1A1A] flex flex-col items-center justify-center border border-white/5 p-8 text-center space-y-6">
+                            <div className="text-4xl">⚠️</div>
+                            <div className="space-y-2">
+                                <p className="font-mono text-[10px] text-red-400 uppercase tracking-widest">Draping Interrupted</p>
+                                <p className="text-white/60 text-xs italic font-serif leading-relaxed px-4">
+                                    {drapingError.includes("demand") ? drapingError : "The AI stylist is slightly overwhelmed or your image pose is complex. Let's try once more."}
+                                </p>
+                            </div>
+                            <button 
+                                onClick={() => {
+                                    setDrapingError(null);
+                                    fetchedStatus.current.delete(status === 'analyzed' ? 'completed' : status);
+                                    handleGenerateDraping(status === 'analyzed' ? 'completed' : status);
+                                }}
+                                className="px-8 py-3 bg-white text-black rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-[#E88D8D] hover:text-white transition-all active:scale-95"
+                            >
+                                Retry Generation
+                            </button>
+                        </div>
+                      ) : (isRegeneratingDraping.best || isRegeneratingDraping.worst || (!displayDraping.best || !displayDraping.worst)) ? (
                          <div className="absolute inset-0 z-50 bg-[#1A1A1A] flex flex-col items-center justify-center border border-white/5">
                             <div className="relative w-12 h-12 mb-6">
                                 <div className="absolute inset-0 border-2 border-[#C5A059]/10 rounded-full"></div>
@@ -789,6 +863,7 @@ export default function PageComponent({
                                     <>
                                         <svg className="w-4 h-4 text-accent-gold" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" /></svg>
                                         Unlock Full Professional Palette
+                                        <span className="bg-white/20 px-2 py-0.5 rounded-full text-[9px] font-black border border-white/30 tracking-widest">-40 Credits</span>
                                     </>
                                 )}
                             </span>
