@@ -169,7 +169,7 @@ export default function PageComponent({ locale }: { locale: string }) {
             <div className="max-w-4xl mx-auto px-6">
                 <div className="text-center mb-16 space-y-4">
                     <span className="font-mono text-[10px] font-black text-[#C5A059] uppercase tracking-[0.3em]">The Science</span>
-                    <h2 className="text-4xl md:text-5xl font-serif font-bold italic text-[#1A1A2E]">How AI Solves the "What Season Am I" Problem</h2>
+                    <h2 className="text-4xl md:text-5xl font-serif font-bold italic text-[#1A1A2E]">How AI Solves the &quot;What Season Am I&quot; Problem</h2>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -223,7 +223,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                     </div>
                     <div className="pb-8">
                         <h3 className="text-xl font-bold mb-3">Is the AI better than a human consultant?</h3>
-                        <p className="text-white/60 leading-relaxed">AI is objective. It doesn't get tricked by yellow lighting in your bathroom or subjective preferences. While human consultants offer a great in-person experience, AI provides mathematical precision for a fraction of the cost.</p>
+                        <p className="text-white/60 leading-relaxed">AI is objective. It doesn&apos;t get tricked by yellow lighting in your bathroom or subjective preferences. While human consultants offer a great in-person experience, AI provides mathematical precision for a fraction of the cost.</p>
                     </div>
                 </div>
             </div>
