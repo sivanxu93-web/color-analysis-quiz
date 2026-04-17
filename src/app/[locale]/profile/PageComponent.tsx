@@ -18,7 +18,7 @@ export default function PageComponent({
   const { userData, setShowLoginModal, setShowLogoutModal } = useCommonContext();
   const { status } = useSession();
   const [history, setHistory] = useState<any[]>([]);
-  const [credits, setCredits] = useState<number | null>(null);
+  const [credits, setCredits] = useState<{ report: number | null, validator: number | null }>({ report: null, validator: null });
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -56,7 +56,10 @@ export default function PageComponent({
       try {
           const res = await fetch(`/api/user/getAvailableTimes?userId=${userData.user_id}`);
           const json = await res.json();
-          setCredits(json.available_times);
+          setCredits({
+              report: json.available_times,
+              validator: json.validator_times
+          });
       } catch (e) {
           console.error(e);
       }
@@ -107,7 +110,10 @@ export default function PageComponent({
                       
                       <div className="flex flex-col md:flex-row gap-4 justify-center md:justify-start pt-2 w-full">
                           <div className="px-6 py-2 bg-primary/5 rounded-full border border-primary/10 text-primary font-bold text-sm md:text-base">
-                              💎 {credits !== null ? credits : '-'} Credits Available
+                              💎 {credits.report !== null ? credits.report : '-'} Analysis Credits
+                          </div>
+                          <div className="px-6 py-2 bg-[#C5A059]/5 rounded-full border border-[#C5A059]/10 text-[#C5A059] font-bold text-sm md:text-base">
+                              👔 {credits.validator !== null ? credits.validator : '-'} Style Scans
                           </div>
                           <button 
                               onClick={() => setShowLogoutModal(true)}

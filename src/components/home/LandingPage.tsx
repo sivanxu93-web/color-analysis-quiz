@@ -58,9 +58,18 @@ export default function PageComponent({
                         >
                             {colorLabText.Landing.uploadBtn}
                         </Link>
-                        <a href="#how-it-works" className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto">
-                            Learn More
-                        </a>
+                        <Link href={getLinkHref(locale, 'what-season-am-i')} className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 text-lg font-semibold text-text-primary border border-gray-200 hover:bg-gray-50 transition-all w-full sm:w-auto">
+                            What Season Am I?
+                        </Link>
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap justify-center md:justify-start gap-3">
+                        <Link href={getLinkHref(locale, 'blog')} className="px-4 py-2 bg-accent-sage/20 rounded-full text-xs font-bold text-accent-sage-dark hover:bg-accent-sage/30 transition-all">
+                            📚 Style Blog
+                        </Link>
+                        <Link href={getLinkHref(locale, 'examples')} className="px-4 py-2 bg-gray-100 rounded-full text-xs font-bold text-gray-500 hover:bg-gray-200 transition-all">
+                            🎨 12-Season Gallery
+                        </Link>
                     </div>
                     <div className="mt-8 flex items-center justify-center md:justify-start gap-4 text-sm text-text-secondary">
                         <div className="flex -space-x-2">

@@ -5,13 +5,41 @@ import { notFound } from 'next/navigation';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
+import { getSeoAlternates } from '~/libs/seo';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const post = getBlogPost(params.slug);
+export async function generateMetadata({ params: { slug, locale } }: { params: { slug: string, locale: string } }): Promise<Metadata> {
+  const post = getBlogPost(slug);
   if (!post) return {};
+  
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
+  
   return {
     title: `${post.title} | Color Analysis Quiz`,
     description: post.description,
+    alternates: getSeoAlternates(`/blog/${slug}`, locale),
+    openGraph: {
+      title: post.title,
+      description: post.description,
+      url: `${baseUrl}/blog/${slug}`,
+      siteName: 'Color Analysis Quiz',
+      images: [
+        {
+          url: `${baseUrl}/website.png`,
+          width: 1200,
+          height: 630,
+          alt: post.title,
+        },
+      ],
+      locale: locale,
+      type: 'article',
+      publishedTime: post.date,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: post.title,
+      description: post.description,
+      images: [`${baseUrl}/website.png`],
+    }
   }
 }
 
@@ -26,10 +54,36 @@ export default function BlogPost({
     notFound();
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.description,
+    "datePublished": post.date,
+    "dateModified": post.date,
+    "author": {
+      "@type": "Organization",
+      "name": "Color Analysis Quiz",
+      "url": "https://coloranalysisquiz.app"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Color Analysis Quiz",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://coloranalysisquiz.app/appicon.png"
+      }
+    }
+  };
+
   return (
     <>
       <Header locale={locale} page={'blog'} />
       <main className="min-h-screen bg-background py-20 px-6">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <article className="max-w-3xl mx-auto bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
             <div className="mb-8">
                 <Link href={getLinkHref(locale, 'blog')} className="text-sm text-gray-400 hover:text-primary mb-4 inline-block">
