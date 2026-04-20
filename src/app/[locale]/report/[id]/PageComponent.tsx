@@ -30,6 +30,7 @@ export default function PageComponent({
   drapingImages?: { best: string | null; worst: string | null };
   rating?: string;
   isOwner?: boolean;
+  seoText?: React.ReactNode;
 }) {
   const { userData, setShowLoginModal, setShowPricingModal } = useCommonContext();
   const router = useRouter();
