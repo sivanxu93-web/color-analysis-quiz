@@ -17,7 +17,7 @@ export function getSeoAlternates(path: string, locale: string) {
   };
 
   return {
-    canonical: locale === 'en' ? `${BASE_URL}${finalPath}` : `${BASE_URL}/${locale}${finalPath}`,
+    canonical: locale === 'en' || locale === '' ? `${BASE_URL}${finalPath}` : `${BASE_URL}/${locale}${finalPath}`,
     languages: {
       ...languages,
       'x-default': `${BASE_URL}${finalPath}`,

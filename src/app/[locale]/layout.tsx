@@ -27,7 +27,8 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params: { locale } }: Props): Promise<Metadata> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://coloranalysisquiz.app';
-  
+  const canonicalUrl = locale === 'en' ? baseUrl : `${baseUrl}/${locale}`;
+
   return {
     metadataBase: new URL(baseUrl),
     title: {
@@ -58,9 +59,9 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
       images: ['/seasonal_color_analysis.jpg'],
     },
     alternates: {
-      canonical: `${baseUrl}/${locale}`,
+      canonical: canonicalUrl,
       languages: {
-        'en': `${baseUrl}/en`,
+        'en': baseUrl,
         'zh': `${baseUrl}/zh`,
       }
     },

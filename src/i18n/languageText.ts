@@ -1,5 +1,7 @@
 import {getTranslations} from "next-intl/server";
 
+const getWebsiteName = () => process.env.NEXT_PUBLIC_WEBSITE_NAME || 'Color Analysis Quiz';
+
 export const getIndexPageText = async () => {
   const tIndex = await getTranslations('IndexPageText');
   return {
@@ -49,7 +51,8 @@ export const getAuthText = async () => {
 
 export const getPricingText = async () => {
   const tPricing = await getTranslations('PricingText');
-  const title = tPricing('title') + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+  const websiteName = getWebsiteName();
+  const title = tPricing('title') + ' | ' + websiteName;
   const description = tPricing('description');
   const h1Text =  tPricing('h1Text');
   const basic =  tPricing('basic');
@@ -112,8 +115,9 @@ export const getPricingText = async () => {
 
 export const getPrivacyPolicyText = async () => {
   const tPrivacyPolicy = await getTranslations('PrivacyPolicyText');
+  const websiteName = getWebsiteName();
   return {
-    title: tPrivacyPolicy('title') + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME,
+    title: tPrivacyPolicy('title') + ' | ' + websiteName,
     description: tPrivacyPolicy('description'),
     h1Text: tPrivacyPolicy('h1Text'),
     detailText: tPrivacyPolicy('detailText'),
@@ -123,8 +127,9 @@ export const getPrivacyPolicyText = async () => {
 
 export const getTermsOfServiceText = async () => {
   const tTermsOfService = await getTranslations('TermsOfServiceText');
+  const websiteName = getWebsiteName();
   return {
-    title: tTermsOfService('title') + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME,
+    title: tTermsOfService('title') + ' | ' + websiteName,
     description: tTermsOfService('description'),
     h1Text: tTermsOfService('h1Text'),
     detailText: tTermsOfService('detailText'),
@@ -133,8 +138,9 @@ export const getTermsOfServiceText = async () => {
 
 export const getWorksText = async () => {
   const tWorks = await getTranslations('WorksText');
+  const websiteName = getWebsiteName();
   return {
-    title: tWorks('title') + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME,
+    title: tWorks('title') + ' | ' + websiteName,
     description: tWorks('description'),
     h1Text: tWorks('h1Text'),
     descriptionBelowH1Text: tWorks('descriptionBelowH1Text'),
@@ -145,6 +151,7 @@ export const getWorksText = async () => {
 
 export const getExploreText = async (countSticker: string, page) => {
   const tExplore = await getTranslations('ExploreText');
+  const websiteName = getWebsiteName();
   let title = tExplore('title');
   let description = tExplore('description');
   let h1Text = tExplore('h1Text');
@@ -157,9 +164,9 @@ export const getExploreText = async (countSticker: string, page) => {
   pageText = pageText.replace(/%pageNumber%/g, page);
 
   if (page != '1') {
-    title = title + ", " + pageText + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+    title = title + ", " + pageText + ' | ' + websiteName;
   } else {
-    title = title + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+    title = title + ' | ' + websiteName;
   }
   h2Text = h2Text.replace(/%countSticker%/g, countSticker);
 
@@ -173,6 +180,7 @@ export const getExploreText = async (countSticker: string, page) => {
 }
 
 export const getDetailText = async (workDetail) => {
+  const websiteName = getWebsiteName();
   let promptResult = workDetail.input_text.slice(0, 20);
   const tDetail = await getTranslations('DetailText');
   let title = tDetail('title');
@@ -188,7 +196,7 @@ export const getDetailText = async (workDetail) => {
   descriptionBelowH1Text = descriptionBelowH1Text.replace(/%prompt%/g, promptResult);
 
   numberText = numberText.replace(/%detailId%/g, workDetail.id);
-  title = title + ', ' + numberText + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+  title = title + ', ' + numberText + ' | ' + websiteName;
 
   h2Text = h2Text.replace(/%prompt%/g, promptResult);
 
@@ -288,6 +296,8 @@ export const getMenuText = async () => {
     header1: tMenu('header1'),
     header2: tMenu('header2'),
     header3: tMenu('header3'),
+    header4: tMenu('header4'),
+    header5: tMenu('header5'),
     footerLegal: tMenu('footerLegal'),
     footerLegal0: tMenu('footerLegal0'),
     footerLegal1: tMenu('footerLegal1'),
@@ -299,6 +309,7 @@ export const getMenuText = async () => {
 
 export const getSearchText = async (countSticker, sticker: string, countStickerAll) => {
   const tSearch = await getTranslations('SearchText');
+  const websiteName = getWebsiteName();
   let title = tSearch('title');
   let description = tSearch('description');
   let h1Text = tSearch('h1Text');
@@ -310,13 +321,13 @@ export const getSearchText = async (countSticker, sticker: string, countStickerA
   description = description.replace(/%countStickerAll%/g, countStickerAll);
   h2Text = h2Text.replace(/%countSticker%/g, countSticker);
 
-  title = title + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+  title = title + ' | ' + websiteName;
 
   if (sticker) {
     titleSearch = titleSearch.replace(/%countSticker%/g, countSticker);
     let promptResult = sticker.slice(0, 20);
     titleSearch = titleSearch.replace(/%prompt%/g, promptResult);
-    title = titleSearch + ' | ' + process.env.NEXT_PUBLIC_WEBSITE_NAME;
+    title = titleSearch + ' | ' + websiteName;
 
     h2TextSearch = h2TextSearch.replace(/%countSticker%/g, countSticker);
     h2TextSearch = h2TextSearch.replace(/%prompt%/g, promptResult);
