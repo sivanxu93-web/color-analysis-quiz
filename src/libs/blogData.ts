@@ -47,7 +47,7 @@ export const blogPosts = [
       <p>If you have just five $40 items in your closet that you never wear because they are the wrong season, that's $200 wasted. Knowing your color palette is an investment that pays for itself the very next time you go shopping, by acting as a filter against bad purchases.</p>
 
       <h2>How to Get Professional-Level Results for Less</h2>
-      <p>If you're ready to discover your true season without the premium price tag or the 3-month waitlist, technology is your best friend. By taking our <a href="/quiz">AI Color Analysis Quiz</a>, you can get a comprehensive, mathematically accurate 12-season breakdown immediately.</p>
+      <p>If you're ready to discover your true season without the premium price tag or the 3-month waitlist, technology is your best friend. By taking our <a href="/analysis">AI Color Analysis Quiz</a>, you can get a comprehensive, mathematically accurate 12-season breakdown immediately.</p>
       <p>Not convinced you want to spend anything at all just yet? You can start by trying to analyze yourself at home using natural light and your own closet. Read our <a href="/blog/how-to-do-color-analysis-yourself">Step-by-Step Guide to DIY Color Analysis</a> to get started.</p>
 
       <h2>Frequently Asked Questions</h2>
@@ -120,7 +120,7 @@ export const blogPosts = [
 
       <h2>When DIY Isn't Enough: The Easier Way</h2>
       <p>If you're staring at the mirror and feeling more confused than when you started, you're not alone. Human eyes easily adapt to color illusions, making self-analysis incredibly frustrating.</p>
-      <p>That's exactly why we built a mathematical solution. Instead of guessing if your veins are blue or green, our <a href="/quiz">AI Color Analysis Quiz</a> scans the exact hexadecimal pixel values of your skin, hair, and eyes. It computes your contrast ratios and categorizes you into the exact 12-season matrix in under 90 seconds. Stop guessing and let technology find your perfect palette today.</p>
+      <p>That's exactly why we built a mathematical solution. Instead of guessing if your veins are blue or green, our <a href="/analysis">AI Color Analysis Quiz</a> scans the exact hexadecimal pixel values of your skin, hair, and eyes. It computes your contrast ratios and categorizes you into the exact 12-season matrix in under 90 seconds. Stop guessing and let technology find your perfect palette today.</p>
     `,
   },
   {
@@ -184,7 +184,7 @@ export const blogPosts = [
 
       <h2>How to Try Korean Color Analysis Online</h2>
       <p>You don't need a plane ticket to Seoul to get your personal color analyzed. While a trip to a famous clinic in Gangnam is a great experience, you can get highly accurate results at home.</p>
-      <p>Our <a href="/quiz">AI Color Analysis Tool</a> was trained on diverse global datasets, explicitly accounting for the nuances of overtone versus undertone found in Asian skin. It doesn't just default dark hair to Winter. By calculating your precise pigment density and contrast ratios, it can accurately place you into the exact sub-season that a Korean consultant would. Check out some of our <a href="/examples/soft-summer-analysis">Soft Summer</a> or <a href="/examples/true-winter-analysis">True Winter</a> examples to see the results.</p>
+      <p>Our <a href="/analysis">AI Color Analysis Tool</a> was trained on diverse global datasets, explicitly accounting for the nuances of overtone versus undertone found in Asian skin. It doesn't just default dark hair to Winter. By calculating your precise pigment density and contrast ratios, it can accurately place you into the exact sub-season that a Korean consultant would. Check out some of our <a href="/examples/soft-summer-analysis">Soft Summer</a> or <a href="/examples/true-winter-analysis">True Winter</a> examples to see the results.</p>
     `,
   },
   {
@@ -271,8 +271,8 @@ export const blogPosts = [
       <p>Finding your specific sub-season is the key to a "Power Palette" that truly works. It's the difference between wearing a color that's "okay" and wearing one that makes people ask if you've just come back from vacation. When you wear your correct sub-season, your skin looks smoother, your eyes look brighter, and your jawline appears more defined.</p>
       
       <h2>How to Find Your Exact 12-Season Match</h2>
-      <p>Identifying which of the 12 seasons you belong to using just your eyes and a mirror is extremely difficult. Human perception is heavily influenced by surrounding colors and lighting. That is why we built our <a href="/quiz">AI Seasonal Color Analysis Quiz</a>.</p>
-      <p>Our tool uses advanced computer vision algorithms to map your facial features to the precise 12-season matrix. It calculates your exact Hue, Value, and Chroma to place you in your perfect sub-season. Stop guessing and start knowing. <a href="/quiz">Take the free AI scan today.</a></p>
+      <p>Identifying which of the 12 seasons you belong to using just your eyes and a mirror is extremely difficult. Human perception is heavily influenced by surrounding colors and lighting. That is why we built our <a href="/analysis">AI Seasonal Color Analysis Quiz</a>.</p>
+      <p>Our tool uses advanced computer vision algorithms to map your facial features to the precise 12-season matrix. It calculates your exact Hue, Value, and Chroma to place you in your perfect sub-season. Stop guessing and start knowing. <a href="/analysis">Take the free AI scan today.</a></p>
     `,
   },
   {
@@ -322,7 +322,7 @@ export const blogPosts = [
       <p>Many free tools are just generic 5-question surveys that ask "what color are your veins?" and guess your season. Others use basic Instagram filters that heavily alter your natural skin tone. To help you find real, actionable results, we tested and reviewed the top 5 color analysis tools available online today based on precision, technology, and user experience.</p>
 
       <h3>1. ColorAnalysisQuiz.app (Best Overall Precision)</h3>
-      <p>Taking the top spot for 2026 is <a href="/quiz">ColorAnalysisQuiz.app</a>. Unlike simple surveys, this platform utilizes advanced neural networks and computer vision to analyze your uploaded photo.</p>
+      <p>Taking the top spot for 2026 is <a href="/analysis">ColorAnalysisQuiz.app</a>. Unlike simple surveys, this platform utilizes advanced neural networks and computer vision to analyze your uploaded photo.</p>
       <ul>
         <li><strong>How it works:</strong> It scans the hexadecimal pixel values of your skin, hair, and eyes, bypassing human bias.</li>
         <li><strong>Accuracy:</strong> 9.8/10. It accounts for complex factors like olive overtones that trip up simpler apps.</li>
@@ -364,7 +364,7 @@ export const blogPosts = [
 
       <h2>Why True AI Precision Matters</h2>
       <p>Choosing the wrong season can lead to expensive mistakes—buying a whole new capsule wardrobe or dyeing your hair a color that makes you look exhausted. When looking for the best free color analysis quiz, prioritize tools that process raw image data without applying beauty filters, and that output results into the professional 12-season framework.</p>
-      <p>Ready to get started? <a href="/quiz">Take our #1 ranked AI Color Analysis Quiz today</a> and discover your true palette.</p>
+      <p>Ready to get started? <a href="/analysis">Take our #1 ranked AI Color Analysis Quiz today</a> and discover your true palette.</p>
     `,
   },
   {
@@ -510,7 +510,7 @@ export const blogPosts = [
         <li><strong>Look 2: The Office Professional:</strong> A dusty rose blouse under a soft brown blazer.</li>
         <li><strong>Look 3: Evening Elegance:</strong> A slip dress in deep moss green paired with muted gold jewelry.</li>
       </ul>
-      <p>Want to see if these colors actually match you? Try our <a href="/quiz">AI Color Analysis Quiz</a>.</p>
+      <p>Want to see if these colors actually match you? Try our <a href="/analysis">AI Color Analysis Quiz</a>.</p>
     `
   },
   {
@@ -544,7 +544,7 @@ export const blogPosts = [
         <li><strong>Autumns:</strong> You shine in olive, brown, and warm beige.</li>
         <li><strong>Springs:</strong> Light grey, warm navy, and cream are your best bets.</li>
       </ul>
-      <p>Get a precise breakdown of your ideal suit colors with our <a href="/quiz">AI Color Analysis tool</a>.</p>
+      <p>Get a precise breakdown of your ideal suit colors with our <a href="/analysis">AI Color Analysis tool</a>.</p>
     `
   },
   {
@@ -559,7 +559,7 @@ export const blogPosts = [
       <p>True Autumns are the classic fall leaves. Their colors are rich, deep, and spicy. They look amazing in dark rust, mustard yellow, and deep chocolate brown.</p>
       <h3>Soft Autumn: Dusty and Blended</h3>
       <p>Soft Autumns have a much lower contrast. Their colors are faded and grayish. They look best in sage green, dusty rose, and light camel. A True Autumn's mustard yellow would completely overpower a Soft Autumn.</p>
-      <p>If you're still unsure, let our <a href="/quiz">AI Scanner</a> do the math for you.</p>
+      <p>If you're still unsure, let our <a href="/analysis">AI Scanner</a> do the math for you.</p>
     `
   }
 ];

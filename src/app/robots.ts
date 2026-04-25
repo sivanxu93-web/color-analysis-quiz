@@ -10,8 +10,8 @@ export default function robots(): MetadataRoute.Robots {
       disallow: [
           '/api/', 
           '/_next/', 
-          '/profile', // Private user pages
-          '/report/' // Reports are usually private unless shared, but let's disallow to save crawl budget on dynamic infinite pages
+          '/profile', // Private user profile
+          '/admin' // Admin routes if any
       ],
     },
     sitemap: `${baseUrl}/sitemap.xml`,

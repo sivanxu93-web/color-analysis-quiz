@@ -26,7 +26,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                 </p>
                 <div className="pt-8">
                     <Link 
-                        href={getLinkHref(locale, 'quiz')}
+                        href={getLinkHref(locale, 'analysis')}
                         className="inline-block px-12 py-5 bg-[#2D2D2D] text-white rounded-full font-black text-xs md:text-sm uppercase tracking-[0.3em] shadow-[0_20px_40px_-15px_rgba(45,45,45,0.4)] hover:shadow-[0_30px_60px_-15px_rgba(45,45,45,0.6)] hover:-translate-y-1 transition-all active:scale-95"
                     >
                         Start Free AI Scan
@@ -233,7 +233,7 @@ export default function PageComponent({ locale }: { locale: string }) {
         <section className="py-32 bg-white text-center px-6">
             <h2 className="text-4xl md:text-6xl font-serif font-bold italic tracking-tighter text-[#1A1A2E] mb-10">Stop Asking, Start Knowing.</h2>
             <Link 
-                href={getLinkHref(locale, 'quiz')}
+                href={getLinkHref(locale, 'analysis')}
                 className="inline-block px-12 py-5 bg-[#E88D8D] text-white rounded-full font-black text-sm uppercase tracking-[0.3em] shadow-xl hover:bg-[#D67474] hover:scale-105 transition-all active:scale-95"
             >
                 Take The Quiz Now
