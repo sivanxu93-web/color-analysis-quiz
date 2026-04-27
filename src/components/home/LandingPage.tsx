@@ -92,15 +92,15 @@ export default function PageComponent({
                 </div>
                 
                 {/* Hero Image / Visual */}
-                <div className="flex-1 relative w-full aspect-square md:aspect-[3/4]">
-                    <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500 h-full w-full">
+                <div className="flex-1 relative w-full">
+                    <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
                         <Image 
                             src="/seasonal_color_analysis.jpg" 
                             alt="AI Color Analysis Quiz - Seasonal Palette Results" 
-                            fill
-                            sizes="(max-width: 768px) 100vw, 50vw"
+                            width={1080}
+                            height={1350}
                             priority
-                            className="object-cover" 
+                            className="w-full h-auto" 
                         />
                     </div>
                 </div>
