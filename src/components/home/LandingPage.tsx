@@ -7,6 +7,7 @@ import { useCommonContext } from '~/context/common-context';
 import { useState, useEffect } from 'react';
 import { SEO_EXAMPLES } from '~/libs/examples';
 import Image from 'next/image';
+import ReactMarkdown from 'react-markdown';
 
 export default function PageComponent({
   locale,
@@ -201,20 +202,20 @@ export default function PageComponent({
                     {colorLabText.Landing.seoContent?.title}
                 </h2>
                 
-                <div className="prose prose-lg mx-auto text-text-secondary">
+                <div className="prose prose-lg mx-auto text-text-secondary max-w-none">
                     <div className="mb-10">
                         <h3 className="text-2xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section1Title}</h3>
-                        <p>{colorLabText.Landing.seoContent?.section1Body}</p>
+                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section1Body}</ReactMarkdown>
                     </div>
                     
                     <div className="mb-10">
                         <h3 className="text-2xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section2Title}</h3>
-                        <div className="markdown-body" dangerouslySetInnerHTML={{ __html: colorLabText.Landing.seoContent?.section2Body.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section2Body}</ReactMarkdown>
                     </div>
 
                     <div>
                         <h3 className="text-2xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section3Title}</h3>
-                        <p>{colorLabText.Landing.seoContent?.section3Body}</p>
+                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section3Body}</ReactMarkdown>
                     </div>
                 </div>
             </div>

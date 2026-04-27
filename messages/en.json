@@ -132,10 +132,10 @@
     "Landing": {
       "title": "Free Color Analysis Quiz | AI Seasonal Color Palette Test",
       "description": "Take the most accurate Color Analysis Quiz online. Discover your seasonal palette (Spring, Summer, Autumn, or Winter) in seconds with our AI Stylist. Free results.",
-      "h1": "The #1 Accurate AI Color Analysis Quiz",
+      "h1": "The Most Accurate AI Color Analysis Quiz",
       "h2": "How Our Color Analysis Quiz Works",
       "h2_2": "Why Choose an AI Color Analysis Over a Stylist?",
-      "uploadBtn": "Start My Free Quiz",
+      "uploadBtn": "Start My Analysis",
       "feature1Title": "AI Virtual Draping",
       "feature1Desc": "Don't just read about it—see it. Our AI simulates high-fashion draping on your actual photo to prove which colors make you glow.",
       "feature2Title": "Professional Color Palette",
@@ -148,15 +148,15 @@
       "step2": "AI Analysis",
       "step2Desc": "We analyze your skin, eyes, and hair contrast to determine your season.",
       "step3": "Visual Reveal",
-      "step3Desc": "See the before/after difference and unlock your full style guide.",
+      "step3Desc": "See the before/after difference and unlock your professional style guide.",
       "seoContent": {
         "title": "Everything You Need to Know About Personal Color Analysis",
-        "section1Title": "What is a Color Analysis Quiz?",
-        "section1Body": "A color analysis quiz is a tool designed to identify your personal color season—Spring, Summer, Autumn, or Winter. Based on the 12-season color theory, it analyzes the undertones of your skin (warm, cool, or neutral), the contrast of your features, and the intensity of your eye and hair color. While traditional analysis requires an in-person appointment with a stylist, our **AI Color Analysis Quiz** uses advanced computer vision to perform this assessment in seconds, offering a fast, free, and accurate alternative.",
-        "section2Title": "How to Do Your Own Color Analysis?",
-        "section2Body": "If you want to try a DIY approach before using our AI, here are the basics: 1. **Vein Test:** Look at the veins on your wrist. Green veins suggest a Warm undertone; blue/purple veins suggest Cool. 2. **Jewelry Test:** Does silver (Cool) or gold (Warm) make your skin glow? 3. **Contrast:** Do you have a high contrast between your hair and skin (like Snow White) or low contrast? Combining these factors helps pinpoint your season. However, human bias often leads to incorrect results—which is why our objective **AI Color Analysis** is often more reliable.",
-        "section3Title": "Korean Color Analysis Trend",
-        "section3Body": "Korean Personal Color Analysis has exploded in popularity thanks to K-pop idols and social media. It places a heavy emphasis on skin clarity and brightness. Our tool incorporates these modern K-beauty standards, helping you find colors that not only match your season but also enhance your natural complexion, giving you that 'glass skin' effect."
+        "section1Title": "What is an AI Color Analysis Quiz?",
+        "section1Body": "A professional color analysis quiz is a tool designed to instantly identify your personal color season—Spring, Summer, Autumn, or Winter. Based on the Munsell color system and 12-season color theory, it analyzes the undertones of your skin (warm, cool, or neutral), the contrast of your facial features, and the intensity of your eye and hair color. While traditional analysis requires an expensive in-person appointment with a stylist, our **AI Color Analysis App** uses advanced computer vision to extract your precise hex pixel data in seconds. Whether you are looking for a color analysis for men or a comprehensive styling guide for women, our tool offers a fast, objective, and highly accurate alternative to human guesswork.",
+        "section2Title": "How to Do a Color Analysis Test at Home?",
+        "section2Body": "If you want to try a DIY approach before using our AI, here are the basics:\n\n1. **Vein Test:** Look at the veins on your wrist. Green veins suggest a Warm undertone; blue/purple veins suggest Cool.\n2. **Jewelry Test:** Does silver (Cool) or gold (Warm) make your skin glow?\n3. **Contrast:** Do you have a high contrast between your hair and skin (like Snow White) or low contrast?\n\nCombining these factors helps pinpoint your season. However, human bias often leads to incorrect results—which is why taking a color analysis test photo and running it through our objective AI is the most reliable method.",
+        "section3Title": "The Rise of Korean Color Analysis",
+        "section3Body": "Korean color analysis quiz trends have exploded in popularity recently thanks to K-pop idols and social media influencers. The Korean system places a heavy emphasis on skin clarity, brightness, and achieving a 'glass skin' effect by neutralizing unwanted yellow overtones. Our AI tool incorporates these modern K-beauty standards, helping you find colors that not only match your traditional 12-season profile but also enhance your natural complexion for maximum radiance."
       }
     },
     "Analysis": {
