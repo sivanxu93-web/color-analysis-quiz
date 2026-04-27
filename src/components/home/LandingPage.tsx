@@ -232,8 +232,15 @@ export default function PageComponent({
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "4.90",
+                  "price": "8.90",
                   "priceCurrency": "USD"
+                },
+                "aggregateRating": {
+                  "@type": "AggregateRating",
+                  "ratingValue": "4.9",
+                  "reviewCount": "13628",
+                  "bestRating": "5",
+                  "worstRating": "1"
                 }
               })
             }}
@@ -246,19 +253,19 @@ export default function PageComponent({
                 "@type": "FAQPage",
                 "mainEntity": [{
                   "@type": "Question",
-                  "name": "How does the Color Analysis Quiz work?",
+                  "name": "How much does an AI color analysis cost?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Simply upload a photo in natural lighting. Our AI analyzes your skin tone, eye color, and hair to determine your seasonal palette and generate a personalized report."
+                    "text": "While traditional in-person color analysis can cost up to $300, our professional AI color analysis provides a comprehensive 30-page digital style guide, including your exact 12-season palette and virtual draping, for a small fraction of the cost."
                   }
                 }, {
                   "@type": "Question",
-                  "name": "How accurate is AI color analysis?",
+                  "name": "How accurate is an AI color analysis quiz?",
                   "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Our AI is trained on professional color theory and thousands of verified seasonal profiles, providing an objective and highly accurate assessment compared to human bias."
+                    "text": "Our AI is trained on the Munsell color system and thousands of professional draping sessions. By extracting the exact hex pixel codes from your uploaded color analysis test photo, the AI bypasses subjective human bias, making it highly objective and accurate compared to traditional styling."
                   }
-                }, {
+                }]
                   "@type": "Question",
                   "name": "Is the analysis free?",
                   "acceptedAnswer": {
