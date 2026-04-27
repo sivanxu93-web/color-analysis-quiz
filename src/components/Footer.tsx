@@ -76,7 +76,6 @@ export default function Footer({
                     <Link
                       href={getLinkHref(locale, 'blog')}
                       className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('blog')}
                     >
                       {menuText.header4}
                     </Link>
@@ -85,7 +84,6 @@ export default function Footer({
                     <Link
                       href={getLinkHref(locale, 'examples')}
                       className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('examples')}
                     >
                       {menuText.header5}
                     </Link>
