@@ -6,6 +6,7 @@ import { getLinkHref } from '~/configs/buildLink';
 import { useCommonContext } from '~/context/common-context';
 import { useState, useEffect } from 'react';
 import { SEO_EXAMPLES } from '~/libs/examples';
+import Image from 'next/image';
 
 export default function PageComponent({
   locale,
@@ -90,12 +91,15 @@ export default function PageComponent({
                 </div>
                 
                 {/* Hero Image / Visual */}
-                <div className="flex-1 relative w-full">
-                    <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500">
-                        <img 
+                <div className="flex-1 relative w-full aspect-square md:aspect-[3/4]">
+                    <div className="relative z-10 rounded-2xl overflow-hidden shadow-2xl border-4 border-white rotate-2 hover:rotate-0 transition-transform duration-500 h-full w-full">
+                        <Image 
                             src="/seasonal_color_analysis.jpg" 
                             alt="AI Color Analysis Quiz - Seasonal Palette Results" 
-                            className="w-full h-auto object-cover" 
+                            fill
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                            priority
+                            className="object-cover" 
                         />
                     </div>
                 </div>
@@ -118,7 +122,7 @@ export default function PageComponent({
                             className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1"
                         >
                             <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
-                                <img src={item.imageUrl} alt={item.season} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                <Image src={item.imageUrl} alt={item.season} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
                                 <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                                     <h3 className="text-2xl font-serif font-bold leading-tight">
