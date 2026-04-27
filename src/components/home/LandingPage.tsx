@@ -232,7 +232,7 @@ export default function PageComponent({
                 "operatingSystem": "Web",
                 "offers": {
                   "@type": "Offer",
-                  "price": "8.90",
+                  "price": "4.90",
                   "priceCurrency": "USD"
                 },
                 "aggregateRating": {
@@ -265,7 +265,7 @@ export default function PageComponent({
                     "@type": "Answer",
                     "text": "Our AI is trained on the Munsell color system and thousands of professional draping sessions. By extracting the exact hex pixel codes from your uploaded color analysis test photo, the AI bypasses subjective human bias, making it highly objective and accurate compared to traditional styling."
                   }
-                }]
+                }, {
                   "@type": "Question",
                   "name": "Is the analysis free?",
                   "acceptedAnswer": {
