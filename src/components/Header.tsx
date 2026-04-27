@@ -62,7 +62,7 @@ export default function Header({
           <Link
             href={getLinkHref(locale, '')}
             className="-m-1.5 p-1.5 flex items-center gap-2 active:opacity-70 transition-opacity"
-            onClick={() => checkPageAndLoading('')}>
+          >
             <span className="font-serif text-2xl font-bold text-[#1A1A2E] tracking-tight">
               Color Analysis <span className="text-primary">Quiz</span>
             </span>
@@ -85,13 +85,11 @@ export default function Header({
         <div className="hidden lg:flex lg:gap-x-10">
           <Link
             href={getLinkHref(locale, '')}
-            onClick={() => checkPageAndLoading('')}
             className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
             {menuText.header0}
           </Link>
           <Link
             href={getLinkHref(locale, 'validator')}
-            onClick={() => checkPageAndLoading('validator')}
             className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
             {menuText.header1}
           </Link>
@@ -99,14 +97,12 @@ export default function Header({
             userData.email ?
             <Link
                 href={getLinkHref(locale, 'analysis')} 
-                onClick={() => checkPageAndLoading('analysis')}
                 className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
                 {menuText.header2}
             </Link> : null
            }
           <Link
             href={getLinkHref(locale, 'pricing')}
-            onClick={() => checkPageAndLoading('pricing')}
             className="text-sm font-medium leading-6 text-gray-600 hover:text-primary transition-colors">
             {menuText.header3}
           </Link>

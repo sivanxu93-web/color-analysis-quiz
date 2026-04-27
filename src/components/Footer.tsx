@@ -112,49 +112,45 @@ export default function Footer({
                         <Link
                           href={getLinkHref(locale, 'pricing')}
                           className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                          onClick={()=>checkPageAndLoading('pricing')}
                         >
                           {menuText.footerSupport0}
                         </Link>
-                      </li>
-                      :
-                      null
-                  }
-                  {
-                    userData && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
-                      <li>
+                        </li>
+                        :
+                        null
+                        }
+                        {
+                        userData && process.env.NEXT_PUBLIC_CHECK_AVAILABLE_TIME != '0' ?
+                        <li>
                         <a
                           onClick={() => manageSubscribe()}
                           className="cursor-pointer text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]">
                           {menuText.footerSupport1}
                         </a>
-                      </li>
-                      :
-                      null
-                  }
-                </ul>
-              </div>
-              <div className="mt-10 md:mt-0">
-                <div className="text-sm font-semibold leading-6 text-white">{menuText.footerLegal}</div>
-                <ul role="list" className="mt-6 space-y-4">
-                  <li>
-                    <Link
-                      href={getLinkHref(locale, 'privacy-policy')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('privacy-policy')}
-                    >
-                      {menuText.footerLegal0}
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      href={getLinkHref(locale, 'terms-of-service')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
-                      onClick={()=>checkPageAndLoading('terms-of-service')}
-                    >
-                      {menuText.footerLegal1}
-                    </Link>
-                  </li>
+                        </li>
+                        :
+                        null
+                        }
+                        </ul>
+                        </div>
+                        <div className="mt-10 md:mt-0">
+                        <div className="text-sm font-semibold leading-6 text-white">{menuText.footerLegal}</div>
+                        <ul role="list" className="mt-6 space-y-4">
+                        <li>
+                        <Link
+                        href={getLinkHref(locale, 'privacy-policy')}
+                        className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                        >
+                        {menuText.footerLegal0}
+                        </Link>
+                        </li>
+                        <li>
+                        <Link
+                        href={getLinkHref(locale, 'terms-of-service')}
+                        className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                        >
+                        {menuText.footerLegal1}
+                        </Link>                  </li>
                 </ul>
               </div>
             </div>
