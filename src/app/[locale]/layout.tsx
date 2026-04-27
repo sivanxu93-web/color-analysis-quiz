@@ -91,10 +91,8 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${inter.variable} ${playfair.variable}`}>
-      <head>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
-      </head>
       <body suppressHydrationWarning={true} className={clsx('flex flex-col min-h-screen bg-[#FFFBF7] text-[#1A1A2E]')}>
+        <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         <NextAuthProvider>
           <CommonProvider
             commonText={commonText}
@@ -109,9 +107,9 @@ export default async function LocaleLayout({
         <MicrosoftClarity />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17982041169"
-          strategy="afterInteractive"
+          strategy="lazyOnload"
         />
-        <Script id="google-ads-init" strategy="afterInteractive">
+        <Script id="google-ads-init" strategy="lazyOnload">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
