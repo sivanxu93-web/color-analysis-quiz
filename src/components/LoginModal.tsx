@@ -12,12 +12,14 @@ const LoginModal = ({
                       loginModalTitle,
                       loginModalDesc,
                       loginModalButtonText,
+                      isDismissible = true,
                     }: {
                         loadingText: string,
                         redirectPath: string,
                         loginModalTitle: string,
                         loginModalDesc: string,
-                        loginModalButtonText: string
+                        loginModalButtonText: string,
+                        isDismissible?: boolean
                     }) => {
 
   const [loadGoogle, setLoadGoogle] = useState(false)
@@ -26,7 +28,15 @@ const LoginModal = ({
 
   return (
     <Transition.Root show={showLoginModal} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={setShowLoginModal}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={(open) => {
+          if (isDismissible) {
+            setShowLoginModal(open);
+          }
+        }}
+      >
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"

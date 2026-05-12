@@ -48,6 +48,7 @@ export default function Header({
         loginModalTitle={authText.loginModalTitle}
         loginModalDesc={authText.loginModalDesc}
         loginModalButtonText={authText.loginModalButtonText}
+        isDismissible={page !== 'report'}
       />
       <LogoutModal
         logoutModalDesc={authText.logoutModalDesc}
