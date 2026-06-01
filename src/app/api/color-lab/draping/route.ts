@@ -37,19 +37,19 @@ export async function POST(req: NextRequest) {
     // SECURITY CHECK: Verify session status is 'completed' (Paid)
     const sessionRes = await db.query(
       "select status from color_lab_sessions where id = $1",
-      [sessionId]
+      [sessionId],
     );
 
     if (sessionRes.rowCount === 0) {
-        return NextResponse.json({ error: "Session not found" }, { status: 404 });
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
-    if (sessionRes.rows[0].status !== 'completed') {
-        console.warn(`Blocked draping attempt for unpaid session: ${sessionId}`);
-        return NextResponse.json(
-            { error: "Payment required to unlock virtual draping." }, 
-            { status: 403 }
-        );
+    if (sessionRes.rows[0].status !== "completed") {
+      console.warn(`Blocked draping attempt for unpaid session: ${sessionId}`);
+      return NextResponse.json(
+        { error: "Payment required to unlock virtual draping." },
+        { status: 403 },
+      );
     }
 
     // CHECK CACHE: Check if draping image already exists
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Using gemini-3-pro-image-preview which supports image generation
     const model = genAI.getGenerativeModel({
-      model: "gemini-3-pro-image-preview",
+      model: "gemini-3.5-flash",
     });
 
     const fullPrompt = `STRICT IMAGE EDITING INSTRUCTION FOR 'COLOR ANALYSIS QUIZ'.
@@ -120,7 +120,6 @@ export async function POST(req: NextRequest) {
     STYLE: Professional, photorealistic studio result. NO filters. NO AI-generated faces.
     
     FINAL COMMAND: "Modify only the clothing to ${prompt} and apply the specified subtle makeup. Everything else must remain pixel-perfect identical to the original."`;
-
 
     console.log(`Calling Gemini (${type})...`);
     console.time(`Gemini-Gen-${type}`);
@@ -140,7 +139,9 @@ export async function POST(req: NextRequest) {
     } catch (geminiError: any) {
       console.error("Gemini API Technical Error:", geminiError);
       // Bragging about high volume while masking the technical error
-      throw new Error("Wow! We're experiencing overwhelming demand from our global community. Our AI stylists are working at maximum capacity—please give us a few seconds and try again!");
+      throw new Error(
+        "Wow! We're experiencing overwhelming demand from our global community. Our AI stylists are working at maximum capacity—please give us a few seconds and try again!",
+      );
     }
     console.timeEnd(`Gemini-Gen-${type}`);
 

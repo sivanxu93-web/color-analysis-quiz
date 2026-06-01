@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
     if (!sessionId || !imageUrl) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -112,52 +112,52 @@ export async function POST(req: NextRequest) {
     if (!email) {
       return NextResponse.json(
         { error: "Please login to continue." },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     // 1. Get User ID
     const userRes = await db.query(
       "select user_id from user_info where email = $1",
-      [email]
+      [email],
     );
     if (userRes.rows.length === 0) {
       return NextResponse.json(
         { error: "User not found. Please login again." },
-        { status: 401 }
+        { status: 401 },
       );
     }
     const userId = userRes.rows[0].user_id;
 
     // 2. CHECK FOR EXISTING PENDING REPORTS (Anti-Abuse & Conversion Logic)
     // User can only have ONE pending (protected/analyzing) report at a time.
-    // CRITICAL: Exclude the *current* session ID to prevent self-conflict if the API is called twice 
+    // CRITICAL: Exclude the *current* session ID to prevent self-conflict if the API is called twice
     // or if the session was already marked 'analyzing'.
     const pendingRes = await db.query(
-        `SELECT id FROM color_lab_sessions 
+      `SELECT id FROM color_lab_sessions 
          WHERE email = $1 
          AND (status = 'protected' OR status = 'analyzing')
          AND id != $2
          LIMIT 1`,
-        [email, sessionId]
+      [email, sessionId],
     );
 
     if (pendingRes.rows.length > 0) {
-        // Conflict detected!
-        // Delete the *current* session so it doesn't leave a zombie draft.
-        await db.query(
-            "DELETE FROM color_lab_sessions WHERE id = $1 AND email = $2",
-            [sessionId, email]
-        );
+      // Conflict detected!
+      // Delete the *current* session so it doesn't leave a zombie draft.
+      await db.query(
+        "DELETE FROM color_lab_sessions WHERE id = $1 AND email = $2",
+        [sessionId, email],
+      );
 
-        return NextResponse.json(
-            { 
-                error: "You already have a pending report.", 
-                code: "PENDING_REPORT_EXISTS",
-                sessionId: pendingRes.rows[0].id 
-            },
-            { status: 409 }
-        );
+      return NextResponse.json(
+        {
+          error: "You already have a pending report.",
+          code: "PENDING_REPORT_EXISTS",
+          sessionId: pendingRes.rows[0].id,
+        },
+        { status: 409 },
+      );
     }
 
     // 3. Check Credits - REMOVED for Teaser Model
@@ -176,7 +176,7 @@ export async function POST(req: NextRequest) {
       // Also add to waitlist for marketing
       await db.query(
         "insert into color_lab_waitlist(email, locale, interest) values($1, $2, $3) ON CONFLICT (email) DO NOTHING",
-        [email, "en", "color-lab-report"]
+        [email, "en", "color-lab-report"],
       );
     }
 
@@ -201,10 +201,10 @@ export async function POST(req: NextRequest) {
     // Call Gemini
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-3-pro-preview",
-      generationConfig: { 
-          responseMimeType: "application/json",
-          temperature: 0.0 // Reduce randomness
+      model: "gemini-3.1-pro-preview",
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0.0, // Reduce randomness
       },
     });
 
@@ -230,11 +230,11 @@ export async function POST(req: NextRequest) {
 
     // Save report to DB with 'protected' status (Teaser Mode)
     await saveColorLabReport(
-        sessionId, 
-        analysisResult.season, 
-        analysisResult, 
-        'protected', 
-        imageUrl
+      sessionId,
+      analysisResult.season,
+      analysisResult,
+      "protected",
+      imageUrl,
     );
 
     // Update session status to 'protected' explicitly
