@@ -7,7 +7,7 @@ export async function generateMetadata({ params: { locale } }: { params: { local
 
   return {
     title: `What Season Am I? Take the AI Color Analysis Test`,
-    description: `Stop wondering 'what season am I'. Take our free AI color analysis quiz to discover your exact 12-season palette, best colors, and makeup shades.`,
+    description: `Stop wondering 'what season am I'. Take our professional AI color analysis quiz to discover your exact 12-season palette, best colors, and makeup shades.`,
     alternates: {
         canonical: pageUrl
     }

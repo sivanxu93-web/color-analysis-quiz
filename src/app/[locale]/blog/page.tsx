@@ -4,9 +4,15 @@ import Link from 'next/link';
 import { blogPosts } from '~/libs/blogData';
 import { getLinkHref } from '~/configs/buildLink';
 
-export const metadata = {
-  title: 'Color Analysis Blog | Tips, Guides & Trends',
-  description: 'Learn everything about seasonal color analysis, DIY tests, and the latest trends in personal style.',
+import { Metadata } from 'next';
+import { getSeoAlternates } from '~/libs/seo';
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  return {
+    title: 'Color Analysis Blog | Tips, Guides & Trends',
+    description: 'Learn everything about seasonal color analysis, DIY tests, and the latest trends in personal style.',
+    alternates: getSeoAlternates('/blog', locale),
+  }
 }
 
 export default function BlogIndex({

@@ -5,10 +5,15 @@ import { getLinkHref } from '~/configs/buildLink';
 import { SEO_EXAMPLES, ExampleItem } from '~/libs/examples';
 import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Color Analysis Examples & Sample Reports | AI Color Palette',
-  description: 'Browse real color analysis results categorized by Spring, Summer, Autumn, and Winter. See how our AI determines seasonal color palettes.',
-};
+import { getSeoAlternates } from '~/libs/seo';
+
+export async function generateMetadata({ params: { locale } }: { params: { locale: string } }): Promise<Metadata> {
+  return {
+    title: 'Color Analysis Examples & Sample Reports | AI Color Palette',
+    description: 'Browse real color analysis results categorized by Spring, Summer, Autumn, and Winter. See how our AI determines seasonal color palettes.',
+    alternates: getSeoAlternates('/examples', locale),
+  };
+}
 
 export default function ExamplesPage({
   params: { locale }

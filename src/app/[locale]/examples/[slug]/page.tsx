@@ -72,7 +72,7 @@ export default async function ExamplePage({
       status: 'completed'
   };
 
-  const seoText = getSeoText(slug);
+  const seoText = getSeoText(slug, locale);
 
   return (
     <PageComponent 
