@@ -60,10 +60,10 @@ export async function generateMetadata({ params: { locale } }: Props): Promise<M
     },
     alternates: {
       canonical: canonicalUrl,
-      languages: {
-        'en': baseUrl,
-        'zh': `${baseUrl}/zh`,
-      }
+      languages: locales.reduce((acc, l) => {
+        acc[l as string] = l === 'en' ? baseUrl : `${baseUrl}/${l}`;
+        return acc;
+      }, {} as Record<string, string>)
     },
     icons: {
       icon: '/favicon.ico',

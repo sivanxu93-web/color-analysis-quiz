@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+import { locales } from "~/i18n/config";
+
 const BASE_URL = 'https://coloranalysisquiz.app';
 
 /**
@@ -11,10 +13,10 @@ export function getSeoAlternates(path: string, locale: string) {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   const finalPath = cleanPath === '/' ? '' : cleanPath;
 
-  const languages: Record<string, string> = {
-    'en': `${BASE_URL}${finalPath}`,
-    'zh': `${BASE_URL}/zh${finalPath}`,
-  };
+  const languages: Record<string, string> = {};
+  locales.forEach((l) => {
+    languages[l] = l === 'en' ? `${BASE_URL}${finalPath}` : `${BASE_URL}/${l}${finalPath}`;
+  });
 
   return {
     canonical: locale === 'en' || locale === '' ? `${BASE_URL}${finalPath}` : `${BASE_URL}/${locale}${finalPath}`,

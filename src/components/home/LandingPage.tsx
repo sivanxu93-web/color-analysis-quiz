@@ -152,7 +152,7 @@ export default function PageComponent({
 
                 <div className="mt-16 text-center">
                     <Link 
-                        href={getLinkHref(locale, 'quiz')}
+                        href={getLinkHref(locale, 'analysis')}
                         className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-[#1A1A2E] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#2D2D2D] hover:scale-105 transition-all shadow-xl"
                     >
                         Don&apos;t know your season? Take the AI Quiz

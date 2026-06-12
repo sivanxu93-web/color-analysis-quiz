@@ -1,11 +1,108 @@
 'use client'
+import { useState } from 'react';
 import Header from '~/components/Header';
 import Footer from '~/components/Footer';
 import Link from 'next/link';
 import { getLinkHref } from '~/configs/buildLink';
 import Image from 'next/image';
 
+const QUESTIONS = [
+  {
+    id: 1,
+    question: "1. The Undertone Test: How does your skin react to direct sun?",
+    options: [
+      { text: "I burn easily, turn red, and rarely tan", value: "cool" },
+      { text: "I tan easily, rarely burn, and golden up quickly", value: "warm" },
+      { text: "I burn first, but it turns into a nice tan later", value: "neutral" }
+    ]
+  },
+  {
+    id: 2,
+    question: "2. The Metal Test: Which jewelry color makes your skin look healthier?",
+    options: [
+      { text: "Cool Silver or Platinum - makes me look clear and awake", value: "cool" },
+      { text: "Warm Yellow Gold - gives me an instant healthy glow", value: "warm" },
+      { text: "Both look equally great on me", value: "neutral" }
+    ]
+  },
+  {
+    id: 3,
+    question: "3. The Fabric Contrast Test: Stark White vs. Ivory Cream?",
+    options: [
+      { text: "Stark pure white looks clean; cream washes me out", value: "cool" },
+      { text: "Cream/ivory makes me glow; stark white looks harsh", value: "warm" },
+      { text: "Both look okay, but I prefer muted heather grey", value: "neutral" }
+    ]
+  },
+  {
+    id: 4,
+    question: "4. Contrast Level: Describe the natural contrast in your features",
+    options: [
+      { text: "High contrast (e.g., very dark eyes/hair + fair skin)", value: "bright" },
+      { text: "Low contrast (e.g., overall sandy blonde, soft eyes, light skin)", value: "muted" },
+      { text: "Medium contrast (balanced brown hair/eyes and golden skin)", value: "medium" }
+    ]
+  }
+];
+
 export default function PageComponent({ locale }: { locale: string }) {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [answers, setAnswers] = useState<string[]>([]);
+  const [result, setResult] = useState<string | null>(null);
+
+  const handleSelectOption = (val: string) => {
+    const updatedAnswers = [...answers, val];
+    setAnswers(updatedAnswers);
+
+    if (currentStep < QUESTIONS.length - 1) {
+      setCurrentStep(currentStep + 1);
+    } else {
+      // Calculate Result
+      calculateResult(updatedAnswers);
+    }
+  };
+
+  const calculateResult = (finalAnswers: string[]) => {
+    let coolCount = 0;
+    let warmCount = 0;
+    let neutralCount = 0;
+    let contrast = "medium";
+
+    finalAnswers.forEach((ans, index) => {
+      if (index < 3) {
+        if (ans === "cool") coolCount++;
+        else if (ans === "warm") warmCount++;
+        else neutralCount++;
+      } else {
+        contrast = ans; // The 4th question is contrast
+      }
+    });
+
+    let season = "";
+    if (coolCount > warmCount) {
+      season = contrast === "bright" ? "True/Deep Winter" : "Soft/Light Summer";
+    } else if (warmCount > coolCount) {
+      season = contrast === "bright" ? "Bright Spring" : "True/Soft Autumn";
+    } else {
+      // Neutral leanings
+      if (contrast === "bright") {
+        season = "Bright Spring / Clear Winter (Neutral-Cool/Warm)";
+      } else if (contrast === "muted") {
+        season = "Soft Summer / Soft Autumn (Neutral Muted)";
+      } else {
+        season = "True Spring / True Summer (Neutral Balance)";
+      }
+    }
+
+    setResult(season);
+  };
+
+  const resetQuiz = () => {
+    setCurrentStep(0);
+    setAnswers([]);
+    setResult(null);
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF9F6] text-[#2D2D2D] font-sans">
       <Header locale={locale} page="what-season-am-i" />
@@ -45,6 +142,92 @@ export default function PageComponent({ locale }: { locale: string }) {
                     </div>
                 </div>
             </div>
+        </section>
+
+        {/* Interactive Self-Test Section */}
+        <section className="py-20 bg-white border-b border-gray-50">
+          <div className="max-w-3xl mx-auto px-6">
+            <div className="text-center mb-12 space-y-4">
+              <span className="font-mono text-[10px] font-black text-[#E88D8D] uppercase tracking-[0.3em]">Quick Evaluation</span>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold italic text-[#1A1A2E]">
+                Don&apos;t want to upload a photo? Take the Quick 60-Second Self-Test
+              </h2>
+              <p className="text-gray-500 text-sm max-w-lg mx-auto">
+                Answer 4 simple draping questions to see which seasonal color family you likely belong to.
+              </p>
+            </div>
+
+            <div className="bg-[#FAF9F6] border border-gray-100 rounded-[2.5rem] p-8 md:p-12 shadow-sm relative overflow-hidden min-h-[350px] flex flex-col justify-between">
+              
+              {!result ? (
+                <>
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200/60 rounded-full h-1.5 mb-8">
+                    <div 
+                      className="bg-[#E88D8D] h-1.5 rounded-full transition-all duration-500" 
+                      style={{ width: `${((currentStep + 1) / QUESTIONS.length) * 100}%` }}
+                    ></div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xl md:text-2xl font-serif font-bold text-[#1A1A2E] leading-relaxed">
+                      {QUESTIONS[currentStep].question}
+                    </h3>
+
+                    <div className="grid grid-cols-1 gap-4 pt-4">
+                      {QUESTIONS[currentStep].options.map((opt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleSelectOption(opt.value)}
+                          className="w-full text-left p-5 bg-white border border-gray-200/60 rounded-2xl hover:border-[#E88D8D] hover:bg-[#E88D8D]/5 transition-all text-sm md:text-base font-medium text-gray-700 hover:text-[#1A1A2E] shadow-sm transform hover:-translate-y-0.5 active:scale-[0.98]"
+                        >
+                          {opt.text}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="mt-8 flex justify-between items-center text-xs text-gray-400 font-mono">
+                    <span>Question {currentStep + 1} of {QUESTIONS.length}</span>
+                    <span>No personal data collected</span>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-8 py-4 text-center">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#E88D8D]/15 text-[#E88D8D] rounded-full mb-2">
+                    <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <span className="text-xs font-mono uppercase tracking-widest text-gray-400">Your Preliminary Season Matches</span>
+                    <h3 className="text-3xl md:text-4xl font-serif font-bold italic text-[#1A1A2E]">
+                      {result}
+                    </h3>
+                    <p className="text-gray-500 text-sm max-w-md mx-auto leading-relaxed">
+                      Based on your answers, you lean towards the {result.includes("Winter") || result.includes("Summer") ? "Cool" : "Warm"} color family. However, human eyes are easily tricked by bad bathroom lighting.
+                    </p>
+                  </div>
+
+                  <div className="pt-4 flex flex-col sm:flex-row gap-4 justify-center items-center">
+                    <Link 
+                      href={getLinkHref(locale, 'analysis')}
+                      className="px-8 py-4 bg-[#1A1A2E] text-white rounded-full font-bold text-xs uppercase tracking-widest hover:bg-[#2D2D2D] hover:scale-105 transition-all shadow-md w-full sm:w-auto"
+                    >
+                      Verify with 99.8% AI Precision Scan
+                    </Link>
+                    <button 
+                      onClick={resetQuiz}
+                      className="px-8 py-4 border border-gray-300 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-gray-100 text-gray-600 w-full sm:w-auto"
+                    >
+                      Retake Test
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
         </section>
 
         {/* The 4 Main Seasons at a Glance */}
