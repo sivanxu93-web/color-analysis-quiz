@@ -42,7 +42,7 @@ export default function Footer({
   }
 
   return (
-    <footer aria-labelledby="footer-heading" className="bg-[#1A1A2E]">
+    <footer aria-labelledby="footer-heading" className="bg-[#2D2926]">
       <div id="footer-heading" className="sr-only">
         Footer
       </div>
@@ -80,7 +80,7 @@ export default function Footer({
                   <li>
                     <Link
                       href={getLinkHref(locale, 'blog')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                      className="text-sm leading-6 text-gray-300 hover:text-primary"
                     >
                       {menuText.header4}
                     </Link>
@@ -88,7 +88,7 @@ export default function Footer({
                   <li>
                     <Link
                       href={getLinkHref(locale, 'examples')}
-                      className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                      className="text-sm leading-6 text-gray-300 hover:text-primary"
                     >
                       {menuText.header5}
                     </Link>
@@ -116,7 +116,7 @@ export default function Footer({
                       <li>
                         <Link
                           href={getLinkHref(locale, 'pricing')}
-                          className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                          className="text-sm leading-6 text-gray-300 hover:text-primary"
                         >
                           {menuText.footerSupport0}
                         </Link>
@@ -129,7 +129,7 @@ export default function Footer({
                         <li>
                         <a
                           onClick={() => manageSubscribe()}
-                          className="cursor-pointer text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]">
+                          className="cursor-pointer text-sm leading-6 text-gray-300 hover:text-primary">
                           {menuText.footerSupport1}
                         </a>
                         </li>
@@ -144,7 +144,7 @@ export default function Footer({
                         <li>
                         <Link
                         href={getLinkHref(locale, 'privacy-policy')}
-                        className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                        className="text-sm leading-6 text-gray-300 hover:text-primary"
                         >
                         {menuText.footerLegal0}
                         </Link>
@@ -152,7 +152,7 @@ export default function Footer({
                         <li>
                         <Link
                         href={getLinkHref(locale, 'terms-of-service')}
-                        className="text-sm leading-6 text-gray-300 hover:text-[#2d6ae0]"
+                        className="text-sm leading-6 text-gray-300 hover:text-primary"
                         >
                         {menuText.footerLegal1}
                         </Link>                  </li>

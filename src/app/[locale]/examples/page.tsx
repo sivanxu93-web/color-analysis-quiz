@@ -25,10 +25,10 @@ export default function ExamplesPage({
   return (
     <>
       <Header locale={locale} page={'examples'} />
-      <main className="min-h-screen bg-[#FFFBF7] py-16 sm:py-24">
+      <main className="min-h-screen bg-[#fff8f5] py-16 sm:py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#1A1A2E] mb-6">
+            <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#2D2926] mb-6">
                 Color Analysis Example Gallery
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
@@ -43,7 +43,7 @@ export default function ExamplesPage({
             return (
               <section key={cat} className="mb-20">
                 <div className="flex items-center gap-4 mb-8">
-                    <h2 className="text-3xl font-serif font-bold text-[#1A1A2E]">{cat} Palette Examples</h2>
+                    <h2 className="text-3xl font-serif font-bold text-[#2D2926]">{cat} Palette Examples</h2>
                     <div className="h-px flex-1 bg-[#E8E1D9]"></div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">

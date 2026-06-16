@@ -21,25 +21,28 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
 
   // Single Plan Details
   const SinglePlan = () => (
-    <div className={`rounded-3xl p-8 ring-1 ring-gray-200 bg-white/60 xl:p-10 hover:shadow-lg transition-shadow ${isModal ? 'bg-white' : ''}`}>
-        <h3 className="text-lg font-semibold leading-8 text-gray-900">Single Report</h3>
-        <p className="mt-4 text-sm leading-6 text-gray-600">Perfect for one person.</p>
-        <div className="mt-6 flex items-baseline gap-x-1">
-            <span className="text-4xl font-bold tracking-tight text-gray-900">${isDiscounted ? '2.45' : '4.90'}</span>
-            <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">${isDiscounted ? '4.90' : '19.90'}</span>
+    <div className={`rounded-3xl p-8 glass-card xl:p-10 hover:shadow-lg transition-shadow duration-300 ${isModal ? 'bg-white' : ''}`}>
+        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-sm border border-white/50 bg-white/10">
+            <img src="/pricing_single_pass.jpg" alt="Single Report Pass" className="w-full h-full object-cover" />
         </div>
-        <div className="mt-2 inline-block bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded">
+        <h3 className="text-lg font-serif font-semibold leading-8 text-[#2D2926]">Single Report</h3>
+        <p className="mt-4 text-sm leading-6 text-text-secondary">Perfect for one person.</p>
+        <div className="mt-6 flex items-baseline gap-x-1">
+            <span className="text-4xl font-bold tracking-tight text-[#2D2926]">${isDiscounted ? '2.95' : '5.90'}</span>
+            <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">${isDiscounted ? '5.90' : '19.90'}</span>
+        </div>
+        <div className="mt-2 inline-block bg-secondary/10 text-[#7B5455] text-xs font-bold px-2 py-0.5 rounded">
             {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '75% OFF')}
         </div>
         
         <button
             onClick={() => onCheckout('single')}
-            className="mt-6 block w-full rounded-md bg-[#1A1A2E] px-3 py-2 text-center text-sm font-bold text-white hover:bg-black transition-all shadow-md transform hover:-translate-y-0.5 active:translate-y-0"
+            className="mt-6 block w-full rounded-full border-2 border-[#D4A5A5] text-[#7B5455] bg-transparent px-3 py-2.5 text-center text-sm font-bold hover:bg-[#D4A5A5]/15 transition-all shadow-sm transform hover:-translate-y-0.5 active:translate-y-0 font-sans"
         >
             Unlock My Full Analysis
         </button>
 
-        <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-600">
+        <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-text-secondary">
             <li className="flex items-start gap-x-3">
                 <span className="text-green-500 mt-0.5 shrink-0">✅</span>
                 <span><strong>Discover Your True Season</strong></span>
@@ -56,9 +59,9 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
                 <span className="text-green-500 mt-0.5 shrink-0">✅</span>
                 <span><strong>Avoid List</strong></span>
             </li>
-            <li className="flex items-start gap-x-3 bg-green-50/50 p-2 rounded-lg border border-green-100 -mx-2">
+            <li className="flex items-start gap-x-3 bg-[#F5ECE7] p-2 rounded-lg border border-[#C07A60]/10 -mx-2">
                 <span className="text-xl shrink-0 leading-none">🎁</span>
-                <span><strong>3 Style Validations</strong> <span className="text-xs text-gray-500 block">Test clothes before you buy</span></span>
+                <span><strong className="text-[#2D2926]">3 Style Validations</strong> <span className="text-xs text-text-secondary block">Test clothes before you buy</span></span>
             </li>
         </ul>
     </div>
@@ -66,11 +69,14 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
 
   // Pack Plan Details
   const PackPlan = () => (
-    <div className="relative rounded-3xl p-8 ring-1 ring-gray-200 bg-[#1A1A2E] text-white shadow-2xl xl:p-10 transform scale-105 z-10 border-t-4 border-primary">
-        <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl uppercase tracking-wider">
+    <div className="relative rounded-3xl p-8 ring-1 ring-white/10 bg-[#2D2926] text-white shadow-2xl xl:p-10 transform lg:scale-105 z-10 border-t-4 border-[#C07A60]">
+        <div className="absolute top-0 right-0 bg-[#C07A60] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl uppercase tracking-wider z-20">
             Best Value
         </div>
-        <h3 className="text-lg font-semibold leading-8 text-white">Style Pack</h3>
+        <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-sm border border-white/10 bg-white/5">
+            <img src="/pricing_unlimited_vip.jpg" alt="Style Pack Premium" className="w-full h-full object-cover" />
+        </div>
+        <h3 className="text-lg font-serif font-semibold leading-8 text-white">Style Pack</h3>
         <p className="mt-4 text-sm leading-6 text-gray-300">Share with family or test different photos.</p>
         <div className="mt-6 flex items-baseline gap-x-1">
             <span className="text-4xl font-bold tracking-tight text-white">${isDiscounted ? '4.95' : '9.90'}</span>
@@ -79,29 +85,29 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         
         <button 
             onClick={() => onCheckout('pack')}
-            className="mt-6 block w-full rounded-md bg-primary px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-primary-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary animate-pulse transition-colors"
+            className="mt-6 block w-full rounded-full bg-[#C07A60] px-3 py-2.5 text-center text-sm font-bold text-white shadow-md hover:bg-[#884C35] hover:shadow-[0_8px_20px_rgba(192,122,96,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C07A60] animate-pulse transition-all transform hover:-translate-y-0.5 active:translate-y-0 font-sans"
         >
             Get 3 Credits (${isDiscounted ? '1.65' : '3.30'}/each)
         </button>
 
         <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300">
             <li className="flex items-start gap-x-3">
-                <span className="text-primary text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>3 Full Analyses</strong> <span className="text-gray-400 text-xs block sm:inline">(3 Credits)</span></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-primary text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Shareable</strong></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-primary text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Test Different Photos</strong></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-primary text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Huge Savings</strong></span>
             </li>
-            <li className="flex items-start gap-x-3 bg-white/10 p-2 rounded-lg border border-white/10 -mx-2 mt-4">
+            <li className="flex items-start gap-x-3 bg-white/5 p-2 rounded-lg border border-white/5 -mx-2 mt-4">
                 <span className="text-xl shrink-0 leading-none">🎁</span>
                 <span><strong>10 Style Validations</strong> <span className="text-xs text-gray-400 block">AI checks your shopping</span></span>
             </li>

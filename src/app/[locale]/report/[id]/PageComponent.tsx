@@ -38,6 +38,7 @@ export default function PageComponent({
     const [status, setStatus] = useState(initialStatus);
     const [drapingImages, setDrapingImages] = useState(initialDrapingImages || { best: null, worst: null });
     const [isGeneratingDraping, setIsGeneratingDraping] = useState(false);
+    const [isDownloadingPdf, setIsDownloadingPdf] = useState(false);
     const hasTriggeredDraping = useRef(false);
     const [currentTipIndex, setCurrentTipIndex] = useState(0);
     const [progress, setProgress] = useState(0);
@@ -135,12 +136,12 @@ export default function PageComponent({
                 (window as any).gtag('event', 'purchase', {
                     'send_to': `${conversionId}/${conversionLabel}`,
                     'transaction_id': sessionId,
-                    'value': 4.90,
+                    'value': 5.90,
                     'currency': 'USD',
                     'items': [{
                         'item_id': 'color_report_single',
                         'item_name': 'Color Analysis Report',
-                        'price': 4.90
+                        'price': 5.90
                     }]
                 });
                 console.log("Google Ads Purchase Tracked with Label:", sessionId);
@@ -403,15 +404,303 @@ export default function PageComponent({
       worst_colors: dWorst, celebrities: dCelebs, hair_color_recommendations: dHair
   } = displayReport || {};
 
+  const handleDownloadPDF = async () => {
+    if (isDownloadingPdf) return;
+    setIsDownloadingPdf(true);
+    try {
+      // @ts-ignore
+      const pdfMakeModule = await import('pdfmake/build/pdfmake');
+      const pdfMake = pdfMakeModule.default || pdfMakeModule;
+      
+      // @ts-ignore
+      window.pdfMake = pdfMake;
+
+      // @ts-ignore
+      await import('pdfmake/build/vfs_fonts');
+
+      const seasonName = typeof rawSeason === 'string' ? rawSeason : 'My_Color_Analysis';
+      const filename = `${seasonName.replace(/\s+/g, '_')}_Report.pdf`;
+
+      // Helper for building colors grid
+      const buildColorGrid = (colorsList: any[]) => {
+        if (!colorsList || colorsList.length === 0) return [];
+        const columnsPerRow = 4;
+        const body: any[] = [];
+        
+        for (let i = 0; i < colorsList.length; i += columnsPerRow) {
+          const chunk = colorsList.slice(i, i + columnsPerRow);
+          
+          const colorRow = chunk.map((color: any) => ({
+            text: '',
+            fillColor: color.hex,
+            margin: [0, 15, 0, 15]
+          }));
+          
+          const textRow = chunk.map((color: any) => ({
+            text: `${color.name || ''}\n${color.hex || ''}`,
+            style: 'colorLabel',
+            margin: [0, 4, 0, 12]
+          }));
+          
+          while (colorRow.length < columnsPerRow) {
+            colorRow.push({ text: '', fillColor: '#fff8f5', margin: [0, 15, 0, 15] });
+            textRow.push({ text: '', style: 'colorLabel', margin: [0, 4, 0, 12] });
+          }
+          
+          body.push(colorRow);
+          body.push(textRow);
+        }
+        
+        return {
+          table: {
+            widths: ['25%', '25%', '25%', '25%'],
+            body: body
+          },
+          layout: {
+            hLineWidth: () => 0,
+            vLineWidth: () => 0,
+            paddingLeft: () => 4,
+            paddingRight: () => 4
+          }
+        };
+      };
+
+      // Helper for worst colors
+      const buildWorstColorsList = (worstList: any[]) => {
+        if (!worstList || worstList.length === 0) return [];
+        
+        const body = worstList.map((color: any) => {
+          return [
+            {
+              text: '',
+              fillColor: color.hex,
+              width: 16,
+              margin: [0, 4, 0, 4]
+            },
+            {
+              stack: [
+                { text: color.name, style: 'worstColorName' },
+                { text: color.reason, style: 'worstColorReason' }
+              ],
+              margin: [8, 1, 0, 1]
+            }
+          ];
+        });
+        
+        return {
+          table: {
+            widths: [30, '*'],
+            body: body
+          },
+          layout: 'noBorders'
+        };
+      };
+
+      // Helper for makeup tables
+      const buildMakeupTable = (products: any[]) => {
+        if (!products || products.length === 0) return [];
+        
+        const headerRow = [
+          { text: 'Category', style: 'tableHeader' },
+          { text: 'Shade / Product', style: 'tableHeader' },
+          { text: 'Style Advice', style: 'tableHeader' }
+        ];
+        
+        const bodyRows = products.map((prod: any) => [
+          { text: prod.category || '', style: 'tableBodyCategory' },
+          { text: prod.shade || '', style: 'tableBodyShade' },
+          { text: prod.recommendation || '', style: 'tableBodyText' }
+        ]);
+        
+        return {
+          table: {
+            headerRows: 1,
+            widths: ['25%', '30%', '45%'],
+            body: [headerRow, ...bodyRows]
+          },
+          layout: {
+            hLineWidth: (i: number, node: any) => (i === 0 || i === 1 || i === node.table.body.length) ? 1 : 0.5,
+            vLineWidth: () => 0,
+            hLineColor: (i: number, node: any) => (i === 0 || i === 1) ? '#C07A60' : '#E8DCD8',
+            paddingTop: (i: number) => i === 0 ? 8 : 10,
+            paddingBottom: (i: number) => i === 0 ? 8 : 10,
+          }
+        };
+      };
+
+      // Helper for hair color
+      const buildHairTable = (hairList: any[]) => {
+        if (!hairList || hairList.length === 0) return [];
+        
+        const bodyRows = hairList.map((item: any) => [
+          { text: item.color || '', style: 'tableBodyShade' },
+          { text: item.desc || '', style: 'tableBodyText' }
+        ]);
+        
+        return {
+          table: {
+            widths: ['35%', '65%'],
+            body: bodyRows
+          },
+          layout: {
+            hLineWidth: (i: number, node: any) => (i === 0 || i === node.table.body.length) ? 1 : 0.5,
+            vLineWidth: () => 0,
+            hLineColor: () => '#E8DCD8',
+            paddingTop: () => 8,
+            paddingBottom: () => 8,
+          }
+        };
+      };
+
+      // Construct docDefinition
+      const docDefinition = {
+        content: [
+          { text: 'AURA AI COLOR LAB', style: 'brandHeader' },
+          { text: 'PERSONAL COLOR ANALYSIS REPORT', style: 'brandSub' },
+          {
+            table: {
+              widths: ['*'],
+              body: [
+                ['']
+              ]
+            },
+            layout: {
+              hLineWidth: (i: number) => i === 1 ? 1.5 : 0,
+              vLineWidth: () => 0,
+              hLineColor: () => '#C07A60',
+              paddingTop: () => 0,
+              paddingBottom: () => 0
+            },
+            margin: [0, 8, 0, 20]
+          },
+          
+          { text: 'YOUR SEASONAL TYPE', style: 'sectionLabel' },
+          { text: seasonName.toUpperCase(), style: 'seasonTitle' },
+          
+          dCharacteristics ? {
+            columns: Object.entries(dCharacteristics).map(([key, value]) => ({
+              text: `${key.toUpperCase()}: ${String(value).toUpperCase()}`,
+              style: 'traitBadge',
+              width: 'auto',
+              margin: [0, 0, 10, 0]
+            })),
+            margin: [0, 5, 0, 15]
+          } : null,
+
+          { text: dHeadline || '', style: 'headline' },
+          { text: dDescription || '', style: 'description', margin: [0, 10, 0, 20] },
+
+          { text: 'YOUR POWER PALETTE', style: 'sectionTitle', pageBreak: 'before' },
+          { text: 'Shades that maximize your natural contrast and undertones.', style: 'sectionDesc', margin: [0, 0, 0, 15] },
+
+          { text: 'Power Colors', style: 'subSectionTitle' },
+          powerPalette.usage_advice ? { text: `"${powerPalette.usage_advice}"`, style: 'usageAdvice' } : null,
+          buildColorGrid(powerPalette.colors),
+
+          { text: 'Neutral Foundation Colors', style: 'subSectionTitle', margin: [0, 12, 0, 8] },
+          neutralPalette.usage_advice ? { text: `"${neutralPalette.usage_advice}"`, style: 'usageAdvice' } : null,
+          buildColorGrid(neutralPalette.colors),
+
+          { text: 'Pastel Highlight Colors', style: 'subSectionTitle', margin: [0, 12, 0, 8] },
+          pastelPalette.usage_advice ? { text: `"${pastelPalette.usage_advice}"`, style: 'usageAdvice' } : null,
+          buildColorGrid(pastelPalette.colors),
+
+          dWorst && dWorst.length > 0 ? {
+            stack: [
+              { text: 'COLORS TO AVOID', style: 'sectionTitle', pageBreak: 'before' },
+              { text: 'Shades that tend to clash with your undertones or make you look washed out.', style: 'sectionDesc', margin: [0, 0, 0, 15] },
+              buildWorstColorsList(dWorst)
+            ]
+          } : null,
+
+          { text: 'BEAUTY & HAIR STYLING', style: 'sectionTitle', pageBreak: 'before' },
+          { text: 'Tailored cosmetic selections that harmonize with your seasonal profile.', style: 'sectionDesc', margin: [0, 0, 0, 15] },
+          
+          dMakeup?.summary ? { text: `Cosmetics Summary: ${dMakeup.summary}`, style: 'makeupSummary', margin: [0, 0, 0, 12] } : null,
+          dMakeup?.specific_products ? {
+            stack: [
+              { text: 'Recommended Cosmetic Shades', style: 'subSectionTitle', margin: [0, 8, 0, 8] },
+              buildMakeupTable(dMakeup.specific_products)
+            ]
+          } : null,
+
+          dHair && dHair.length > 0 ? {
+            stack: [
+              { text: 'Recommended Hair Colors', style: 'subSectionTitle', margin: [0, 15, 0, 8] },
+              buildHairTable(dHair)
+            ]
+          } : null,
+
+          dStyling ? {
+            stack: [
+              { text: 'Styling & Accessories', style: 'subSectionTitle', margin: [0, 15, 0, 8] },
+              {
+                columns: [
+                  {
+                    stack: [
+                      { text: 'BEST METALS', style: 'stylingLabel' },
+                      { text: (dStyling.metals || []).join(', '), style: 'stylingValue' }
+                    ]
+                  },
+                  {
+                    stack: [
+                      { text: 'STYLE KEYWORDS', style: 'stylingLabel' },
+                      { text: (dStyling.keywords || []).join(', '), style: 'stylingValue' }
+                    ]
+                  }
+                ],
+                margin: [0, 5, 0, 10]
+              }
+            ]
+          } : null,
+        ],
+        styles: {
+          brandHeader: { fontSize: 10, bold: true, color: '#C07A60', characterSpacing: 1.5 },
+          brandSub: { fontSize: 8, bold: true, color: '#8E7A75', margin: [0, 2, 0, 0], characterSpacing: 1 },
+          sectionLabel: { fontSize: 9, bold: true, color: '#C07A60', margin: [0, 8, 0, 4] },
+          seasonTitle: { fontSize: 28, bold: true, color: '#2D2926', margin: [0, 0, 0, 8] },
+          traitBadge: { fontSize: 8, bold: true, color: '#7b5455', background: '#F2E8E5', margin: [0, 4, 10, 4] },
+          headline: { fontSize: 16, bold: true, color: '#884C35', margin: [0, 8, 0, 8], italic: true },
+          description: { fontSize: 10.5, color: '#53433e', lineHeight: 1.5 },
+          sectionTitle: { fontSize: 20, bold: true, color: '#2D2926', margin: [0, 8, 0, 4] },
+          sectionDesc: { fontSize: 9.5, color: '#8E7A75' },
+          subSectionTitle: { fontSize: 13, bold: true, color: '#884C35', margin: [0, 8, 0, 4] },
+          usageAdvice: { fontSize: 9.5, italic: true, color: '#53433e', margin: [0, 0, 0, 8] },
+          colorLabel: { fontSize: 7.5, bold: true, color: '#2D2926', alignment: 'center' },
+          worstColorName: { fontSize: 10, bold: true, color: '#2D2926' },
+          worstColorReason: { fontSize: 8.5, color: '#8E7A75', lineHeight: 1.2 },
+          makeupSummary: { fontSize: 9.5, italic: true, color: '#53433e', lineHeight: 1.3 },
+          tableHeader: { fontSize: 9.5, bold: true, color: '#ffffff', fillColor: '#C07A60', alignment: 'left', margin: [4, 4, 4, 4] },
+          tableBodyCategory: { fontSize: 8.5, bold: true, color: '#2D2926', margin: [4, 4, 4, 4] },
+          tableBodyShade: { fontSize: 8.5, bold: true, color: '#884C35', margin: [4, 4, 4, 4] },
+          tableBodyText: { fontSize: 8.5, color: '#53433e', lineHeight: 1.25, margin: [4, 4, 4, 4] },
+          stylingLabel: { fontSize: 8.5, bold: true, color: '#8E7A75', margin: [0, 0, 0, 3] },
+          stylingValue: { fontSize: 10, bold: true, color: '#2D2926' }
+        }
+      };
+
+      pdfMake.createPdf(docDefinition as any).download(filename);
+    } catch (error) {
+      console.error('Failed to generate PDF, falling back to print:', error);
+      const originalTitle = document.title;
+      const seasonName = typeof rawSeason === 'string' ? rawSeason : 'My_Color_Analysis';
+      document.title = `${seasonName.replace(/\s+/g, '_')}_Report`;
+      window.print();
+      document.title = originalTitle;
+    } finally {
+      setIsDownloadingPdf(false);
+    }
+  };
+
   // --- LOCKED CONTENT LOGIC ---
   // 1. Mask Season Name (e.g. "Deep Winter" -> "**** Winter")
   const baseSeason = rawSeason?.split(' ').pop();
   const dSeason = isLocked ? (
       <span className="inline-flex items-baseline gap-2">
-          <span className="text-white/40 tracking-widest animate-pulse font-mono text-4xl">****</span> 
+          <span className="text-[#8b4e37]/40 tracking-widest animate-pulse font-mono text-4xl">****</span> 
           <span>{baseSeason}</span>
-          <span className="bg-white/10 p-1.5 rounded-full ml-2 self-center">
-            <svg className="w-4 h-4 text-white/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          <span className="bg-[#8b4e37]/10 p-1.5 rounded-full ml-2 self-center">
+            <svg className="w-4 h-4 text-[#8b4e37]/70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
           </span>
       </span>
   ) : rawSeason;
@@ -452,7 +741,7 @@ export default function PageComponent({
             
             {/* Overlay Layer */}
             <div className="absolute inset-0 flex flex-col items-center justify-center z-10 bg-white/20 hover:bg-white/10 transition-colors">
-                <div className="bg-[#1A1A2E] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 transform transition-all group-hover:scale-105 ring-4 ring-white/50 hover:bg-black">
+                <div className="bg-[#2D2926] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 transform transition-all group-hover:scale-105 ring-4 ring-white/50 hover:bg-black">
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
@@ -476,9 +765,9 @@ export default function PageComponent({
                     {generationError ? (
                         <>
                             <div className="text-5xl mb-6 opacity-80">
-                                {generationError.includes("pending report") ? "⚠️" : "🤔"}
+                                {generationError.includes("pending report") ? <span className="material-symbols-outlined text-red-500">warning</span> : <span className="material-symbols-outlined text-gray-500">help</span>}
                             </div>
-                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-3">
+                            <h2 className="text-2xl font-serif font-bold text-[#2D2926] mb-3">
                                 {generationError.includes("pending report") ? "One Report at a Time" : "Stylist Interrupted"}
                             </h2>
                             <p className="text-gray-500 font-medium mb-8 max-w-xs mx-auto leading-relaxed">
@@ -490,14 +779,14 @@ export default function PageComponent({
                             {generationError.includes("pending report") ? (
                                 <Link 
                                     href={`/${locale}/profile`}
-                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg inline-block"
+                                    className="bg-[#2D2926] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg inline-block"
                                 >
                                     View My Reports
                                 </Link>
                             ) : (
                                 <button 
                                     onClick={triggerGeneration}
-                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg transform hover:-translate-y-0.5"
+                                    className="bg-[#2D2926] text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-black transition-colors shadow-lg transform hover:-translate-y-0.5"
                                 >
                                     Resume Analysis
                                 </button>
@@ -516,17 +805,17 @@ export default function PageComponent({
                                             strokeLinecap="round" />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-2xl font-bold font-mono text-[#1A1A2E]">{Math.floor(progress)}%</span>
+                                    <span className="text-2xl font-bold font-mono text-[#2D2926]">{Math.floor(progress)}%</span>
                                 </div>
                                 <div className="absolute -inset-4 bg-primary/10 rounded-full blur-xl animate-pulse -z-10"></div>
                             </div>
 
-                            <h2 className="text-2xl font-serif font-bold text-[#1A1A2E] mb-2 tracking-tight">AI Stylist at Work</h2>
+                            <h2 className="text-2xl font-serif font-bold text-[#2D2926] mb-2 tracking-tight">AI Stylist at Work</h2>
                             <p className="text-xs font-bold text-primary uppercase tracking-[0.3em] mb-8 animate-pulse">Personalizing Your Report</p>
                             
                             {/* Rotating Tip Card */}
                             <div className="bg-white/60 backdrop-blur-sm p-6 rounded-2xl border border-primary/10 shadow-sm min-h-[100px] flex items-center justify-center transition-all duration-1000">
-                                <p className="text-[#1A1A2E] font-medium leading-relaxed italic text-sm md:text-base">
+                                <p className="text-[#2D2926] font-medium leading-relaxed italic text-sm md:text-base">
                                     &quot;{LOADING_TIPS[currentTipIndex]}&quot;
                                 </p>
                             </div>
@@ -547,17 +836,43 @@ export default function PageComponent({
       <PricingModal locale={locale} page={'report'} />
 
       {/* Main Content (Blurred if Locked) */}
-      <main className={`min-h-screen bg-[#FFFBF7] font-sans text-[#1A1A2E] pb-20 scroll-smooth transition-all duration-1000`}>
+      <main className={`min-h-screen bg-[#fff8f5] font-sans text-[#1e1b18] pb-20 scroll-smooth transition-all duration-1000`}>
 
         {/* Sticky Nav */}
-        <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#FFFBF7]/95 backdrop-blur-md border-b border-[#E8E1D9] py-3 overflow-x-auto no-scrollbar shadow-sm transition-all">
-            <div className="max-w-6xl mx-auto px-4 flex justify-start md:justify-center gap-6 md:gap-10 min-w-max">
-                <a href="#reveal" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Analysis</a>
-                <a href="#draping" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Draping</a>
-                <a href="#palette" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Palette</a>
-                <a href="#makeup" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Makeup</a>
-                {dHair && <a href="#hair" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Hair</a>}
-                <a href="#styling" className="text-sm font-bold text-gray-500 hover:text-primary transition-colors uppercase tracking-wider whitespace-nowrap">Styling</a>
+        <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#fff8f5]/70 backdrop-blur-md border-b border-white/50 py-3 shadow-sm transition-all print:hidden">
+            <div className="max-w-6xl mx-auto px-4 flex justify-between items-center gap-4">
+                <div className="flex gap-6 md:gap-10 overflow-x-auto no-scrollbar py-1 flex-1 scroll-smooth">
+                    <a href="#reveal" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Analysis</a>
+                    <a href="#draping" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Draping</a>
+                    <a href="#palette" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Palette</a>
+                    <a href="#makeup" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Makeup</a>
+                    {dHair && <a href="#hair" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Hair</a>}
+                    <a href="#styling" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Styling</a>
+                </div>
+                {!isLocked && (
+                    <button 
+                        onClick={handleDownloadPDF}
+                        disabled={isDownloadingPdf}
+                        className={`inline-flex items-center gap-2 px-4 py-2 bg-[#C07A60] text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#884c35] transition-all shadow-sm hover:shadow active:scale-95 shrink-0 ${isDownloadingPdf ? 'opacity-75 cursor-not-allowed' : ''}`}
+                    >
+                        {isDownloadingPdf ? (
+                            <>
+                                <svg className="animate-spin h-3.5 w-3.5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Saving...</span>
+                            </>
+                        ) : (
+                            <>
+                                <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                <span>PDF</span>
+                            </>
+                        )}
+                    </button>
+                )}
             </div>
         </nav>
 
@@ -569,67 +884,59 @@ export default function PageComponent({
 
         <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16 pt-8">
 
-            {/* 1. The Reveal - Magazine Card Layout */}
-            <div id="reveal" className="relative bg-[#1A1A2E] text-white rounded-[2.5rem] overflow-hidden shadow-2xl min-h-[650px] flex flex-col md:flex-row">
-                
-                {/* Background Pattern */}
-                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] z-0 pointer-events-none"></div>
-
-                {/* Right Side: Image (Background Anchor) */}
-                <div className="relative w-full md:absolute md:right-0 md:top-0 md:bottom-0 md:w-[55%] h-[400px] md:h-full z-0 order-1 md:order-2">
-                    {displayUserImage ? (
-                        <div className="w-full h-full relative">
-                            <img src={displayUserImage} alt="User" className="w-full h-full object-cover object-top opacity-90" />
-                            {/* Gradient: Bottom fade for mobile */}
-                            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1A1A2E] to-transparent md:hidden"></div>
-                            {/* Gradient: Left fade for desktop */}
-                            <div className="hidden md:block absolute inset-y-0 left-0 w-64 bg-gradient-to-r from-[#1A1A2E] via-[#1A1A2E]/60 to-transparent"></div>
+            {/* 1. The Reveal - Soft Magazine Layout */}
+            <div id="reveal" className="flex flex-col md:flex-row items-center gap-12 pt-4">
+                {/* Left: User Image inside premium glass card */}
+                <div className="w-full md:w-1/2 relative">
+                    <div className="glass-card rounded-[2rem] p-3 relative overflow-hidden shadow-[0_8px_32px_rgba(192,122,96,0.05)] border border-white/50 bg-white/40">
+                        {displayUserImage ? (
+                            <div className="relative w-full aspect-[4/5] rounded-[1.5rem] overflow-hidden">
+                                <img src={displayUserImage} alt="User Face" className="w-full h-full object-cover object-top" />
+                            </div>
+                        ) : (
+                            <div className="w-full aspect-[4/5] bg-gray-100 rounded-[1.5rem] flex items-center justify-center text-gray-400">
+                                No Image Uploaded
+                            </div>
+                        )}
+                        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 glass-card px-6 py-3 rounded-full flex items-center gap-2 whitespace-nowrap bg-white/60 border border-white/80">
+                            <span className="w-3 h-3 rounded-full bg-[#8b4e37] animate-pulse"></span>
+                            <span className="font-sans text-xs font-semibold tracking-wider uppercase text-[#1e1b18]">{dSeason}</span>
                         </div>
-                    ) : (
-                        <div className="w-full h-full bg-gray-800 flex items-center justify-center text-gray-500">No Image</div>
-                    )}
+                    </div>
                 </div>
 
-                {/* Left Side: Content (The Hook) */}
-                <div className="relative z-10 w-full md:w-[55%] p-8 md:p-16 flex flex-col justify-center order-2 md:order-1 bg-gradient-to-t from-[#1A1A2E] via-[#1A1A2E] to-transparent md:bg-none -mt-20 md:mt-0">
-                    <div className="inline-block px-4 py-1 border border-accent-gold/50 text-accent-gold text-xs font-bold uppercase tracking-[0.2em] mb-6 w-max rounded-full backdrop-blur-md bg-[#1A1A2E]/30">
+                {/* Right: Analysis Title & Trait Badges */}
+                <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left space-y-6">
+                    <div className="inline-block px-4 py-1.5 border border-[#C07A60]/30 text-[#884c35] text-[10px] font-bold uppercase tracking-[0.2em] w-max rounded-full bg-[#C07A60]/5 mx-auto md:mx-0">
                         Personal Analysis
                     </div>
+                    <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#1e1b18] font-bold leading-[1.15]">
+                        You are a<br/>
+                        <span className="text-[#884c35] italic font-semibold">{dSeason}</span>
+                    </h2>
                     
-                    <h1 className="font-serif text-5xl md:text-7xl font-bold mb-4 leading-tight drop-shadow-lg">
-                        You are a <br/>
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-300 italic pr-2">{dSeason}</span>
-                    </h1>
-                    
-                    <p className="text-xl md:text-2xl text-gray-300 font-light italic mb-10 pl-6 border-l-4 border-accent-gold/80">
-                        &quot;{isLocked ? 'Unlock to reveal your true style persona.' : (dHeadline || 'Discover your true colors.')}&quot;
+                    <p className="text-[#53433e] text-base md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 font-sans opacity-95">
+                        &quot;{isLocked ? 'Unlock your full color profile to reveal your customized seasonal undertones and power wardrobe colors.' : (dHeadline || 'Discover your true colors.')}&quot;
                     </p>
-                    
-                    {/* Quick Traits Grid */}
-                    <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-8 backdrop-blur-sm bg-[#1A1A2E]/20 rounded-xl p-4 -mx-4 md:mx-0">
+
+                    {/* Traits Badges */}
+                    <div className="flex flex-wrap gap-3 mt-4 justify-center md:justify-start">
                         {dCharacteristics && Object.entries(dCharacteristics).map(([key, value]) => (
-                            <div key={key}>
-                                <p className="text-accent-gold uppercase text-[10px] tracking-widest mb-1.5 font-bold opacity-80">{key}</p>
-                                <p className="font-medium text-white text-sm md:text-base leading-snug">
-                                    {isLocked ? (
-                                        <span className="blur-sm select-none opacity-50">Hidden</span>
-                                    ) : (
-                                        value as string
-                                    )}
-                                </p>
-                            </div>
+                            <span key={key} className="px-4 py-2 rounded-full glass-card bg-white/50 font-sans text-xs font-semibold text-[#7b5455] border border-[#d8c2bb]/50 shadow-sm uppercase tracking-wider">
+                                {isLocked ? '••••••' : (value as string)}
+                            </span>
                         ))}
                     </div>
                 </div>
             </div>
 
             {/* 1.5 The Profile (Deep Dive) - New Section */}
-            <div id="profile" className="max-w-4xl mx-auto px-6 text-center space-y-12">
+            <div id="profile" className="max-w-4xl mx-auto px-6 text-center space-y-12 border-t border-[#d8c2bb]/30 pt-16">
                 {/* Analysis Text */}
                 <BlurLock label="Unlock Full Analysis">
                     <div className="relative">
                         <span className="absolute -top-6 -left-4 text-8xl text-primary/10 font-serif leading-none">&ldquo;</span>
-                        <p className="text-xl md:text-2xl text-[#1A1A2E] font-serif leading-relaxed italic">
+                        <p className="text-xl md:text-2xl text-[#1e1b18] font-serif leading-relaxed italic">
                             {dDescription}
                         </p>
                         <span className="absolute -bottom-12 -right-4 text-8xl text-primary/10 font-serif leading-none rotate-180">&rdquo;</span>
@@ -638,18 +945,18 @@ export default function PageComponent({
 
                 {/* Celebrity Twins */}
                 {displayCelebs && (
-                    <div className="border-t border-gray-100 pt-10">
-                        <p className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-6">Celebrity Muse</p>
+                    <div className="border-t border-[#d8c2bb]/30 pt-10">
+                        <p className="text-[#53433e] text-xs font-bold uppercase tracking-widest mb-6 font-sans">Celebrity Muse</p>
                         <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                             {displayCelebs.map((celeb: string, i: number) => (
-                                <div key={i} className="bg-white border border-gray-200 px-6 py-3 rounded-full shadow-sm flex items-center gap-3">
-                                    <span className="text-xl">✨</span>
+                                <div key={i} className="bg-white/50 backdrop-blur border border-white/50 px-6 py-3 rounded-full shadow-sm flex items-center gap-3 glass-card">
+                                    <span className="material-symbols-outlined text-xl text-[#C07A60] align-middle">auto_awesome</span>
                                     <span className="font-serif text-lg text-gray-900 italic">{celeb}</span>
                                 </div>
                             ))}
                             {isLocked && (
-                                <div className="bg-gray-50 border border-gray-200 px-6 py-3 rounded-full shadow-sm flex items-center gap-2 opacity-60">
-                                    <span className="text-sm font-bold text-gray-400">+ 2 others</span>
+                                <div className="bg-white/30 border border-white/40 px-6 py-3 rounded-full shadow-sm flex items-center gap-2 opacity-60 glass-card">
+                                    <span className="text-sm font-bold text-[#53433e]">+ 2 others</span>
                                 </div>
                             )}
                         </div>
@@ -657,27 +964,71 @@ export default function PageComponent({
                 )}
             </div>
 
+            {/* 1.8 The Seasonal Matrix */}
+            <div className="space-y-6 text-center border-t border-[#d8c2bb]/30 pt-16">
+                <span className="text-[#884c35] font-bold tracking-widest uppercase text-xs font-sans">The Seasonal Matrix</span>
+                <h3 className="font-serif text-3xl font-bold text-[#1e1b18]">Find Your Place in the Seasons</h3>
+                <p className="text-sm text-[#53433e] max-w-xl mx-auto font-sans opacity-85">
+                    Our analysis places you in one of the 12 key seasons. Here is how your profile compares across the matrix.
+                </p>
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4">
+                    {[
+                        { name: "Light Spring", color: "#F3E5AB" },
+                        { name: "True Spring", color: "#FAD6A5" },
+                        { name: "Bright Spring", color: "#E2C275" },
+                        { name: "Light Summer", color: "#E6E6FA" },
+                        { name: "True Summer", color: "#B0C4DE" },
+                        { name: "Soft Summer", color: "#95B8D1" },
+                        { name: "Soft Autumn", color: "#D2B48C" },
+                        { name: "True Autumn", color: "#CD853F" },
+                        { name: "Deep Autumn", color: "#8B4513" },
+                        { name: "Deep Winter", color: "#1A1A1A" },
+                        { name: "True Winter", color: "#000080" },
+                        { name: "Bright Winter", color: "#FF00FF" }
+                    ].map((seasonItem) => {
+                        const isCurrent = rawSeason?.toLowerCase().includes(seasonItem.name.toLowerCase());
+                        
+                        return (
+                            <div 
+                                key={seasonItem.name} 
+                                className={`glass-card p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${
+                                    isCurrent 
+                                        ? 'border-2 border-[#C07A60] ring-4 ring-[#C07A60]/10 scale-105 bg-white/80 shadow-[0_8px_24px_rgba(192,122,96,0.15)] z-10' 
+                                        : 'opacity-55 hover:opacity-80 bg-white/30 border-white/30'
+                                }`}
+                            >
+                                <div className="w-10 h-10 rounded-full mb-2.5 shadow-inner border border-white" style={{ backgroundColor: seasonItem.color }} />
+                                <span className={`font-sans text-xs font-semibold tracking-wider ${isCurrent ? 'text-[#884c35] font-bold' : 'text-[#53433e]'}`}>
+                                    {seasonItem.name}
+                                </span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
             {/* 2. Visual Proof */}
             <div id="draping" className="text-center space-y-4 pt-8">
-                <span className="text-primary font-bold tracking-widest uppercase text-xs">The Transformation</span>
-                <h2 className="text-4xl font-serif font-bold text-[#1A1A2E]">Virtual Draping</h2>
-                <div className="w-24 h-1 bg-primary mx-auto rounded-full"></div>
+                <span className="text-[#884c35] font-bold tracking-widest uppercase text-xs font-sans">The Transformation</span>
+                <h2 className="text-4xl font-serif font-bold text-[#1e1b18]">Virtual Draping</h2>
+                <div className="w-24 h-1 bg-[#C07A60] mx-auto rounded-full"></div>
                 
                 {/* View Mode Toggle */}
                 {!isLocked && (
                     <div className="flex justify-center mt-6">
-                        <div className="bg-white p-1 rounded-full border border-gray-200 shadow-sm inline-flex">
+                        <div className="bg-white/45 p-1 rounded-full border border-white/50 shadow-sm inline-flex glass-card">
                             <button
                                 onClick={() => setViewMode('draping')}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'draping' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'draping' ? 'bg-[#C07A60] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
                             >
-                                ✨ AI Try-On
+                                <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">auto_awesome</span> AI Try-On</span>
                             </button>
                             <button
                                 onClick={() => setViewMode('fan')}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'fan' ? 'bg-[#1A1A2E] text-white shadow-md' : 'text-gray-500 hover:text-gray-900'}`}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'fan' ? 'bg-[#C07A60] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
                             >
-                                🎨 Color Fan
+                                <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">palette</span> Color Fan</span>
                             </button>
                         </div>
                     </div>
@@ -700,7 +1051,7 @@ export default function PageComponent({
                             <div className="absolute inset-0 bg-emerald-900/30 mix-blend-multiply"></div>
                             <div className="absolute top-6 left-0 right-0 text-center z-10">
                                 <span className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white/90 shadow-lg tracking-widest uppercase border border-white/10">
-                                    ✨ Best Match
+                                    <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#C07A60]">auto_awesome</span> Best Match</span>
                                 </span>
                             </div>
                         </div>
@@ -716,7 +1067,7 @@ export default function PageComponent({
                             <div className="absolute inset-0 bg-yellow-900/40 mix-blend-multiply"></div>
                             <div className="absolute top-6 left-0 right-0 text-center z-10">
                                 <span className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white/90 shadow-lg tracking-widest uppercase border border-white/10">
-                                    🚫 To Avoid
+                                    <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-red-500">block</span> To Avoid</span>
                                 </span>
                             </div>
                         </div>
@@ -743,10 +1094,10 @@ export default function PageComponent({
                                 Don&apos;t guess. Let AI show you exactly what works.
                             </p>
                             
-                            <button className="group/btn relative inline-flex items-center gap-3 bg-white text-[#1A1A2E] px-10 py-4 rounded-full font-bold text-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_rgba(255,255,255,0.2)] transition-all overflow-hidden" onClick={handleUnlockClick}>
+                            <button className="group/btn relative inline-flex items-center gap-3 bg-white text-[#1e1b18] px-10 py-4 rounded-full font-bold text-lg shadow-[0_15px_30px_rgba(192,122,96,0.2)] transition-all overflow-hidden" onClick={handleUnlockClick}>
                                 <span className="relative z-10">Unlock Visual Proof</span>
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000"></div>
-                                <span className="relative z-10 bg-[#1A1A2E] text-white text-xs px-2 py-0.5 rounded ml-1">1 Credit</span>
+                                <span className="relative z-10 bg-[#C07A60] text-white text-xs px-2 py-0.5 rounded ml-1">1 Credit</span>
                             </button>
                         </div>
                     </div>
@@ -791,7 +1142,7 @@ export default function PageComponent({
                         <p className="text-sm text-gray-500 mb-6 max-w-md">{drapingError}</p>
                         <button 
                             onClick={handleGenerateDraping}
-                            className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
+                            className="bg-[#2D2926] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0"
                         >
                             Try Again
                         </button>
@@ -806,7 +1157,7 @@ export default function PageComponent({
                             <div className="w-full rounded-xl overflow-hidden relative bg-gray-50">
                                 <img src={displayDraping.best} alt="Best" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
                                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-green-100">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-green-800">✨ Best Match</p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-green-800"><span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#C07A60]">auto_awesome</span> Best Match</span></p>
                                 </div>
                             </div>
                         </div>
@@ -821,7 +1172,7 @@ export default function PageComponent({
                             <div className="w-full rounded-xl overflow-hidden relative bg-gray-50">
                                 <img src={displayDraping.worst} alt="Worst" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
                                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-red-100">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-red-800">🚫 To Avoid</p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-red-800"><span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-red-500">block</span> To Avoid</span></p>
                                 </div>
                             </div>
                         </div>
@@ -836,12 +1187,12 @@ export default function PageComponent({
 
             {/* 3. The Curator's Palette */}
             {dPalette && (
-                <div id="palette" className="bg-white p-10 md:p-16 rounded-[3rem] shadow-sm border border-[#E8E1D9] relative overflow-hidden scroll-mt-20">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                <div id="palette" className="bg-white/45 backdrop-blur-md p-10 md:p-16 rounded-[3rem] glass-card soft-shadow border border-white/50 relative overflow-hidden scroll-mt-20">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#C07A60]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
                     
                     <div className="text-center mb-16 relative z-10">
-                        <h2 className="text-4xl font-serif font-bold mb-4">Your Power Palette</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto">
+                        <h2 className="text-4xl font-serif font-bold mb-4 text-[#1e1b18]">Your Power Palette</h2>
+                        <p className="text-[#53433e] max-w-xl mx-auto font-sans">
                             A curated selection of shades that harmonize perfectly with your natural coloring.
                         </p>
                     </div>
@@ -849,14 +1200,14 @@ export default function PageComponent({
                     <div className="space-y-16 relative z-10">
                         <div>
                             <div className="flex items-center gap-4 mb-8">
-                                <span className="h-px flex-1 bg-gray-200"></span>
-                                <h3 className="font-serif text-2xl font-bold italic">Power Colors</h3>
-                                <span className="h-px flex-1 bg-gray-200"></span>
+                                <span className="h-px flex-1 bg-[#d8c2bb]/30"></span>
+                                <h3 className="font-serif text-2xl font-bold italic text-[#1e1b18]">Power Colors</h3>
+                                <span className="h-px flex-1 bg-[#d8c2bb]/30"></span>
                             </div>
                             
                             {powerPalette.usage_advice && (
-                                <div className="bg-[#FFFBF7] p-6 rounded-2xl border border-primary/10 mb-8 text-center">
-                                    <p className="text-[#1A1A2E] font-medium italic leading-relaxed">
+                                <div className="bg-[#fff8f5] p-6 rounded-2xl border border-[#C07A60]/10 mb-8 text-center">
+                                    <p className="text-[#1e1b18] font-medium italic leading-relaxed font-sans">
                                         &quot;{powerPalette.usage_advice}&quot;
                                     </p>
                                 </div>
@@ -870,7 +1221,7 @@ export default function PageComponent({
                                             <div className="absolute inset-0 bg-gradient-to-tr from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
                                         </div>
                                         <div className="text-center mt-3">
-                                            <p className="font-bold text-[#1A1A2E]">{color.name}</p>
+                                            <p className="font-bold text-[#2D2926]">{color.name}</p>
                                             <p className="text-xs text-gray-400 uppercase tracking-widest">{color.hex}</p>
                                         </div>
                                     </div>
@@ -889,9 +1240,9 @@ export default function PageComponent({
 
                                 {isLocked && (
                                      <div className="absolute inset-0 left-[25%] flex items-center justify-center z-10" onClick={handleUnlockClick}>
-                                        <div className="bg-[#1A1A2E] text-white px-6 py-3 rounded-full shadow-xl flex items-center gap-3 cursor-pointer hover:bg-black transition-all transform hover:scale-105 ring-4 ring-white/50">
+                                        <div className="bg-[#C07A60] text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 cursor-pointer hover:bg-[#a5644b] transition-all transform hover:scale-105 ring-4 ring-white/50">
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                            <span className="text-xs font-bold tracking-wide uppercase">Unlock Personalized Palette</span>
+                                            <span className="text-xs font-bold tracking-wide uppercase font-sans">Unlock Personalized Palette</span>
                                         </div>
                                      </div>
                                 )}
@@ -934,7 +1285,7 @@ export default function PageComponent({
                             <div className="mt-16 pt-12 border-t border-dashed border-gray-200">
                                 <div className="text-center mb-10">
                                     <h3 className="font-serif text-2xl font-bold text-red-800 flex items-center justify-center gap-2">
-                                        <span>🚫</span> Colors to Avoid
+                                        <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-red-500">block</span> Colors to Avoid</span>
                                     </h3>
                                     <p className="text-sm text-gray-500 mt-2">Shades that may conflict with your natural undertones.</p>
                                 </div>
@@ -960,15 +1311,58 @@ export default function PageComponent({
             {/* 4. Beauty & Style */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* Makeup */}
-                <div id="makeup" className="lg:col-span-7 bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-[#E8E1D9] scroll-mt-20">
-                    <h3 className="font-serif text-3xl font-bold mb-8 flex items-center gap-3">
-                        <span className="text-4xl">💄</span> Makeup Lab
+                <div id="makeup" className="lg:col-span-7 bg-white/45 backdrop-blur-md p-8 md:p-12 rounded-[2rem] glass-card soft-shadow border border-white/50 scroll-mt-20">
+                    <h3 className="font-serif text-3xl font-bold mb-6 flex items-center gap-3 text-[#1e1b18]">
+                        <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-4xl text-[#C07A60]">face</span> Makeup Lab</span>
                     </h3>
                     
-                    <div className="bg-[#FFFBF7] p-6 rounded-xl border border-primary/10 mb-8">
-                        <p className="text-lg text-[#1A1A2E] font-medium leading-relaxed italic">
-                            &quot;{dMakeup?.summary}&quot;
+                    <div className="bg-[#fff8f5] p-6 rounded-xl border border-[#C07A60]/10 mb-8">
+                        <p className="text-lg text-[#1e1b18] font-medium leading-relaxed italic font-sans">
+                            &quot;{dMakeup?.summary || 'Opt for cool, deep shades to complement your high contrast.'}&quot;
                         </p>
+                    </div>
+
+                    {/* Curated Cosmetics Colors Grid (Stitch style) */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                        {/* Lips */}
+                        <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
+                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">face</span>
+                            <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Lips</h4>
+                            <div className="flex gap-2 mb-3">
+                                {(displayReport.makeup?.lips || [
+                                    { hex: "#6B0D1A" }, { hex: "#8B0000" }, { hex: "#4A0404" }
+                                ]).slice(0, 3).map((item: any, idx: number) => (
+                                    <div key={idx} className="w-8 h-8 rounded-full border border-white shadow-inner" style={{ backgroundColor: item.hex }} title={item.name} />
+                                ))}
+                            </div>
+                            <p className="text-[11px] text-[#53433e] leading-snug opacity-90">Deep berries, burgundy, and true reds complement your tone.</p>
+                        </div>
+                        {/* Eyes */}
+                        <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
+                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">visibility</span>
+                            <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Eyes</h4>
+                            <div className="flex gap-2 mb-3">
+                                {(displayReport.makeup?.eyes || [
+                                    { hex: "#1A1A1A" }, { hex: "#2F4F4F" }, { hex: "#483D8B" }
+                                ]).slice(0, 3).map((item: any, idx: number) => (
+                                    <div key={idx} className="w-8 h-8 rounded-full border border-white shadow-inner" style={{ backgroundColor: item.hex }} title={item.name} />
+                                ))}
+                            </div>
+                            <p className="text-[11px] text-[#53433e] leading-snug opacity-90">Charcoal, deep navy, and icy taupe create striking definition.</p>
+                        </div>
+                        {/* Cheeks */}
+                        <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
+                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">brush</span>
+                            <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Cheeks</h4>
+                            <div className="flex gap-2 mb-3">
+                                {(displayReport.makeup?.blush || [
+                                    { hex: "#9E4244" }, { hex: "#C71585" }, { hex: "#800080" }
+                                ]).slice(0, 3).map((item: any, idx: number) => (
+                                    <div key={idx} className="w-8 h-8 rounded-full border border-white shadow-inner" style={{ backgroundColor: item.hex }} title={item.name} />
+                                ))}
+                            </div>
+                            <p className="text-[11px] text-[#53433e] leading-snug opacity-90">Plum, deep rose, and cool magenta add a natural flush.</p>
+                        </div>
                     </div>
 
                     <BlurLock label="Unlock Makeup Guide">
@@ -1015,33 +1409,33 @@ export default function PageComponent({
                 <div id="styling" className="lg:col-span-5 space-y-8 scroll-mt-20">
                     {/* Hair Card */}
                     {dHair && (
-                        <div id="hair" className="bg-[#1A1A2E] text-white p-8 rounded-[2rem] shadow-lg relative overflow-hidden scroll-mt-20">
+                        <div id="hair" className="bg-[#2d2926] text-white p-8 rounded-[2rem] shadow-lg relative overflow-hidden scroll-mt-20 border border-white/10">
                             <div className="relative z-10">
                                 <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                                    <span>💇‍♀️</span> Hair Color
+                                    <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-[#C07A60]">face_retouching_natural</span> Hair Color</span>
                                 </h3>
                                 <BlurLock label="Unlock Hair Colors">
                                 <div className="space-y-4">
                                     {dHair.map((hair: any, i: number) => (
                                         <div key={i} className="bg-white/10 backdrop-blur border border-white/10 p-4 rounded-xl">
-                                            <p className="font-bold text-accent-gold mb-1">{hair.color}</p>
-                                            <p className="text-sm text-gray-300 leading-snug">{hair.desc}</p>
+                                            <p className="font-bold text-[#D4A5A5] mb-1">{hair.color}</p>
+                                            <p className="text-sm text-gray-300 leading-snug font-sans">{hair.desc}</p>
                                         </div>
                                     ))}
                                 </div>
                                 </BlurLock>
                             </div>
-                            <div className="absolute top-0 right-0 w-48 h-48 bg-accent-gold/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+                            <div className="absolute top-0 right-0 w-48 h-48 bg-[#D4A5A5]/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
                         </div>
                     )}
 
                     {/* Metal Card */}
-                    <div className="bg-white text-[#1A1A2E] p-8 rounded-[2rem] shadow-sm border border-[#E8E1D9] relative overflow-hidden">
+                    <div className="bg-white/45 backdrop-blur-md text-[#1e1b18] p-8 rounded-[2rem] glass-card soft-shadow border border-white/50 relative overflow-hidden">
                         <div className="relative z-10">
                             <h3 className="font-serif text-2xl font-bold mb-4">Best Metals</h3>
                             <div className="flex flex-wrap gap-3">
                                 {dStyling?.metals?.map((m: string, i: number) => (
-                                    <span key={i} className="px-4 py-2 bg-gray-100 rounded-lg text-sm font-medium border border-gray-200">
+                                    <span key={i} className="px-4 py-2 bg-[#F5F0E8] rounded-lg text-sm font-medium border border-white/40 shadow-sm font-sans">
                                         {m}
                                     </span>
                                 ))}
@@ -1050,11 +1444,11 @@ export default function PageComponent({
                     </div>
 
                     {/* Keywords Card */}
-                    <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-[#E8E1D9]">
+                    <div className="bg-white/45 backdrop-blur-md p-8 rounded-[2rem] glass-card soft-shadow border border-white/50 text-[#1e1b18]">
                         <h3 className="font-serif text-2xl font-bold mb-6">Style Keywords</h3>
                         <div className="flex flex-wrap gap-2">
                             {dStyling?.keywords?.map((k: string, i: number) => (
-                                <span key={i} className="px-4 py-2 bg-gray-100 text-gray-600 rounded-full text-sm font-medium hover:bg-primary hover:text-white transition-colors cursor-default">
+                                <span key={i} className="px-4 py-2 bg-[#F5F0E8] text-[#53433e] rounded-full text-sm font-medium hover:bg-[#C07A60] hover:text-white transition-all cursor-default font-sans">
                                     #{k}
                                 </span>
                             ))}
@@ -1066,7 +1460,7 @@ export default function PageComponent({
             {/* Feedback Section - Only for Owner */}
             {isOwner && !isLocked && (
             <div id="main-feedback" className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-[2rem] shadow-sm border border-gray-100 text-center">
-                <h3 className="text-xl font-serif font-bold text-[#1A1A2E] mb-6">Was this analysis helpful?</h3>
+                <h3 className="text-xl font-serif font-bold text-[#2D2926] mb-6">Was this analysis helpful?</h3>
                 
                 {feedbackStatus === 'idle' && (
                     <div className="flex justify-center gap-8">
@@ -1074,14 +1468,14 @@ export default function PageComponent({
                             onClick={() => handleFeedback('good')} 
                             className="group flex flex-col items-center gap-2 transition-transform hover:scale-110"
                         >
-                            <span className="text-4xl bg-green-50 p-4 rounded-full border border-green-100 group-hover:bg-green-100 transition-colors">👍</span>
+                            <span className="text-4xl bg-green-50 p-4 rounded-full border border-green-100 group-hover:bg-green-100 transition-colors flex items-center justify-center w-16 h-16"><span className="material-symbols-outlined text-3xl text-green-600">thumb_up</span></span>
                             <span className="text-xs font-bold text-gray-400 group-hover:text-green-600">Yes</span>
                         </button>
                         <button 
                             onClick={() => handleFeedback('bad')} 
                             className="group flex flex-col items-center gap-2 transition-transform hover:scale-110"
                             >
-                                <span className="text-4xl bg-red-50 p-4 rounded-full border border-red-100 group-hover:bg-red-100 transition-colors">👎</span>
+                                <span className="text-4xl bg-red-50 p-4 rounded-full border border-red-100 group-hover:bg-red-100 transition-colors flex items-center justify-center w-16 h-16"><span className="material-symbols-outlined text-3xl text-red-600">thumb_down</span></span>
                                 <span className="text-xs font-bold text-gray-400 group-hover:text-red-600">No</span>
                             </button>
                         </div>
@@ -1089,7 +1483,7 @@ export default function PageComponent({
 
                     {feedbackStatus === 'good' && (
                         <div className="animate-fade-in py-4">
-                            <p className="text-green-600 font-bold text-2xl mb-2">Thank you! ✨</p>
+                            <p className="text-green-600 font-bold text-2xl mb-2">Thank you! <span className="material-symbols-outlined text-sm align-middle text-[#C07A60]">auto_awesome</span></p>
                             <p className="text-gray-500">We&apos;re glad you liked your results.</p>
                         </div>
                     )}
@@ -1107,7 +1501,7 @@ export default function PageComponent({
                             <div className="text-center">
                                 <button 
                                     onClick={submitComment}
-                                    className="bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-md"
+                                    className="bg-[#2D2926] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-black transition-colors shadow-md"
                                 >
                                     Submit Feedback
                                 </button>
@@ -1146,7 +1540,7 @@ export default function PageComponent({
                 <div className="text-center py-16 border-t border-gray-200/50 mt-8">
                     <Link 
                         href={getLinkHref(locale, 'analysis')}
-                        className="group inline-flex items-center gap-3 px-8 py-4 bg-[#1A1A2E] text-white rounded-full text-lg font-bold hover:bg-primary transition-colors shadow-xl"
+                        className="group inline-flex items-center gap-3 px-8 py-4 bg-[#2D2926] text-white rounded-full text-lg font-bold hover:bg-primary transition-colors shadow-xl"
                     >
                         <span>Analyze Another Photo</span>
                         <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1163,19 +1557,19 @@ export default function PageComponent({
         {isOwner && !isLocked && feedbackStatus === 'idle' && !isMainFeedbackVisible && hasSeenContent && drapingImages.best && (
             <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up transition-transform duration-500">
                 <div className="max-w-xl mx-auto flex items-center justify-between">
-                    <span className="text-sm font-bold text-[#1A1A2E] mr-2">Was this helpful?</span>
+                    <span className="text-sm font-bold text-[#2D2926] mr-2">Was this helpful?</span>
                     <div className="flex gap-3">
                         <button 
                             onClick={() => handleFeedback('good')} 
-                            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#1A1A2E] text-white rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-sm"
+                            className="flex items-center gap-1.5 px-5 py-2.5 bg-[#2D2926] text-white rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-sm"
                         >
-                            <span>👍</span> Yes
+                            <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">thumb_up</span> Yes</span>
                         </button>
                         <button 
                             onClick={() => handleFeedback('bad')} 
                             className="flex items-center gap-1.5 px-5 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-full font-bold text-sm hover:bg-gray-50 transition-colors shadow-sm"
                         >
-                            <span>👎</span> No
+                            <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">thumb_down</span> No</span>
                         </button>
                     </div>
                 </div>
@@ -1184,18 +1578,18 @@ export default function PageComponent({
 
         {/* Sticky Unlock Bar (For Locked State) */}
         {isLocked && (
-             <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 shadow-2xl animate-slide-up">
+             <div className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white/80 backdrop-blur-md border-t border-white/40 shadow-[0_-8px_30px_rgba(192,122,96,0.1)] animate-slide-up pb-safe">
                 <div className="max-w-3xl mx-auto flex items-center justify-between gap-4">
                     <div className="hidden md:block">
-                        <p className="text-sm font-bold text-[#1A1A2E]">Your analysis is complete!</p>
-                        <p className="text-xs text-gray-500">Unlock your personalized palette & style guide.</p>
+                        <p className="text-sm font-bold text-[#1e1b18] font-sans">Your analysis is complete!</p>
+                        <p className="text-xs text-[#53433e] font-sans">Unlock your personalized palette & style guide.</p>
                     </div>
                     <button 
                         onClick={handleUnlockClick}
-                        className="flex-1 md:flex-none bg-[#1A1A2E] text-white px-8 py-3 rounded-full font-bold text-sm hover:bg-primary transition-colors shadow-lg flex items-center justify-center gap-2"
+                        className="flex-1 md:flex-none bg-[#C07A60] text-white px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#a5644b] scale-95 hover:scale-100 transition-all shadow-md hover:shadow-[0_8px_20px_rgba(192,122,96,0.2)] flex items-center justify-center gap-2 font-sans"
                     >
                         <span>Unlock full {baseSeason || 'Report'}</span>
-                        <span className="text-accent-gold bg-white/10 px-2 py-0.5 rounded">1 Credit</span>
+                        <span className="text-[#ffdad9] bg-white/10 px-2 py-0.5 rounded ml-1">1 Credit</span>
                     </button>
                 </div>
              </div>

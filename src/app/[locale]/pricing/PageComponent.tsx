@@ -67,7 +67,7 @@ const PricingPageInner = ({
 
 const PageComponent = ({ locale }) => {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#FFFBF7]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#fff8f5]" />}>
       <PricingPageInner locale={locale} />
     </Suspense>
   );

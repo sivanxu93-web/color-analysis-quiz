@@ -73,7 +73,7 @@ export default function Pricing({
   };
 
   return (
-    <section className="bg-[#FFFBF7] py-24 sm:py-32">
+    <section className="bg-[#fff8f5] py-24 sm:py-32">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center mb-16">
           <h2 className="text-base font-semibold leading-7 text-primary uppercase tracking-wide">Launch Special</h2>
@@ -81,7 +81,7 @@ export default function Pricing({
             Professional Analysis,<br/>Coffee Price.
           </p>
           <p className="mt-6 text-lg leading-8 text-gray-600">
-            Get the same insights as a $300 appointment for just <span className="font-bold text-[#1A1A2E]">$4.90</span>. <br/>
+            Get the same insights as a $300 appointment for just <span className="font-bold text-[#2D2926]">$5.90</span>. <br/>
             <span className="text-red-500 font-bold text-sm">⚠️ Limited to first 100 users today.</span>
           </p>
         </div>
@@ -90,18 +90,18 @@ export default function Pricing({
 
         {/* Comparison Table */}
         <div className="mx-auto max-w-2xl mt-20 bg-white rounded-3xl p-8 shadow-sm border border-gray-100">
-            <h3 className="text-xl font-serif font-bold text-center mb-8 text-[#1A1A2E]">Why Choose AI Color Analysis Quiz?</h3>
+            <h3 className="text-xl font-serif font-bold text-center mb-8 text-[#2D2926]">Why Choose AI Color Analysis Quiz?</h3>
             <div className="grid grid-cols-3 gap-6 text-sm items-center border-b border-gray-100 pb-4 mb-4">
                 <div className="font-bold text-gray-400">Feature</div>
                 <div className="text-center font-bold text-gray-500">Human Stylist</div>
-                <div className="text-center font-bold text-primary text-lg">AI Color Analysis Quiz</div>
+                <div className="text-center font-bold text-[#C07A60] text-lg">AI Color Analysis Quiz</div>
             </div>
             
             <div className="space-y-6">
                 <div className="grid grid-cols-3 gap-6 items-center">
                     <div className="font-medium text-gray-600">Cost</div>
                     <div className="text-center text-red-500">$200 - $500</div>
-                    <div className="text-center text-green-600 font-bold bg-green-50 rounded-full py-1">$4.90</div>
+                    <div className="text-center text-green-600 font-bold bg-green-50 rounded-full py-1">$5.90</div>
                 </div>
                 <div className="grid grid-cols-3 gap-6 items-center">
                     <div className="font-medium text-gray-600">Time</div>

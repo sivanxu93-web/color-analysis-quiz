@@ -78,15 +78,15 @@ export async function GET(req: NextRequest) {
               <p>Our AI has finished analyzing your new photo. You've been identified as a <strong>${season_name || 'unique season'}</strong>.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <h2 style="margin: 0 0 10px 0; color: #1A1A2E; font-size: 24px;">Unlock Your ${season_name} Palette</h2>
+                <h2 style="margin: 0 0 10px 0; color: #2D2926; font-size: 24px;">Unlock Your ${season_name} Palette</h2>
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
                   Since you've used us before, we've applied an <strong>extra 50% discount</strong> to your new report.
                 </p>
-                <p style="font-size: 18px; color: #E88D8D; font-weight: bold;">Just $2.45 to unlock.</p>
+                <p style="font-size: 18px; color: #E88D8D; font-weight: bold;">Just $2.95 to unlock.</p>
               </div>
 
               <p style="text-align: center; margin-top: 30px;">
-                <a href="${reportUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <a href="${reportUrl}" style="background-color: #2D2926; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                   View My New Report &rarr;
                 </a>
               </p>
@@ -102,7 +102,7 @@ export async function GET(req: NextRequest) {
               <p>Great news! Our AI has finished your personal color analysis. Based on your features, you are a <strong>${season_name || 'unique seasonal type'}</strong>.</p>
               
               <div style="background-color: #FFFBF7; border: 1px solid #E8E1D9; border-radius: 12px; padding: 20px; margin: 20px 0; text-align: center;">
-                <p style="margin: 0 0 5px 0; font-weight: bold; color: #1A1A2E; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">One-Time Exclusive Offer</p>
+                <p style="margin: 0 0 5px 0; font-weight: bold; color: #2D2926; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;">One-Time Exclusive Offer</p>
                 <h2 style="margin: 0 0 5px 0; color: #E88D8D; font-size: 32px;">EXTRA 50% OFF</h2>
                 <p style="margin: 0 0 15px 0; font-size: 14px; color: #555;">
                   We've automatically applied the 50% off coupon for you.
@@ -110,7 +110,7 @@ export async function GET(req: NextRequest) {
                 <div style="display: flex; justify-content: space-around; margin-top: 20px;">
                     <div style="text-align: center;">
                         <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Single Report</p>
-                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$4.90</span> $2.45</p>
+                        <p style="font-size: 20px; font-weight: bold; color: #333;"><span style="text-decoration: line-through; font-size: 14px; color: #999;">$5.90</span> $2.95</p>
                     </div>
                     <div style="text-align: center;">
                         <p style="font-size: 12px; color: #888; margin-bottom: 2px;">Style Pack (3x)</p>
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
               </ul>
 
               <p style="text-align: center; margin-top: 30px;">
-                <a href="${reportUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                <a href="${reportUrl}" style="background-color: #2D2926; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
                   Unlock My ${season_name || ''} Report Now &rarr;
                 </a>
               </p>

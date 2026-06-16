@@ -39,7 +39,7 @@ export default function Header({
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#FFFBF7]/90 backdrop-blur-lg border-b border-[#E8E1D9]">
+    <header className="sticky top-0 z-50 w-full bg-[#fff8f5]/90 backdrop-blur-lg border-b border-[#e9e1dc]">
       <LoadingModal loadingText={commonText.loadingText} />
       <GeneratingModal generatingText={commonText.generateText} />
       <LoginModal
@@ -64,7 +64,7 @@ export default function Header({
             href={getLinkHref(locale, '')}
             className="-m-1.5 p-1.5 flex items-center gap-2 active:opacity-70 transition-opacity"
           >
-            <span className="font-serif text-2xl font-bold text-[#1A1A2E] tracking-tight">
+            <span className="font-serif text-2xl font-bold text-[#2D2926] tracking-tight">
               Color Analysis <span className="text-primary">Quiz</span>
             </span>
           </Link>
@@ -74,7 +74,7 @@ export default function Header({
         <div className="flex lg:hidden">
           <button
             type="button"
-            className="-m-2.5 inline-flex items-center justify-center rounded-full p-2.5 text-[#1A1A2E] hover:bg-[#F5F0EB] transition-colors"
+            className="-m-2.5 inline-flex items-center justify-center rounded-full p-2.5 text-[#2D2926] hover:bg-[#F5F0EB] transition-colors"
             onClick={() => setMobileMenuOpen(true)}
           >
             <span className="sr-only">Open main menu</span>
@@ -156,10 +156,10 @@ export default function Header({
       {/* Mobile Menu - Full Screen Overlay with Soft Transitions */}
       <Dialog as="div" className="lg:hidden" open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className="fixed inset-0 z-50 bg-black/20 backdrop-blur-sm" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-[#FFFBF7] px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 shadow-2xl">
+        <Dialog.Panel className="fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-[#fff8f5] px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10 shadow-2xl">
           <div className="flex items-center justify-between mb-8">
             <Link href={getLinkHref(locale, '')} className="-m-1.5 p-1.5" onClick={() => setMobileMenuOpen(false)}>
-               <span className="font-serif text-2xl font-bold text-[#1A1A2E]">
+               <span className="font-serif text-2xl font-bold text-[#2D2926]">
                 Color Analysis <span className="text-primary">Quiz</span>
               </span>
             </Link>
@@ -177,14 +177,14 @@ export default function Header({
               <div className="space-y-4 py-6">
                 <Link
                   href={getLinkHref(locale, '')}
-                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#2D2926] hover:bg-white hover:shadow-sm transition-all"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {menuText.header0}
                 </Link>
                 <Link
                   href={getLinkHref(locale, 'validator')}
-                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#2D2926] hover:bg-white hover:shadow-sm transition-all"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {menuText.header1}
@@ -193,7 +193,7 @@ export default function Header({
                   userData.email ?
                     <Link
                       href={getLinkHref(locale, 'profile')}
-                      className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                      className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#2D2926] hover:bg-white hover:shadow-sm transition-all"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       {menuText.header2}
@@ -201,7 +201,7 @@ export default function Header({
                  }
                  <Link
                   href={getLinkHref(locale, 'pricing')}
-                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#1A1A2E] hover:bg-white hover:shadow-sm transition-all"
+                  className="block rounded-xl px-4 py-3 text-lg font-serif font-medium text-[#2D2926] hover:bg-white hover:shadow-sm transition-all"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {menuText.header3}

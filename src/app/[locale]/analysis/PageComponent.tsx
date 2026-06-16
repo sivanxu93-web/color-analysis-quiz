@@ -316,101 +316,151 @@ export default function PageComponent({
   return (
     <>
       <Header locale={locale} page={'analysis'} />
-      <main className="flex min-h-screen flex-col items-center py-12 md:py-20 px-4 bg-background relative">
+      <main className="flex min-h-screen flex-col items-center py-12 md:py-20 px-4 bg-[#fff8f5] relative">
+        <style dangerouslySetInnerHTML={{ __html: `
+          .iridescent-border {
+              position: relative;
+              background: rgba(255, 255, 255, 0.45);
+              border-radius: 24px;
+              z-index: 1;
+          }
+          .iridescent-border::before {
+              content: "";
+              position: absolute;
+              inset: -2px;
+              border-radius: 26px;
+              background: linear-gradient(135deg, rgba(212, 165, 165, 0.4), rgba(192, 122, 96, 0.2), rgba(139, 211, 205, 0.3), rgba(212, 165, 165, 0.4));
+              z-index: -1;
+              filter: blur(2px);
+          }
+        `}} />
         
         <div className="text-center mb-8 md:mb-10">
-            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-text-primary">
+            <h1 className="font-serif text-3xl md:text-4xl font-bold mb-3 md:mb-4 text-[#1e1b18]">
                 <span>{colorLabText.Analysis.title}</span>
             </h1>
-            <p className="text-text-secondary max-w-lg mx-auto text-sm md:text-base">
+            <p className="text-[#53433e] max-w-lg mx-auto text-sm md:text-base font-sans">
                 <span>{colorLabText.Analysis.description}</span>
             </p>
         </div>
         
-        <div className="w-full max-w-md bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100">
-            {!previewUrl ? (
-                <div 
-                    className="border-2 border-dashed border-gray-200 rounded-xl p-8 md:p-12 text-center cursor-pointer hover:bg-gray-50 hover:border-primary/50 transition-all duration-300 group"
-                    onClick={() => fileInputRef.current?.click()}
-                >
-                    <div className="mx-auto h-14 w-14 md:h-16 md:w-16 bg-primary-light/30 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                        <svg className="h-7 w-7 md:h-8 md:w-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <p className="mt-2 text-base md:text-lg font-medium text-gray-900">
-                        <span>{colorLabText.Analysis.uploadTitle}</span>
-                    </p>
-                    <p className="mt-1 text-xs md:text-sm text-gray-500">
-                        <span>{colorLabText.Analysis.uploadDesc}</span>
-                    </p>
-                </div>
-            ) : (
-                <div className="relative rounded-xl overflow-hidden shadow-md">
-                    <img src={previewUrl} alt="Preview" className="w-full object-cover aspect-[3/4]" />
-                    {!analyzing && (
-                        <button 
-                            type="button"
-                            onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}
-                            className="absolute top-3 right-3 z-10 flex items-center justify-center bg-white/80 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-sm backdrop-blur-sm"
-                        >
-                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+        <div className="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-8 items-start mt-4">
+            {/* Left Column: Upload Dropzone & Action Button */}
+            <div className="w-full bg-white/40 backdrop-blur-md p-6 md:p-8 rounded-[2rem] glass-card soft-shadow border border-white/50 text-center">
+                {!previewUrl ? (
+                    <div 
+                        className="w-full aspect-[3/4] max-h-[500px] iridescent-border mb-6 group cursor-pointer flex flex-col items-center justify-center p-6 relative overflow-hidden transition-transform duration-300 hover:scale-[1.01]"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        {/* Dashed inner border for 'drop' zone feel */}
+                        <div className="absolute inset-4 border border-dashed border-[#d8c2bb]/60 rounded-xl pointer-events-none transition-colors duration-300 group-hover:border-[#884c35]/40"></div>
+                        <div className="w-16 h-16 rounded-full bg-[#f5ece7]/50 flex items-center justify-center mb-6 backdrop-blur-md group-hover:scale-110 transition-transform">
+                            <svg className="h-7 w-7 text-[#884c35]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                        </button>
-                    )}
-                    {analyzing && (
-                        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
-                            <div className="relative w-20 h-20 mb-6">
-                                <div className="absolute inset-0 border-4 border-gray-200 rounded-full"></div>
-                                <div className="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"></div>
-                            </div>
-                            <h3 className="text-xl font-serif font-bold text-gray-900 mb-2">
-                                <span>Uploading...</span>
-                            </h3>
-                            <p className="text-text-secondary animate-pulse">
-                                <span>Please wait while we secure your photo.</span>
-                            </p>
                         </div>
-                    )}
-                </div>
-            )}
-            
-            <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                accept="image/*" 
-                className="hidden" 
-            />
+                        <p className="font-serif text-xl font-bold text-[#1e1b18] mb-2">
+                            <span>{colorLabText.Analysis.uploadTitle}</span>
+                        </p>
+                        <p className="font-sans text-xs text-[#53433e] opacity-70">
+                            <span>{colorLabText.Analysis.uploadDesc}</span>
+                        </p>
+                    </div>
+                ) : (
+                    <div className="relative rounded-[2rem] overflow-hidden glass-card soft-shadow p-3 mb-6">
+                        <div className="relative rounded-[1.5rem] overflow-hidden">
+                            <img src={previewUrl} alt="Preview" className="w-full object-cover aspect-[3/4]" />
+                        </div>
+                        {!analyzing && (
+                            <button 
+                                type="button"
+                                onClick={() => { setPreviewUrl(null); setSelectedFile(null); }}
+                                className="absolute top-6 right-6 z-10 flex items-center justify-center bg-white/80 text-gray-800 p-2 rounded-full hover:bg-white transition-colors shadow-sm backdrop-blur-sm"
+                            >
+                                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
+                                </svg>
+                            </button>
+                        )}
+                        {analyzing && (
+                            <div className="absolute inset-0 bg-[#fff8f5]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20">
+                                <div className="relative w-20 h-20 mb-6 rounded-full overflow-hidden shadow-[0_0_20px_rgba(192,122,96,0.15)] flex items-center justify-center bg-white border border-white/50">
+                                    {/* Ambient Aura rotating gradients */}
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#c07a60] via-[#D4A5A5] to-[#fff8f5] opacity-60 filter blur-md animate-spin" style={{ animationDuration: '6s' }} />
+                                    <div className="absolute inset-2 bg-gradient-to-bl from-[#D4A5A5] via-[#fff8f5] to-[#c07a60] opacity-50 filter blur-sm animate-[spin_8s_linear_infinite_reverse]" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse mix-blend-overlay" />
+                                    <div className="absolute inset-2 rounded-full border border-white/20 pointer-events-none z-10" />
+                                </div>
+                                <h3 className="text-xl font-serif font-bold text-[#1e1b18] mb-2">
+                                    <span>Uploading...</span>
+                                </h3>
+                                <p className="text-[#53433e] animate-pulse text-xs font-sans">
+                                    <span>Please wait while we secure your photo.</span>
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
+                
+                <input 
+                    type="file" 
+                    ref={fileInputRef} 
+                    onChange={handleFileChange} 
+                    accept="image/*" 
+                    className="hidden" 
+                />
 
-            {!analyzing && (
-                 <button
-                    onClick={startAnalysis}
-                    disabled={!selectedFile || isCheckingFace}
-                    className={`mt-6 w-full rounded-full px-6 py-4 text-base font-semibold text-white shadow-lg transition-all transform hover:-translate-y-0.5 ${(!selectedFile || isCheckingFace) ? 'bg-gray-300 cursor-not-allowed shadow-none' : 'bg-primary hover:bg-primary-hover'}`}
-                 >
-                    <span>{isCheckingFace ? "Checking image..." : colorLabText.Landing.uploadBtn}</span>
-                 </button>
-            )}
-            
-            <div className="mt-6 bg-blue-50/50 rounded-xl p-4 border border-blue-100 text-left">
-                <div className="flex gap-3">
-                    <span className="text-xl">💡</span>
-                    <div>
-                        <p className="text-sm font-bold text-blue-900 mb-1">For Best Results:</p>
-                        <ul className="text-xs text-blue-800 space-y-1 list-disc list-inside">
-                            <li>Use natural daylight (face a window)</li>
-                            <li>Avoid heavy makeup or filters</li>
-                            <li>Wear neutral colors if possible</li>
-                        </ul>
+                {!analyzing && (
+                     <button
+                        onClick={startAnalysis}
+                        disabled={!selectedFile || isCheckingFace}
+                        className={`w-full rounded-full px-6 py-4 text-base font-semibold text-white transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
+                          (!selectedFile || isCheckingFace) 
+                            ? 'bg-gray-300 cursor-not-allowed shadow-none' 
+                            : 'bg-[#C07A60] hover:bg-[#a5644b] hover:shadow-[0_8px_24px_rgba(192,122,96,0.25)]'
+                        }`}
+                     >
+                        <span>{isCheckingFace ? "Checking image..." : colorLabText.Landing.uploadBtn}</span>
+                     </button>
+                )}
+
+                <p className="mt-6 text-xs text-center text-gray-400 font-sans">
+                    <span>{colorLabText.Analysis.privacyNote}</span>
+                </p>
+            </div>
+
+            {/* Right Column: Photo Guidelines */}
+            <div className="w-full bg-white/40 backdrop-blur-md p-6 md:p-8 rounded-[2rem] glass-card soft-shadow border border-white/50 text-left">
+                <h3 className="font-sans text-xs font-bold tracking-widest uppercase text-[#53433e] mb-6 text-center border-b border-[#d8c2bb]/30 pb-4">
+                    Photo Guidelines
+                </h3>
+                <div className="glass-card rounded-[2rem] p-6 flex flex-col gap-6 border border-white/40 bg-white/30">
+                    <div className="w-full h-32 rounded-xl overflow-hidden flex items-center justify-center bg-white/50">
+                        <img 
+                            alt="Photo guidelines illustrations" 
+                            className="w-full h-full object-contain mix-blend-multiply opacity-80" 
+                            src="/line_illustrations.jpg" 
+                        />
+                    </div>
+                    
+                    <div className="flex flex-col gap-4">
+                        <div className="flex items-start gap-4">
+                            <span className="material-symbols-outlined text-xl text-[#C07A60] mt-0.5">wb_sunny</span>
+                            <div>
+                                <p className="font-serif text-base font-bold text-[#1e1b18]">Natural Lighting</p>
+                                <p className="font-sans text-xs text-[#53433e] opacity-75">Face a window for even, indirect sunlight.</p>
+                            </div>
+                        </div>
+                        <div className="flex items-start gap-4">
+                            <span className="material-symbols-outlined text-xl text-[#C07A60] mt-0.5">person</span>
+                            <div>
+                                <p className="font-serif text-base font-bold text-[#1e1b18]">Bare Face</p>
+                                <p className="font-sans text-xs text-[#53433e] opacity-75">Remove makeup and glasses for accuracy.</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <p className="mt-6 text-xs text-center text-gray-400">
-                <span>{colorLabText.Analysis.privacyNote}</span>
-            </p>
         </div>
 
         {/* Custom Alert Dialog */}
@@ -418,14 +468,14 @@ export default function PageComponent({
             isOpen={alertState.isOpen} 
             onClose={closeAlert}
             title={alertState.title}
-            icon={<span className="text-3xl">{alertState.type === 'error' ? '❌' : '⚠️'}</span>}
+            icon={<span className="material-symbols-outlined text-3xl text-primary">{alertState.type === 'error' ? 'cancel' : 'warning'}</span>}
         >
             <p className="text-gray-500 mb-8">{alertState.message}</p>
             <div className="flex flex-col sm:flex-row gap-3">
                 {alertState.onConfirm && (
                     <button 
                         onClick={() => { alertState.onConfirm?.(); closeAlert(); }}
-                        className="flex-1 w-full bg-[#1A1A2E] text-white py-3 rounded-full font-bold shadow-md hover:bg-black transition-colors"
+                        className="flex-1 w-full bg-[#2D2926] text-white py-3 rounded-full font-bold shadow-md hover:bg-black transition-colors"
                     >
                         <span>{alertState.confirmText || "Continue"}</span>
                     </button>
@@ -441,7 +491,7 @@ export default function PageComponent({
                     !alertState.onConfirm && (
                         <button 
                             onClick={closeAlert}
-                            className="w-full bg-[#1A1A2E] text-white py-3 rounded-full font-bold shadow-md"
+                            className="w-full bg-[#2D2926] text-white py-3 rounded-full font-bold shadow-md"
                         >
                             <span>Okay</span>
                         </button>

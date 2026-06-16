@@ -72,7 +72,7 @@ const LoginModal = ({
                     </svg>
                   </div>
 
-                  <Dialog.Title as="h3" className="text-2xl font-serif font-bold text-[#1A1A2E] mb-2">
+                  <Dialog.Title as="h3" className="text-2xl font-serif font-bold text-[#2D2926] mb-2">
                     {loginModalTitle || "Save Your Results"}
                   </Dialog.Title>
                   
@@ -116,7 +116,7 @@ const LoginModal = ({
                       ) : (
                         <button
                           type="button"
-                          className="group flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3.5 text-base font-bold text-[#1A1A2E] shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
+                          className="group flex w-full items-center justify-center gap-3 rounded-full bg-white px-6 py-3.5 text-base font-bold text-[#2D2926] shadow-md border border-gray-200 hover:bg-gray-50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300"
                           onClick={async () => {
                             setLoadGoogle(true)
                             await signInUseAuth({

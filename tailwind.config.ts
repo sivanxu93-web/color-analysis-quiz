@@ -3,7 +3,7 @@ module.exports = {
   content: ["./src/**/*.{tsx,css}"],
   theme: {
     fontFamily: {
-      sans: ["var(--font-inter)", "Inter", "sans-serif"],
+      sans: ["var(--font-montserrat)", "Montserrat", "sans-serif"],
       serif: ["var(--font-playfair)", "Playfair Display", "serif"],
       mono: [
         "Monaco",
@@ -18,29 +18,34 @@ module.exports = {
     },
     extend: {
       colors: {
-        // New Palette based on 'Color Analysis App' aesthetic
+        // Aura & Hue Design System Palette
         primary: {
-            DEFAULT: "#D67474", // Dusty Rose
-            hover: "#C05F5F",
-            light: "#FADADD",
+            DEFAULT: "#C07A60", // Terracotta
+            hover: "#884C35",   // Dark Terracotta
+            light: "#F5ECE7",   // Surface Container
+        },
+        secondary: {
+            DEFAULT: "#D4A5A5", // Dusty Rose
+            hover: "#7B5455",   // Dark Dusty Rose
+            light: "#FFDAD9",
         },
         background: {
-            DEFAULT: "#FFFBF7", // Warm Cream
+            DEFAULT: "#FFF8F5", // Oat
             paper: "#FFFFFF",
         },
         text: {
-            primary: "#1A1A2E", // Soft Black/Navy
-            secondary: "#6B6B7F",
-            accent: "#D67474",
+            primary: "#2D2926", // Charcoal
+            secondary: "#53433e", // Muted Charcoal
+            accent: "#C07A60",  // Terracotta
         },
         accent: {
             gold: "#D4AF37",
-            sage: "#A3C9A8",
+            sage: "#156761", // Muted Teal (Tertiary in Stitch)
         }
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'gradient-rainbow': 'linear-gradient(to right, #ff9a9e 0%, #fecfef 99%, #fecfef 100%)', // Soft holographic feel
+        'gradient-rainbow': 'linear-gradient(to right, #C07A60 0%, #D4A5A5 50%, #FFF8F5 100%)', // Aura themed gradient
       }
     },
   },

@@ -44,7 +44,7 @@ export default function ColorFan({ imageUrl, colors, title }: ColorFanProps) {
         <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-gray-100 flex justify-between items-center">
             <div>
                 <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{title}</p>
-                <p className="font-bold text-[#1A1A2E]">{selectedColor?.name}</p>
+                <p className="font-bold text-[#2D2926]">{selectedColor?.name}</p>
             </div>
             <div className="w-6 h-6 rounded-full border border-gray-200" style={{backgroundColor: selectedColor?.hex}}></div>
         </div>
@@ -58,7 +58,7 @@ export default function ColorFan({ imageUrl, colors, title }: ColorFanProps) {
                   <button
                     key={i}
                     onClick={() => setSelectedColor(c)}
-                    className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${selectedColor.hex === c.hex ? 'border-[#1A1A2E] scale-110 shadow-md' : 'border-transparent'}`}
+                    className={`w-8 h-8 rounded-full border-2 transition-all hover:scale-110 ${selectedColor.hex === c.hex ? 'border-[#2D2926] scale-110 shadow-md' : 'border-transparent'}`}
                     style={{backgroundColor: c.hex}}
                     title={c.name}
                   />

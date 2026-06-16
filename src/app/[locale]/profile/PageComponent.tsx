@@ -88,7 +88,7 @@ export default function PageComponent({
       return (
       <>
         <Header locale={locale} page={'profile'} />
-        <main className="min-h-screen bg-[#FFFBF7] py-12 md:py-20 px-4">
+        <main className="min-h-screen bg-[#fff8f5] py-12 md:py-20 px-4">
            <div className="max-w-6xl mx-auto space-y-8 md:space-y-12">
               
               {/* User Profile Card */}
@@ -103,7 +103,7 @@ export default function PageComponent({
                   </div>
                   
                   <div className="flex-1 text-center md:text-left space-y-4 w-full">
-                      <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#1A1A2E]">
+                      <h1 className="text-2xl md:text-3xl font-serif font-bold text-[#2D2926]">
                           Hello, {userData?.name || 'Guest'}
                       </h1>
                       <p className="text-gray-500 text-sm md:text-base">{userData?.email}</p>
@@ -128,7 +128,7 @@ export default function PageComponent({
               {/* History Grid */}
               <div>
                   <div className="flex items-center justify-between mb-8">
-                      <h2 className="text-2xl font-serif font-bold text-[#1A1A2E]">Your Analysis History</h2>
+                      <h2 className="text-2xl font-serif font-bold text-[#2D2926]">Your Analysis History</h2>
                       <Link href={getLinkHref(locale, 'analysis')} className="text-primary font-bold hover:underline">
                           + New Analysis
                       </Link>
@@ -193,7 +193,7 @@ export default function PageComponent({
                                                   ? "Your personalized report is waiting to be unlocked. Click to view results." 
                                                   : "View your full color analysis report and styling guide."}
                                           </p>
-                                          <p className={`mt-3 text-sm font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 ${isLocked ? 'text-[#1A1A2E]' : 'text-primary'}`}>
+                                          <p className={`mt-3 text-sm font-bold group-hover:translate-x-1 transition-transform inline-flex items-center gap-1 ${isLocked ? 'text-[#2D2926]' : 'text-primary'}`}>
                                               {isLocked ? "Unlock Now →" : "View Report →"}
                                           </p>
                                       </div>

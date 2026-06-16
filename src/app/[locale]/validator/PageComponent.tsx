@@ -325,11 +325,11 @@ export default function ValidatorPageComponent({
     return (
         <>
             <Header locale={locale} page={'validator'} />
-            <main className="min-h-screen bg-[#FFFBF7] py-12 px-4 sm:px-6">
+            <main className="min-h-screen bg-[#fff8f5] py-12 px-4 sm:px-6">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-10">
                         <span className="text-primary font-bold tracking-widest uppercase text-xs">Style Validator</span>
-                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-[#1A1A2E] mt-3 mb-4">
+                        <h1 className="text-3xl md:text-5xl font-serif font-bold text-[#2D2926] mt-3 mb-4">
                             Will this look good on me?
                         </h1>
                         <p className="text-gray-500 text-lg max-w-2xl mx-auto">
@@ -339,7 +339,7 @@ export default function ValidatorPageComponent({
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                         {/* Left: Upload Area / Profile Selection */}
-                        <div className="bg-white p-6 rounded-3xl shadow-sm border border-[#E8E1D9] flex flex-col min-h-[400px]">
+                        <div className="glass-card soft-shadow p-6 rounded-[2rem] flex flex-col min-h-[400px]">
                             {isLoadingProfiles ? (
                                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
                                     <div className="w-8 h-8 border-2 border-primary/20 border-t-primary rounded-full animate-spin mb-4"></div>
@@ -347,7 +347,7 @@ export default function ValidatorPageComponent({
                                 </div>
                             ) : !activeProfileId && profiles.length > 1 ? (
                                 <div className="animate-fade-in flex flex-col h-full justify-center">
-                                    <h3 className="font-serif text-2xl font-bold text-[#1A1A2E] mb-2 text-center">Who are we styling?</h3>
+                                    <h3 className="font-serif text-2xl font-bold text-[#2D2926] mb-2 text-center">Who are we styling?</h3>
                                     <p className="text-gray-500 text-sm mb-6 text-center">Please select a color profile to use for validation.</p>
                                     <div className="space-y-3 overflow-y-auto max-h-[400px] pr-2 custom-scrollbar">
                                         {profiles.map((profile: any) => (
@@ -362,7 +362,7 @@ export default function ValidatorPageComponent({
                                                     <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center shrink-0 text-2xl shadow-sm">👤</div>
                                                 )}
                                                 <div>
-                                                    <p className="font-bold text-[#1A1A2E] text-lg">{profile.season || 'Unknown Season'}</p>
+                                                    <p className="font-bold text-[#2D2926] text-lg">{profile.season || 'Unknown Season'}</p>
                                                     <p className="text-sm text-gray-500 truncate">{profile.headline || 'Your Color Profile'}</p>
                                                 </div>
                                             </button>
@@ -382,7 +382,7 @@ export default function ValidatorPageComponent({
                                                 )}
                                                 <div>
                                                     <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">Validating for</p>
-                                                    <p className="text-sm font-bold text-[#1A1A2E] leading-tight">
+                                                    <p className="text-sm font-bold text-[#2D2926] leading-tight">
                                                         {profiles.find(p => p.id === activeProfileId)?.season}
                                                     </p>
                                                 </div>
@@ -409,11 +409,11 @@ export default function ValidatorPageComponent({
                                                                     strokeLinecap="round" />
                                                         </svg>
                                                         <div className="absolute inset-0 flex items-center justify-center">
-                                                            <span className="text-xl font-bold font-mono text-[#1A1A2E]">{Math.floor(progress)}%</span>
+                                                            <span className="text-xl font-bold font-mono text-[#2D2926]">{Math.floor(progress)}%</span>
                                                         </div>
                                                         <div className="absolute -inset-2 bg-primary/10 rounded-full blur-lg animate-pulse -z-10"></div>
                                                     </div>
-                                                    <p className="text-[#1A1A2E] font-serif font-bold text-lg mb-1">{processStep}</p>
+                                                    <p className="text-[#2D2926] font-serif font-bold text-lg mb-1">{processStep}</p>
                                                     <p className="text-xs text-gray-500 uppercase tracking-widest animate-pulse">Please wait</p>
                                                 </div>
                                             )}
@@ -435,7 +435,7 @@ export default function ValidatorPageComponent({
                                             <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                                                 <svg className="w-8 h-8 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                             </div>
-                                            <h3 className="font-serif text-xl font-bold text-[#1A1A2E] mb-2">Upload Clothing Image</h3>
+                                            <h3 className="font-serif text-xl font-bold text-[#2D2926] mb-2">Upload Clothing Image</h3>
                                             <p className="text-gray-400 text-sm px-8 text-center">Take a photo or upload a screenshot of an outfit you want to buy.</p>
                                         </div>
                                     )}
@@ -454,8 +454,10 @@ export default function ValidatorPageComponent({
                         <div className="flex flex-col justify-center h-full">
                             {error ? (
                                 error.includes("top-up") || error.includes("LIMIT_REACHED") ? (
-                                    <div className="bg-[#1A1A2E] p-8 rounded-3xl border border-[#1A1A2E] text-center shadow-xl text-white transform transition-all hover:scale-105">
-                                        <div className="text-5xl mb-4">💎</div>
+                                    <div className="bg-[#2D2926] p-8 rounded-3xl border border-[#2D2926] text-center shadow-xl text-white transform transition-all hover:scale-105">
+                                        <div className="text-[#C07A60] mb-4">
+                                            <span className="material-symbols-outlined text-5xl">diamond</span>
+                                        </div>
                                         <h3 className="text-2xl font-serif font-bold mb-3">Time for a Top-up</h3>
                                         <p className="text-gray-300 mb-8 max-w-sm mx-auto leading-relaxed">
                                             {error.includes("top-up") ? error : "You've used all your free Style Validations. Get a scan pack to keep your AI stylist on call."}
@@ -463,7 +465,7 @@ export default function ValidatorPageComponent({
                                         <div className="bg-white/10 p-6 rounded-2xl mb-8 border border-white/10">
                                             <div className="flex items-center justify-between mb-2">
                                                 <span className="font-bold text-lg">20 Outfit Scans</span>
-                                                <span className="text-2xl font-bold text-accent-gold">$4.90</span>
+                                                <span className="text-2xl font-bold text-accent-gold">$5.90</span>
                                             </div>
                                             <p className="text-left text-xs text-gray-400">That&apos;s just $0.24 per scan to never buy the wrong color again.</p>
                                         </div>
@@ -486,13 +488,15 @@ export default function ValidatorPageComponent({
                                     </div>
                                 ) : (
                                     <div className="bg-red-50 p-6 rounded-2xl border border-red-100 text-center animate-fade-in">
-                                        <div className="text-4xl mb-4">⚠️</div>
+                                        <div className="text-red-500 mb-4">
+                                            <span className="material-symbols-outlined text-5xl">warning</span>
+                                        </div>
                                         <h3 className="text-lg font-bold text-red-800 mb-2">Analysis Failed</h3>
                                         <p className="text-red-600/80 mb-6">{error}</p>
                                         {error === "You need to complete your Personal Color Analysis before using the Style Validator." ? (
                                             <button 
                                                 onClick={() => router.push(getLinkHref(locale, 'analysis'))}
-                                                className="bg-[#1A1A2E] text-white px-6 py-2.5 rounded-full font-bold shadow-sm"
+                                                className="bg-[#2D2926] text-white px-6 py-2.5 rounded-full font-bold shadow-sm"
                                             >
                                                 Start Color Analysis
                                             </button>
@@ -501,7 +505,7 @@ export default function ValidatorPageComponent({
                                                 {uploadedImageUrl && activeProfileId && (
                                                     <button 
                                                         onClick={() => { setError(null); continueValidationWithProfile(activeProfileId, uploadedImageUrl); }}
-                                                        className="bg-[#1A1A2E] text-white px-6 py-2.5 rounded-full font-bold shadow-sm"
+                                                        className="bg-[#2D2926] text-white px-6 py-2.5 rounded-full font-bold shadow-sm"
                                                     >
                                                         Retry Analysis
                                                     </button>
@@ -519,8 +523,12 @@ export default function ValidatorPageComponent({
                             ) : result ? (
                                 <div className={`p-8 rounded-[2rem] shadow-lg border relative overflow-hidden transition-all duration-500 animate-slide-up ${result.is_match ? 'bg-[#F2FCEE] border-green-200' : 'bg-[#FFF5F5] border-red-200'}`}>
                                     
-                                    <div className="absolute top-0 right-0 p-6 opacity-20 text-8xl pointer-events-none">
-                                        {result.is_match ? '✨' : '🛑'}
+                                    <div className="absolute top-0 right-0 p-6 opacity-10 text-8xl pointer-events-none text-current">
+                                        {result.is_match ? (
+                                            <span className="material-symbols-outlined text-8xl">auto_awesome</span>
+                                        ) : (
+                                            <span className="material-symbols-outlined text-8xl">block</span>
+                                        )}
                                     </div>
 
                                     <div className="relative z-10">
@@ -558,7 +566,9 @@ export default function ValidatorPageComponent({
                                 </div>
                             ) : (
                                 <div className="hidden md:flex flex-col items-center justify-center text-center p-8 bg-white/50 rounded-[2rem] border border-dashed border-gray-200 h-full min-h-[300px]">
-                                    <div className="text-6xl mb-4 opacity-50 grayscale">👗</div>
+                                    <div className="text-[#C07A60] opacity-40 mb-4">
+                                        <span className="material-symbols-outlined text-6xl">apparel</span>
+                                    </div>
                                     <h3 className="font-serif text-xl font-bold text-gray-400 mb-2">Awaiting Image</h3>
                                     <p className="text-gray-400 text-sm max-w-xs">Upload a clothing item to see how it aligns with your seasonal color profile.</p>
                                 </div>

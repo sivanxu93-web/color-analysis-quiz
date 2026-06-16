@@ -128,7 +128,7 @@ export default function PricingModal({
       isOpen={showPricingModal} 
       onClose={() => setShowPricingModal(false)}
       title="Reveal Your Full Color Palette & Style Guide"
-      icon={<span className="text-4xl">✨</span>}
+      icon={<span className="material-symbols-outlined text-3xl text-[#C07A60]">auto_awesome</span>}
       maxWidth="sm:max-w-4xl"
     >
         {timeLeft && (
@@ -136,7 +136,7 @@ export default function PricingModal({
                 <span className={`w-2 h-2 rounded-full ${timeLeft === '00:00' ? 'bg-yellow-400 animate-ping' : 'bg-red-500 animate-pulse'}`}></span>
                 <span className="text-xs font-bold uppercase tracking-wider">
                     {timeLeft === '00:00' 
-                        ? "LAST CHANCE: Discount Expired! Secure $4.90 before price reverts." 
+                        ? "LAST CHANCE: Discount Expired! Secure $5.90 before price reverts." 
                         : `${isFromGoogle ? 'Google Search Exclusive' : 'Limited Time Special'} Offer Expires In: ${timeLeft}`
                     }
                 </span>
@@ -146,7 +146,12 @@ export default function PricingModal({
             <PricingContent onCheckout={handleCreemCheckout} isModal={true} />
             <div className="mt-8 pt-6 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-900 mb-1 uppercase tracking-widest">Expert AI Analysis • One-Time Payment • Lifetime Access</p>
-                <p className="text-[10px] text-gray-400">Join 5,000+ style enthusiasts. Secure checkout powered by Creem.</p>
+                <div className="flex items-center justify-center gap-1.5 mt-2 text-xs text-green-600 font-semibold">
+                    <svg className="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <span>Secure Payment via Creem • Encrypted & Reliable</span>
+                </div>
             </div>
         </div>
     </BaseModal>

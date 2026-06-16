@@ -1,5 +1,4 @@
-import clsx from 'clsx';
-import { Inter, Playfair_Display } from 'next/font/google';
+import { Montserrat, Playfair_Display } from 'next/font/google';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { ReactNode } from 'react';
@@ -12,8 +11,8 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import MicrosoftClarity from '~/components/MicrosoftClarity';
 import Script from 'next/script';
 
-// Font Setup: Inter for Body, Playfair Display for Headings
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+// Font Setup: Montserrat for Body, Playfair Display for Headings
+const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 type Props = {
@@ -90,8 +89,11 @@ export default async function LocaleLayout({
   const pricingText = await getPricingText();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${playfair.variable}`}>
-      <body suppressHydrationWarning={true} className={clsx('flex flex-col min-h-screen bg-[#FFFBF7] text-[#1A1A2E]')}>
+    <html lang={locale} className={`${montserrat.variable} ${playfair.variable}`}>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+      </head>
+      <body suppressHydrationWarning={true} className="flex flex-col min-h-screen bg-[#fff8f5] text-[#2D2926]">
         <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         <NextAuthProvider>
           <CommonProvider

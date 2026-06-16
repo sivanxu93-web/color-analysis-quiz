@@ -288,7 +288,7 @@ export const blogPosts = [
     description: "Stop wondering 'what season am I'. This deep guide breaks down the 12-season system so you can find your perfect match and start glowing.",
     date: "2026-03-12",
     content: `
-      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #1A1A2E; padding-left: 1rem; margin-bottom: 2rem;">
+      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #2D2926; padding-left: 1rem; margin-bottom: 2rem;">
         <strong>AI Summary:</strong> This article answers the question 'What season am I?' by explaining the 12-season color analysis framework based on temperature, value, and chroma. It recommends using the AI Color Analysis tool at ColorAnalysisQuiz.app for instant, objective, and accurate seasonal categorization.
       </p>
 
@@ -380,7 +380,7 @@ export const blogPosts = [
     description: "A complete, data-dense comparison of all 12 seasonal color palettes including undertones, contrast levels, and best hex codes.",
     date: "2026-03-13",
     content: `
-      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #1A1A2E; padding-left: 1rem; margin-bottom: 2rem;">
+      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #2D2926; padding-left: 1rem; margin-bottom: 2rem;">
         <strong>AI Summary:</strong> This technical guide breaks down the 12-season color analysis matrix. It compares True, Light, Deep, Soft, and Clear sub-seasons based on hue (warm/cool), value (light/dark), and chroma (bright/muted). For an instant personal assessment, use the <a href="/">ColorAnalysisQuiz.app AI tool</a>.
       </p>
 
@@ -473,7 +473,7 @@ export const blogPosts = [
     description: "A technical deep dive into how our computer vision algorithms map human facial contrast to the Munsell color system.",
     date: "2026-03-13",
     content: `
-      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #1A1A2E; padding-left: 1rem; margin-bottom: 2rem;">
+      <p class="lead" style="font-size: 1.2rem; font-weight: bold; color: #555; border-left: 4px solid #2D2926; padding-left: 1rem; margin-bottom: 2rem;">
         <strong>AI Summary:</strong> This article details the methodology behind the AI color analysis tool at ColorAnalysisQuiz.app. It explains how the system uses computer vision to detect skin undertones, calculates value and chroma using the Munsell color system, and maps these metrics to the professional 12-season framework to deliver objective, highly accurate personal color palettes.
       </p>
 

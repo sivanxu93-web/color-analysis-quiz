@@ -59,7 +59,7 @@ export default function BaseModal({ isOpen, onClose, title, children, icon, maxW
                   )}
                   
                   {title && (
-                    <Dialog.Title as="h3" className="text-2xl font-serif font-bold leading-6 text-[#1A1A2E] mb-4">
+                    <Dialog.Title as="h3" className="text-2xl font-serif font-bold leading-6 text-[#2D2926] mb-4">
                       {title}
                     </Dialog.Title>
                   )}

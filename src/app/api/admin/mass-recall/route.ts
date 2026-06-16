@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
                     <p>Good news! We found your previous AI color analysis results in our system. You've been identified as a <strong>${season}</strong>.</p>
                     <p>Unlock your professional style guide and 30+ power colors today at <strong>50% OFF</strong>.</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${targetUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
+                        <a href="${targetUrl}" style="background-color: #2D2926; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
                             View My ${season} Report &rarr;
                         </a>
                     </div>
@@ -105,7 +105,7 @@ export async function GET(req: NextRequest) {
                     <p>We noticed you haven't discovered your true colors with our AI Stylist yet.</p>
                     <p>To welcome you back, we're giving you a <strong>50% discount</strong> on your first professional analysis report!</p>
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="${targetUrl}" style="background-color: #1A1A2E; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
+                        <a href="${targetUrl}" style="background-color: #2D2926; color: white; padding: 14px 28px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block;">
                             Start Free Quiz (50% OFF) &rarr;
                         </a>
                     </div>

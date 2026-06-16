@@ -47,7 +47,7 @@ const PageComponent = ({
       <div className="mt-6 my-auto min-h-[80vh]">
         <TopBlurred/>
         <main className="w-[95%] md:w-[65%] lg:w-[55%] 2xl:w-[45%] mx-auto h-full my-8">
-          <div className="p-6 prose prose-lg mx-auto text-[#1A1A2E] prose-headings:text-[#1A1A2E] prose-p:text-gray-700 prose-strong:text-[#1A1A2E] prose-a:text-primary">
+          <div className="p-6 prose prose-lg mx-auto text-[#2D2926] prose-headings:text-[#2D2926] prose-p:text-gray-700 prose-strong:text-[#2D2926] prose-a:text-primary">
             <Markdown>
               {privacyPolicyText.detailText}
             </Markdown>

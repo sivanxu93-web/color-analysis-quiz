@@ -27,16 +27,16 @@
 
 
 .background-div {
-    background-color: #FFFBF7;
+    background-color: #fff8f5;
 }
 
 .background-header {
-    background-color: rgba(255, 251, 247, 0.8);
-    backdrop-filter: blur(8px);
+    background-color: rgba(255, 248, 245, 0.85);
+    backdrop-filter: blur(12px);
 }
 
 .background-footer {
-    background-color: #1A1A2E; /* Dark Navy for Contrast in Footer */
+    background-color: #2D2926; /* Dark Navy for Contrast in Footer */
 }
 
 .line-clamp-2 {
@@ -56,3 +56,64 @@
     /* 偏移其中一个渐变，以产生交错效果 */
     background-position: 0 0, 10px 10px;
 }
+
+/* Stitch Design System Utilities */
+.glass-card {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.soft-shadow {
+    box-shadow: 0 10px 30px -10px rgba(192, 122, 96, 0.12);
+}
+
+/* Print styles for saving report as PDF */
+@media print {
+    header,
+    footer,
+    nav,
+    button,
+    .print\:hidden {
+        display: none !important;
+    }
+    
+    body {
+        background-color: #fff8f5 !important;
+        color: #2D2926 !important;
+    }
+    
+    /* Force background colors on all browser print engines */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+
+    /* Convert glass effect cards to solid background to prevent transparency rendering bugs in PDFs */
+    .glass-card {
+        background-color: #ffffff !important;
+        background-image: none !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border: 1px solid #d8c2bb !important;
+    }
+    
+    /* Allow large sections to split naturally across pages to prevent layout breakdown */
+    .glass-card, section {
+        page-break-inside: auto !important;
+        break-inside: auto !important;
+    }
+
+    /* Avoid cutting off individual color blocks, list items or table rows mid-page */
+    .card-item, 
+    .group, 
+    tr, 
+    li, 
+    .avoid-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+
