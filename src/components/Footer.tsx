@@ -66,6 +66,11 @@ export default function Footer({
                     support@coloranalysisquiz.app
                 </a>
             </div>
+            <div className="mt-4">
+              <a href="https://findly.tools/color-analysis-quiz?utm_source=color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="150" height="47" />
+              </a>
+            </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
             <div className="md:grid md:grid-cols-2 md:gap-8">
