@@ -28,11 +28,11 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         <h3 className="text-lg font-serif font-semibold leading-8 text-[#2D2926]">Single Report</h3>
         <p className="mt-4 text-sm leading-6 text-text-secondary">Perfect for one person.</p>
         <div className="mt-6 flex items-baseline gap-x-1">
-            <span className="text-4xl font-bold tracking-tight text-[#2D2926]">${isDiscounted ? '2.95' : '5.90'}</span>
+            <span className="text-4xl font-bold tracking-tight text-[#2D2926]">${isDiscounted ? '2.95' : (isAds75 ? '4.90' : '5.90')}</span>
             <span className="text-sm font-semibold leading-6 text-gray-400 line-through ml-2">${isDiscounted ? '5.90' : '19.90'}</span>
         </div>
         <div className="mt-2 inline-block bg-secondary/10 text-[#7B5455] text-xs font-bold px-2 py-0.5 rounded">
-            {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '75% OFF')}
+            {isDiscounted ? 'EXTRA 50% OFF APPLIED' : (isAds75 ? '✨ 75% OFF APPLIED' : '70% OFF')}
         </div>
         
         <button
