@@ -15,7 +15,7 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
   // Check both URL and Database for active offers
   // @ts-ignore
   const isDiscounted = coupon === 'WELCOMEBACK' || userData?.promo_tag === 'WELCOMEBACK';
-  const isAds75 = coupon === 'OFF75';
+  const isAds75 = coupon === 'OFF75' || coupon === 'TAAFT';
 
   const isPaymentEnabled = !!process.env.NEXT_PUBLIC_CREEM_CHECKOUT_URL;
 
