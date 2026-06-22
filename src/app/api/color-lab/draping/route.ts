@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
 
     // Using gemini-3-pro-image-preview which supports image generation
     const model = genAI.getGenerativeModel({
-      model: "gemini-3.5-flash",
+      model: "gemini-3-pro-image-preview",
     });
 
     const fullPrompt = `STRICT IMAGE EDITING INSTRUCTION FOR 'COLOR ANALYSIS QUIZ'.
