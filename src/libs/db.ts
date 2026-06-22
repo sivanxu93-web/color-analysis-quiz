@@ -1,4 +1,19 @@
 import { Pool } from "pg";
+import { setGlobalDispatcher, ProxyAgent } from "undici";
+
+// Setup global HTTP/HTTPS proxy for Node.js native fetch (e.g. Gemini API) in local development
+if (typeof window === "undefined") {
+  const proxyUrl = process.env.HTTP_PROXY || process.env.HTTPS_PROXY;
+  if (proxyUrl) {
+    try {
+      const dispatcher = new ProxyAgent({ uri: proxyUrl });
+      setGlobalDispatcher(dispatcher);
+      console.log("Global HTTP/HTTPS proxy dispatcher initialized for fetch:", proxyUrl);
+    } catch (e) {
+      console.error("Failed to set global proxy dispatcher:", e);
+    }
+  }
+}
 
 // Use globalThis to maintain the pool across hot reloads in development
 const globalForDb = globalThis as unknown as {
