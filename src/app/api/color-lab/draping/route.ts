@@ -23,13 +23,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Default makeup instructions if not provided by the analyze step
-    const defaultMakeup =
-      type === "best"
-        ? "Apply an ultra-realistic, 'No-Makeup' makeup look. Use a sheer, hydrating lip tint and subtle blush that harmonizes with the skin. Maintain skin texture and avoid any heavy application."
-        : "Apply a natural makeup look, but use colors that slightly clash with the skin's undertone. The application must remain light and sheer, showing how the wrong undertone makes the skin look duller without using heavy makeup textures.";
-
-    const makeupInstruction = makeup_prompt || defaultMakeup;
+    // Keep makeup completely unchanged for both best and worst scenarios to preserve identity
+    const makeupInstruction = "CRITICAL: KEEP ORIGINAL MAKEUP. NO CHANGES. Do not add, modify, or retouch any makeup on the face.";
 
     // 1. Get User Image from DB
     const db = getDb();

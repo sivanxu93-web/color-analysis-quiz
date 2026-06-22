@@ -75,7 +75,7 @@ Return ONLY valid JSON. No markdown formatting. No code blocks.
   "virtual_draping_prompts": {
     "best_color_prompt": "string (Focus ONLY on the garment. Instruction: Replace the existing top with a high-quality [Color Name] [Fabric, e.g., silk/cotton] top. Keep the person's face, expression, and pose EXACTLY as in the original photo.)",
     "worst_color_prompt": "string (Focus ONLY on the garment. Instruction: Replace the existing top with a [Color Name] top in a flat, plain fabric. Keep the person's face, expression, and pose EXACTLY as in the original photo. No backgrounds, no changes to the face.)",
-    "best_makeup_prompt": "string (Instructions for a 'Skin-First' look. Use words like 'sheer', 'translucent', 'minimalist'. Enhance only.)",
+    "best_makeup_prompt": "string (CRITICAL: KEEP ORIGINAL MAKEUP. NO CHANGES.)",
     "worst_makeup_prompt": "string (CRITICAL: KEEP ORIGINAL MAKEUP. NO CHANGES.)"
   }
 }
