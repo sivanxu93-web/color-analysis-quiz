@@ -128,7 +128,7 @@ export default function PricingModal({
       isOpen={showPricingModal} 
       onClose={() => setShowPricingModal(false)}
       title="Reveal Your Full Color Palette & Style Guide"
-      icon={<span className="material-symbols-outlined text-3xl text-[#C07A60]">auto_awesome</span>}
+      icon={<span className="material-symbols-outlined text-3xl text-[#A46751]">auto_awesome</span>}
       maxWidth="sm:max-w-4xl"
     >
         {timeLeft && (

@@ -36,6 +36,7 @@
     "react-markdown": "^9.0.1",
     "replicate": "^0.27.1",
     "resend": "^6.12.2",
+    "sharp": "^0.35.2",
     "stripe": "^14.19.0",
     "undici": "5.29.0",
     "uuid": "^9.0.1"

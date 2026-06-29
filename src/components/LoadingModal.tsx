@@ -85,11 +85,11 @@ export default function LoadingModal({
           <div className="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full overflow-hidden shadow-[0_0_40px_rgba(192,122,96,0.15)] flex items-center justify-center bg-white/50 backdrop-blur-md border border-white/50 mb-12">
             {/* Fluid Aura Shader Animation */}
             <div 
-              className="absolute inset-0 bg-gradient-to-tr from-[#c07a60] via-[#D4A5A5] to-[#fff8f5] opacity-60 filter blur-xl scale-125" 
+              className="absolute inset-0 bg-gradient-to-tr from-[#a46751] via-[#D4A5A5] to-[#fff8f5] opacity-60 filter blur-xl scale-125" 
               style={{ animation: 'aura-spin 10s linear infinite' }} 
             />
             <div 
-              className="absolute inset-2 bg-gradient-to-bl from-[#D4A5A5] via-[#fff8f5] to-[#c07a60] opacity-50 filter blur-lg scale-110" 
+              className="absolute inset-2 bg-gradient-to-bl from-[#D4A5A5] via-[#fff8f5] to-[#a46751] opacity-50 filter blur-lg scale-110" 
               style={{ animation: 'aura-spin-reverse 15s linear infinite' }} 
             />
             <div 

@@ -110,7 +110,7 @@ export default function PageComponent({ locale }: { locale: string }) {
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 overflow-hidden border-b border-gray-100">
-            <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[600px] h-[600px] bg-[#C07A60]/5 rounded-full blur-[100px] pointer-events-none"></div>
+            <div className="absolute top-0 right-0 -mr-40 -mt-40 w-[600px] h-[600px] bg-[#A46751]/5 rounded-full blur-[100px] pointer-events-none"></div>
             <div className="max-w-4xl mx-auto px-6 text-center space-y-8 relative z-10">
                 <span className="font-mono text-[10px] md:text-xs font-black text-[#C5A059] uppercase tracking-[0.3em] bg-[#C5A059]/10 px-4 py-1.5 rounded-full">
                     The Ultimate Color Guide
@@ -148,7 +148,7 @@ export default function PageComponent({ locale }: { locale: string }) {
         <section className="py-20 bg-white border-b border-gray-50">
           <div className="max-w-3xl mx-auto px-6">
             <div className="text-center mb-12 space-y-4">
-              <span className="font-mono text-[10px] font-black text-[#C07A60] uppercase tracking-[0.3em]">Quick Evaluation</span>
+              <span className="font-mono text-[10px] font-black text-[#A46751] uppercase tracking-[0.3em]">Quick Evaluation</span>
               <h2 className="text-3xl md:text-4xl font-serif font-bold italic text-[#2D2926]">
                 Don&apos;t want to upload a photo? Take the Quick 60-Second Self-Test
               </h2>
@@ -164,7 +164,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                   {/* Progress bar */}
                   <div className="w-full bg-gray-200/60 rounded-full h-1.5 mb-8">
                     <div 
-                      className="bg-[#C07A60] h-1.5 rounded-full transition-all duration-500" 
+                      className="bg-[#A46751] h-1.5 rounded-full transition-all duration-500" 
                       style={{ width: `${((currentStep + 1) / QUESTIONS.length) * 100}%` }}
                     ></div>
                   </div>
@@ -179,7 +179,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                         <button
                           key={idx}
                           onClick={() => handleSelectOption(opt.value)}
-                          className="w-full text-left p-5 bg-white border border-gray-200/60 rounded-2xl hover:border-[#C07A60] hover:bg-[#C07A60]/5 transition-all text-sm md:text-base font-medium text-gray-700 hover:text-[#2D2926] shadow-sm transform hover:-translate-y-0.5 active:scale-[0.98]"
+                          className="w-full text-left p-5 bg-white border border-gray-200/60 rounded-2xl hover:border-[#A46751] hover:bg-[#A46751]/5 transition-all text-sm md:text-base font-medium text-gray-700 hover:text-[#2D2926] shadow-sm transform hover:-translate-y-0.5 active:scale-[0.98]"
                         >
                           {opt.text}
                         </button>
@@ -194,7 +194,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                 </>
               ) : (
                 <div className="space-y-8 py-4 text-center">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#C07A60]/15 text-[#C07A60] rounded-full mb-2">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#A46751]/15 text-[#A46751] rounded-full mb-2">
                     <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -244,7 +244,7 @@ export default function PageComponent({ locale }: { locale: string }) {
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <h3 className="text-2xl font-serif font-bold italic text-[#2D2926]">Spring</h3>
-                                <p className="text-[10px] font-black uppercase tracking-widest text-[#C07A60] mt-1">Warm & Bright</p>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-[#A46751] mt-1">Warm & Bright</p>
                             </div>
                             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-300 to-green-400 opacity-80"></div>
                         </div>
@@ -318,10 +318,10 @@ export default function PageComponent({ locale }: { locale: string }) {
                     <table className="w-full text-left border-collapse min-w-[800px]">
                         <thead>
                             <tr className="border-b border-white/20">
-                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#C07A60]">Sub-Season</th>
-                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#C07A60]">Primary Trait</th>
-                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#C07A60]">Secondary Trait</th>
-                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#C07A60]">Avoid</th>
+                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#A46751]">Sub-Season</th>
+                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#A46751]">Primary Trait</th>
+                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#A46751]">Secondary Trait</th>
+                                <th className="p-4 font-mono text-[10px] uppercase tracking-widest text-[#A46751]">Avoid</th>
                             </tr>
                         </thead>
                         <tbody className="text-sm font-medium">
@@ -433,7 +433,7 @@ export default function PageComponent({ locale }: { locale: string }) {
 
                     {/* AI Scan */}
                     <div className="bg-[#2D2926] text-white p-8 md:p-12 rounded-[2.5rem] space-y-6 shadow-[0_20px_45px_rgba(26,26,46,0.15)] relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#C07A60]/10 rounded-full blur-2xl"></div>
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-[#A46751]/10 rounded-full blur-2xl"></div>
                         <div className="flex justify-between items-center border-b border-white/10 pb-6">
                             <h3 className="text-2xl font-serif font-bold italic text-white">Professional AI Scan</h3>
                             <span className="text-sm font-mono text-green-400 font-bold bg-green-500/10 px-3 py-1 rounded-full">Premium Accuracy</span>
@@ -486,10 +486,10 @@ export default function PageComponent({ locale }: { locale: string }) {
             <div className="max-w-5xl mx-auto px-6 text-center">
                 <h2 className="text-4xl md:text-5xl font-serif font-bold italic text-[#2D2926] mb-12">Real Seasonal Examples</h2>
                 <div className="flex flex-wrap justify-center gap-4">
-                    <Link href={getLinkHref(locale, 'examples/soft-autumn-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#C07A60] hover:text-[#C07A60] transition-colors">Soft Autumn</Link>
-                    <Link href={getLinkHref(locale, 'examples/true-winter-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#C07A60] hover:text-[#C07A60] transition-colors">True Winter</Link>
-                    <Link href={getLinkHref(locale, 'examples/warm-spring-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#C07A60] hover:text-[#C07A60] transition-colors">Warm Spring</Link>
-                    <Link href={getLinkHref(locale, 'examples/light-summer-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#C07A60] hover:text-[#C07A60] transition-colors">Light Summer</Link>
+                    <Link href={getLinkHref(locale, 'examples/soft-autumn-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#A46751] hover:text-[#A46751] transition-colors">Soft Autumn</Link>
+                    <Link href={getLinkHref(locale, 'examples/true-winter-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#A46751] hover:text-[#A46751] transition-colors">True Winter</Link>
+                    <Link href={getLinkHref(locale, 'examples/warm-spring-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#A46751] hover:text-[#A46751] transition-colors">Warm Spring</Link>
+                    <Link href={getLinkHref(locale, 'examples/light-summer-analysis')} className="px-6 py-3 border border-gray-200 rounded-full text-sm font-bold hover:border-[#A46751] hover:text-[#A46751] transition-colors">Light Summer</Link>
                     <Link href={getLinkHref(locale, 'examples')} className="px-6 py-3 bg-[#fff8f5] text-[#2D2926] rounded-full text-sm font-bold hover:bg-gray-100 transition-colors">View All 12 Seasons →</Link>
                 </div>
             </div>
@@ -523,7 +523,7 @@ export default function PageComponent({ locale }: { locale: string }) {
             <h2 className="text-4xl md:text-6xl font-serif font-bold italic tracking-tighter text-[#2D2926] mb-10">Stop Asking, Start Knowing.</h2>
             <Link 
                 href={getLinkHref(locale, 'analysis')}
-                className="inline-block px-12 py-5 bg-[#C07A60] text-white rounded-full font-black text-sm uppercase tracking-[0.3em] shadow-xl hover:bg-[#884C35] hover:scale-105 transition-all active:scale-95"
+                className="inline-block px-12 py-5 bg-[#A46751] text-white rounded-full font-black text-sm uppercase tracking-[0.3em] shadow-xl hover:bg-[#884C35] hover:scale-105 transition-all active:scale-95"
             >
                 Take The Quiz Now
             </Link>

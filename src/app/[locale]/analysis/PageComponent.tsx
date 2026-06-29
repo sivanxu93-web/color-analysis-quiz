@@ -386,8 +386,8 @@ export default function PageComponent({
                             <div className="absolute inset-0 bg-[#fff8f5]/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center z-20">
                                 <div className="relative w-20 h-20 mb-6 rounded-full overflow-hidden shadow-[0_0_20px_rgba(192,122,96,0.15)] flex items-center justify-center bg-white border border-white/50">
                                     {/* Ambient Aura rotating gradients */}
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#c07a60] via-[#D4A5A5] to-[#fff8f5] opacity-60 filter blur-md animate-spin" style={{ animationDuration: '6s' }} />
-                                    <div className="absolute inset-2 bg-gradient-to-bl from-[#D4A5A5] via-[#fff8f5] to-[#c07a60] opacity-50 filter blur-sm animate-[spin_8s_linear_infinite_reverse]" />
+                                    <div className="absolute inset-0 bg-gradient-to-tr from-[#a46751] via-[#D4A5A5] to-[#fff8f5] opacity-60 filter blur-md animate-spin" style={{ animationDuration: '6s' }} />
+                                    <div className="absolute inset-2 bg-gradient-to-bl from-[#D4A5A5] via-[#fff8f5] to-[#a46751] opacity-50 filter blur-sm animate-[spin_8s_linear_infinite_reverse]" />
                                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-pulse mix-blend-overlay" />
                                     <div className="absolute inset-2 rounded-full border border-white/20 pointer-events-none z-10" />
                                 </div>
@@ -417,7 +417,7 @@ export default function PageComponent({
                         className={`w-full rounded-full px-6 py-4 text-base font-semibold text-white transition-all duration-300 active:scale-[0.98] flex items-center justify-center gap-2 ${
                           (!selectedFile || isCheckingFace) 
                             ? 'bg-gray-300 cursor-not-allowed shadow-none' 
-                            : 'bg-[#C07A60] hover:bg-[#a5644b] hover:shadow-[0_8px_24px_rgba(192,122,96,0.25)]'
+                            : 'bg-[#A46751] hover:bg-[#a5644b] hover:shadow-[0_8px_24px_rgba(192,122,96,0.25)]'
                         }`}
                      >
                         <span>{isCheckingFace ? "Checking image..." : colorLabText.Landing.uploadBtn}</span>
@@ -445,14 +445,14 @@ export default function PageComponent({
                     
                     <div className="flex flex-col gap-4">
                         <div className="flex items-start gap-4">
-                            <span className="material-symbols-outlined text-xl text-[#C07A60] mt-0.5">wb_sunny</span>
+                            <span className="material-symbols-outlined text-xl text-[#A46751] mt-0.5">wb_sunny</span>
                             <div>
                                 <p className="font-serif text-base font-bold text-[#1e1b18]">Natural Lighting</p>
                                 <p className="font-sans text-xs text-[#53433e] opacity-75">Face a window for even, indirect sunlight.</p>
                             </div>
                         </div>
                         <div className="flex items-start gap-4">
-                            <span className="material-symbols-outlined text-xl text-[#C07A60] mt-0.5">person</span>
+                            <span className="material-symbols-outlined text-xl text-[#A46751] mt-0.5">person</span>
                             <div>
                                 <p className="font-serif text-base font-bold text-[#1e1b18]">Bare Face</p>
                                 <p className="font-sans text-xs text-[#53433e] opacity-75">Remove makeup and glasses for accuracy.</p>

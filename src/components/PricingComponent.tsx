@@ -94,7 +94,7 @@ export default function Pricing({
             <div className="grid grid-cols-3 gap-6 text-sm items-center border-b border-gray-100 pb-4 mb-4">
                 <div className="font-bold text-gray-400">Feature</div>
                 <div className="text-center font-bold text-gray-500">Human Stylist</div>
-                <div className="text-center font-bold text-[#C07A60] text-lg">AI Color Analysis Quiz</div>
+                <div className="text-center font-bold text-[#A46751] text-lg">AI Color Analysis Quiz</div>
             </div>
             
             <div className="space-y-6">

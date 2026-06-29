@@ -455,7 +455,7 @@ export default function ValidatorPageComponent({
                             {error ? (
                                 error.includes("top-up") || error.includes("LIMIT_REACHED") ? (
                                     <div className="bg-[#2D2926] p-8 rounded-3xl border border-[#2D2926] text-center shadow-xl text-white transform transition-all hover:scale-105">
-                                        <div className="text-[#C07A60] mb-4">
+                                        <div className="text-[#A46751] mb-4">
                                             <span className="material-symbols-outlined text-5xl">diamond</span>
                                         </div>
                                         <h3 className="text-2xl font-serif font-bold mb-3">Time for a Top-up</h3>
@@ -566,7 +566,7 @@ export default function ValidatorPageComponent({
                                 </div>
                             ) : (
                                 <div className="hidden md:flex flex-col items-center justify-center text-center p-8 bg-white/50 rounded-[2rem] border border-dashed border-gray-200 h-full min-h-[300px]">
-                                    <div className="text-[#C07A60] opacity-40 mb-4">
+                                    <div className="text-[#A46751] opacity-40 mb-4">
                                         <span className="material-symbols-outlined text-6xl">apparel</span>
                                     </div>
                                     <h3 className="font-serif text-xl font-bold text-gray-400 mb-2">Awaiting Image</h3>

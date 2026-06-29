@@ -91,9 +91,20 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} className={`${montserrat.variable} ${playfair.variable}`}>
       <head>
-        <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       </head>
       <body suppressHydrationWarning={true} className="flex flex-col min-h-screen bg-[#fff8f5] text-[#2D2926]">
+        <Script id="material-symbols-loader" strategy="afterInteractive">
+          {`
+            (function() {
+              var link = document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+              document.head.appendChild(link);
+            })();
+          `}
+        </Script>
         <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         <NextAuthProvider>
           <CommonProvider

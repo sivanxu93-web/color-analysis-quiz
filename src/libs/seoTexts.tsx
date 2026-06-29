@@ -59,14 +59,14 @@ export const getSeoText = (slug: string, locale: string = 'en') => {
 
       {/* CTA Box */}
       <div className="mt-12 p-8 bg-[#2D2926] text-white rounded-3xl relative overflow-hidden shadow-[0_20px_45px_rgba(26,26,46,0.15)]">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-[#C07A60]/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-[#A46751]/10 rounded-full blur-3xl"></div>
         <h3 className="text-xl md:text-2xl font-serif font-bold mb-4 text-white">Take the Professional AI Scan to Confirm Your Season</h3>
         <p className="mb-6 text-white/80 text-sm leading-relaxed">
           Not entirely sure if you are a {item.title}? The human eye is easily tricked by bathroom yellow lights and clothing reflections. Use our studio-grade AI analyzer to get a mathematically precise breakdown of your facial pigments.
         </p>
         <a 
           href={locale === 'en' || locale === '' ? '/analysis' : `/${locale}/analysis`} 
-          className="inline-block px-8 py-4 bg-[#C07A60] text-white font-black rounded-full text-xs md:text-sm uppercase tracking-[0.2em] shadow-lg hover:bg-[#884C35] hover:scale-105 transition-all"
+          className="inline-block px-8 py-4 bg-[#A46751] text-white font-black rounded-full text-xs md:text-sm uppercase tracking-[0.2em] shadow-lg hover:bg-[#884C35] hover:scale-105 transition-all"
         >
           Start Professional AI Scan
         </a>

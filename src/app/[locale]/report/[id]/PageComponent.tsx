@@ -521,7 +521,7 @@ export default function PageComponent({
           layout: {
             hLineWidth: (i: number, node: any) => (i === 0 || i === 1 || i === node.table.body.length) ? 1 : 0.5,
             vLineWidth: () => 0,
-            hLineColor: (i: number, node: any) => (i === 0 || i === 1) ? '#C07A60' : '#E8DCD8',
+            hLineColor: (i: number, node: any) => (i === 0 || i === 1) ? '#A46751' : '#E8DCD8',
             paddingTop: (i: number) => i === 0 ? 8 : 10,
             paddingBottom: (i: number) => i === 0 ? 8 : 10,
           }
@@ -567,7 +567,7 @@ export default function PageComponent({
             layout: {
               hLineWidth: (i: number) => i === 1 ? 1.5 : 0,
               vLineWidth: () => 0,
-              hLineColor: () => '#C07A60',
+              hLineColor: () => '#A46751',
               paddingTop: () => 0,
               paddingBottom: () => 0
             },
@@ -655,9 +655,9 @@ export default function PageComponent({
           } : null,
         ],
         styles: {
-          brandHeader: { fontSize: 10, bold: true, color: '#C07A60', characterSpacing: 1.5 },
+          brandHeader: { fontSize: 10, bold: true, color: '#A46751', characterSpacing: 1.5 },
           brandSub: { fontSize: 8, bold: true, color: '#8E7A75', margin: [0, 2, 0, 0], characterSpacing: 1 },
-          sectionLabel: { fontSize: 9, bold: true, color: '#C07A60', margin: [0, 8, 0, 4] },
+          sectionLabel: { fontSize: 9, bold: true, color: '#A46751', margin: [0, 8, 0, 4] },
           seasonTitle: { fontSize: 28, bold: true, color: '#2D2926', margin: [0, 0, 0, 8] },
           traitBadge: { fontSize: 8, bold: true, color: '#7b5455', background: '#F2E8E5', margin: [0, 4, 10, 4] },
           headline: { fontSize: 16, bold: true, color: '#884C35', margin: [0, 8, 0, 8], italic: true },
@@ -670,7 +670,7 @@ export default function PageComponent({
           worstColorName: { fontSize: 10, bold: true, color: '#2D2926' },
           worstColorReason: { fontSize: 8.5, color: '#8E7A75', lineHeight: 1.2 },
           makeupSummary: { fontSize: 9.5, italic: true, color: '#53433e', lineHeight: 1.3 },
-          tableHeader: { fontSize: 9.5, bold: true, color: '#ffffff', fillColor: '#C07A60', alignment: 'left', margin: [4, 4, 4, 4] },
+          tableHeader: { fontSize: 9.5, bold: true, color: '#ffffff', fillColor: '#A46751', alignment: 'left', margin: [4, 4, 4, 4] },
           tableBodyCategory: { fontSize: 8.5, bold: true, color: '#2D2926', margin: [4, 4, 4, 4] },
           tableBodyShade: { fontSize: 8.5, bold: true, color: '#884C35', margin: [4, 4, 4, 4] },
           tableBodyText: { fontSize: 8.5, color: '#53433e', lineHeight: 1.25, margin: [4, 4, 4, 4] },
@@ -842,18 +842,18 @@ export default function PageComponent({
         <nav className="sticky top-[72px] lg:top-[80px] z-40 bg-[#fff8f5]/70 backdrop-blur-md border-b border-white/50 py-3 shadow-sm transition-all print:hidden">
             <div className="max-w-6xl mx-auto px-4 flex justify-between items-center gap-4">
                 <div className="flex gap-6 md:gap-10 overflow-x-auto no-scrollbar py-1 flex-1 scroll-smooth">
-                    <a href="#reveal" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Analysis</a>
-                    <a href="#draping" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Draping</a>
-                    <a href="#palette" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Palette</a>
-                    <a href="#makeup" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Makeup</a>
-                    {dHair && <a href="#hair" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Hair</a>}
-                    <a href="#styling" className="text-sm font-bold text-[#53433e] hover:text-[#C07A60] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Styling</a>
+                    <a href="#reveal" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Analysis</a>
+                    <a href="#draping" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Draping</a>
+                    <a href="#palette" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Palette</a>
+                    <a href="#makeup" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Makeup</a>
+                    {dHair && <a href="#hair" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Hair</a>}
+                    <a href="#styling" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Styling</a>
                 </div>
                 {!isLocked && (
                     <button 
                         onClick={handleDownloadPDF}
                         disabled={isDownloadingPdf}
-                        className={`inline-flex items-center gap-2 px-4 py-2 bg-[#C07A60] text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#884c35] transition-all shadow-sm hover:shadow active:scale-95 shrink-0 ${isDownloadingPdf ? 'opacity-75 cursor-not-allowed' : ''}`}
+                        className={`inline-flex items-center gap-2 px-4 py-2 bg-[#A46751] text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#884c35] transition-all shadow-sm hover:shadow active:scale-95 shrink-0 ${isDownloadingPdf ? 'opacity-75 cursor-not-allowed' : ''}`}
                     >
                         {isDownloadingPdf ? (
                             <>
@@ -907,7 +907,7 @@ export default function PageComponent({
 
                 {/* Right: Analysis Title & Trait Badges */}
                 <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left space-y-6">
-                    <div className="inline-block px-4 py-1.5 border border-[#C07A60]/30 text-[#884c35] text-[10px] font-bold uppercase tracking-[0.2em] w-max rounded-full bg-[#C07A60]/5 mx-auto md:mx-0">
+                    <div className="inline-block px-4 py-1.5 border border-[#A46751]/30 text-[#884c35] text-[10px] font-bold uppercase tracking-[0.2em] w-max rounded-full bg-[#A46751]/5 mx-auto md:mx-0">
                         Personal Analysis
                     </div>
                     <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#1e1b18] font-bold leading-[1.15]">
@@ -950,7 +950,7 @@ export default function PageComponent({
                         <div className="flex flex-wrap justify-center gap-4 md:gap-8">
                             {displayCelebs.map((celeb: string, i: number) => (
                                 <div key={i} className="bg-white/50 backdrop-blur border border-white/50 px-6 py-3 rounded-full shadow-sm flex items-center gap-3 glass-card">
-                                    <span className="material-symbols-outlined text-xl text-[#C07A60] align-middle">auto_awesome</span>
+                                    <span className="material-symbols-outlined text-xl text-[#A46751] align-middle">auto_awesome</span>
                                     <span className="font-serif text-lg text-gray-900 italic">{celeb}</span>
                                 </div>
                             ))}
@@ -994,7 +994,7 @@ export default function PageComponent({
                                 key={seasonItem.name} 
                                 className={`glass-card p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${
                                     isCurrent 
-                                        ? 'border-2 border-[#C07A60] ring-4 ring-[#C07A60]/10 scale-105 bg-white/80 shadow-[0_8px_24px_rgba(192,122,96,0.15)] z-10' 
+                                        ? 'border-2 border-[#A46751] ring-4 ring-[#A46751]/10 scale-105 bg-white/80 shadow-[0_8px_24px_rgba(192,122,96,0.15)] z-10' 
                                         : 'opacity-55 hover:opacity-80 bg-white/30 border-white/30'
                                 }`}
                             >
@@ -1012,7 +1012,7 @@ export default function PageComponent({
             <div id="draping" className="text-center space-y-4 pt-8">
                 <span className="text-[#884c35] font-bold tracking-widest uppercase text-xs font-sans">The Transformation</span>
                 <h2 className="text-4xl font-serif font-bold text-[#1e1b18]">Virtual Draping</h2>
-                <div className="w-24 h-1 bg-[#C07A60] mx-auto rounded-full"></div>
+                <div className="w-24 h-1 bg-[#A46751] mx-auto rounded-full"></div>
                 
                 {/* View Mode Toggle */}
                 {!isLocked && (
@@ -1020,13 +1020,13 @@ export default function PageComponent({
                         <div className="bg-white/45 p-1 rounded-full border border-white/50 shadow-sm inline-flex glass-card">
                             <button
                                 onClick={() => setViewMode('draping')}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'draping' ? 'bg-[#C07A60] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'draping' ? 'bg-[#A46751] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
                             >
                                 <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">auto_awesome</span> AI Try-On</span>
                             </button>
                             <button
                                 onClick={() => setViewMode('fan')}
-                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'fan' ? 'bg-[#C07A60] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
+                                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${viewMode === 'fan' ? 'bg-[#A46751] text-white shadow-md' : 'text-[#53433e] hover:text-[#1e1b18]'}`}
                             >
                                 <span className="inline-flex items-center gap-1.5"><span className="material-symbols-outlined text-sm">palette</span> Color Fan</span>
                             </button>
@@ -1051,7 +1051,7 @@ export default function PageComponent({
                             <div className="absolute inset-0 bg-emerald-900/30 mix-blend-multiply"></div>
                             <div className="absolute top-6 left-0 right-0 text-center z-10">
                                 <span className="bg-black/40 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white/90 shadow-lg tracking-widest uppercase border border-white/10">
-                                    <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#C07A60]">auto_awesome</span> Best Match</span>
+                                    <span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#A46751]">auto_awesome</span> Best Match</span>
                                 </span>
                             </div>
                         </div>
@@ -1097,7 +1097,7 @@ export default function PageComponent({
                             <button className="group/btn relative inline-flex items-center gap-3 bg-white text-[#1e1b18] px-10 py-4 rounded-full font-bold text-lg shadow-[0_15px_30px_rgba(192,122,96,0.2)] transition-all overflow-hidden" onClick={handleUnlockClick}>
                                 <span className="relative z-10">Unlock Visual Proof</span>
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-gray-200 to-transparent translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000"></div>
-                                <span className="relative z-10 bg-[#C07A60] text-white text-xs px-2 py-0.5 rounded ml-1">1 Credit</span>
+                                <span className="relative z-10 bg-[#A46751] text-white text-xs px-2 py-0.5 rounded ml-1">1 Credit</span>
                             </button>
                         </div>
                     </div>
@@ -1157,7 +1157,7 @@ export default function PageComponent({
                             <div className="w-full rounded-xl overflow-hidden relative bg-gray-50">
                                 <img src={displayDraping.best} alt="Best" className="w-full h-auto max-h-[700px] object-contain mx-auto" />
                                 <div className="absolute bottom-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-lg shadow-sm border border-green-100">
-                                    <p className="text-xs font-bold uppercase tracking-wider text-green-800"><span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#C07A60]">auto_awesome</span> Best Match</span></p>
+                                    <p className="text-xs font-bold uppercase tracking-wider text-green-800"><span className="inline-flex items-center gap-1"><span className="material-symbols-outlined text-sm text-[#A46751]">auto_awesome</span> Best Match</span></p>
                                 </div>
                             </div>
                         </div>
@@ -1188,7 +1188,7 @@ export default function PageComponent({
             {/* 3. The Curator's Palette */}
             {dPalette && (
                 <div id="palette" className="bg-white/45 backdrop-blur-md p-10 md:p-16 rounded-[3rem] glass-card soft-shadow border border-white/50 relative overflow-hidden scroll-mt-20">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#C07A60]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#A46751]/5 rounded-full blur-3xl -mr-20 -mt-20"></div>
                     
                     <div className="text-center mb-16 relative z-10">
                         <h2 className="text-4xl font-serif font-bold mb-4 text-[#1e1b18]">Your Power Palette</h2>
@@ -1206,7 +1206,7 @@ export default function PageComponent({
                             </div>
                             
                             {powerPalette.usage_advice && (
-                                <div className="bg-[#fff8f5] p-6 rounded-2xl border border-[#C07A60]/10 mb-8 text-center">
+                                <div className="bg-[#fff8f5] p-6 rounded-2xl border border-[#A46751]/10 mb-8 text-center">
                                     <p className="text-[#1e1b18] font-medium italic leading-relaxed font-sans">
                                         &quot;{powerPalette.usage_advice}&quot;
                                     </p>
@@ -1240,7 +1240,7 @@ export default function PageComponent({
 
                                 {isLocked && (
                                      <div className="absolute inset-0 left-[25%] flex items-center justify-center z-10" onClick={handleUnlockClick}>
-                                        <div className="bg-[#C07A60] text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 cursor-pointer hover:bg-[#a5644b] transition-all transform hover:scale-105 ring-4 ring-white/50">
+                                        <div className="bg-[#A46751] text-white px-6 py-3 rounded-full shadow-lg flex items-center gap-3 cursor-pointer hover:bg-[#a5644b] transition-all transform hover:scale-105 ring-4 ring-white/50">
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                                             <span className="text-xs font-bold tracking-wide uppercase font-sans">Unlock Personalized Palette</span>
                                         </div>
@@ -1313,10 +1313,10 @@ export default function PageComponent({
                 {/* Makeup */}
                 <div id="makeup" className="lg:col-span-7 bg-white/45 backdrop-blur-md p-8 md:p-12 rounded-[2rem] glass-card soft-shadow border border-white/50 scroll-mt-20">
                     <h3 className="font-serif text-3xl font-bold mb-6 flex items-center gap-3 text-[#1e1b18]">
-                        <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-4xl text-[#C07A60]">face</span> Makeup Lab</span>
+                        <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-4xl text-[#A46751]">face</span> Makeup Lab</span>
                     </h3>
                     
-                    <div className="bg-[#fff8f5] p-6 rounded-xl border border-[#C07A60]/10 mb-8">
+                    <div className="bg-[#fff8f5] p-6 rounded-xl border border-[#A46751]/10 mb-8">
                         <p className="text-lg text-[#1e1b18] font-medium leading-relaxed italic font-sans">
                             &quot;{dMakeup?.summary || 'Opt for cool, deep shades to complement your high contrast.'}&quot;
                         </p>
@@ -1326,7 +1326,7 @@ export default function PageComponent({
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                         {/* Lips */}
                         <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
-                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">face</span>
+                            <span className="material-symbols-outlined text-2xl text-[#A46751] mb-2 font-sans">face</span>
                             <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Lips</h4>
                             <div className="flex gap-2 mb-3">
                                 {(displayReport.makeup?.lips || [
@@ -1339,7 +1339,7 @@ export default function PageComponent({
                         </div>
                         {/* Eyes */}
                         <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
-                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">visibility</span>
+                            <span className="material-symbols-outlined text-2xl text-[#A46751] mb-2 font-sans">visibility</span>
                             <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Eyes</h4>
                             <div className="flex gap-2 mb-3">
                                 {(displayReport.makeup?.eyes || [
@@ -1352,7 +1352,7 @@ export default function PageComponent({
                         </div>
                         {/* Cheeks */}
                         <div className="glass-card rounded-2xl p-5 flex flex-col items-center text-center bg-white/50 border border-white/80">
-                            <span className="material-symbols-outlined text-2xl text-[#C07A60] mb-2 font-sans">brush</span>
+                            <span className="material-symbols-outlined text-2xl text-[#A46751] mb-2 font-sans">brush</span>
                             <h4 className="font-sans text-xs font-bold text-[#1e1b18] uppercase tracking-wider mb-2">Cheeks</h4>
                             <div className="flex gap-2 mb-3">
                                 {(displayReport.makeup?.blush || [
@@ -1412,7 +1412,7 @@ export default function PageComponent({
                         <div id="hair" className="bg-[#2d2926] text-white p-8 rounded-[2rem] shadow-lg relative overflow-hidden scroll-mt-20 border border-white/10">
                             <div className="relative z-10">
                                 <h3 className="font-serif text-2xl font-bold mb-6 flex items-center gap-2">
-                                    <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-[#C07A60]">face_retouching_natural</span> Hair Color</span>
+                                    <span className="inline-flex items-center gap-2"><span className="material-symbols-outlined text-[#A46751]">face_retouching_natural</span> Hair Color</span>
                                 </h3>
                                 <BlurLock label="Unlock Hair Colors">
                                 <div className="space-y-4">
@@ -1448,7 +1448,7 @@ export default function PageComponent({
                         <h3 className="font-serif text-2xl font-bold mb-6">Style Keywords</h3>
                         <div className="flex flex-wrap gap-2">
                             {dStyling?.keywords?.map((k: string, i: number) => (
-                                <span key={i} className="px-4 py-2 bg-[#F5F0E8] text-[#53433e] rounded-full text-sm font-medium hover:bg-[#C07A60] hover:text-white transition-all cursor-default font-sans">
+                                <span key={i} className="px-4 py-2 bg-[#F5F0E8] text-[#53433e] rounded-full text-sm font-medium hover:bg-[#A46751] hover:text-white transition-all cursor-default font-sans">
                                     #{k}
                                 </span>
                             ))}
@@ -1483,7 +1483,7 @@ export default function PageComponent({
 
                     {feedbackStatus === 'good' && (
                         <div className="animate-fade-in py-4">
-                            <p className="text-green-600 font-bold text-2xl mb-2">Thank you! <span className="material-symbols-outlined text-sm align-middle text-[#C07A60]">auto_awesome</span></p>
+                            <p className="text-green-600 font-bold text-2xl mb-2">Thank you! <span className="material-symbols-outlined text-sm align-middle text-[#A46751]">auto_awesome</span></p>
                             <p className="text-gray-500">We&apos;re glad you liked your results.</p>
                         </div>
                     )}
@@ -1586,7 +1586,7 @@ export default function PageComponent({
                     </div>
                     <button 
                         onClick={handleUnlockClick}
-                        className="flex-1 md:flex-none bg-[#C07A60] text-white px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#a5644b] scale-95 hover:scale-100 transition-all shadow-md hover:shadow-[0_8px_20px_rgba(192,122,96,0.2)] flex items-center justify-center gap-2 font-sans"
+                        className="flex-1 md:flex-none bg-[#A46751] text-white px-8 py-3.5 rounded-full font-bold text-sm hover:bg-[#a5644b] scale-95 hover:scale-100 transition-all shadow-md hover:shadow-[0_8px_20px_rgba(192,122,96,0.2)] flex items-center justify-center gap-2 font-sans"
                     >
                         <span>Unlock full {baseSeason || 'Report'}</span>
                         <span className="text-[#ffdad9] bg-white/10 px-2 py-0.5 rounded ml-1">1 Credit</span>

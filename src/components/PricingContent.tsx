@@ -23,7 +23,7 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
   const SinglePlan = () => (
     <div className={`rounded-3xl p-8 glass-card xl:p-10 hover:shadow-lg transition-shadow duration-300 ${isModal ? 'bg-white' : ''}`}>
         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-sm border border-white/50 bg-white/10">
-            <img src="/pricing_single_pass.jpg" alt="Single Report Pass" className="w-full h-full object-cover" />
+            <img src="/pricing_single_pass.webp" alt="Single Report Pass" className="w-full h-full object-cover" loading="lazy" />
         </div>
         <h3 className="text-lg font-serif font-semibold leading-8 text-[#2D2926]">Single Report</h3>
         <p className="mt-4 text-sm leading-6 text-text-secondary">Perfect for one person.</p>
@@ -59,7 +59,7 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
                 <span className="text-green-500 mt-0.5 shrink-0">✅</span>
                 <span><strong>Avoid List</strong></span>
             </li>
-            <li className="flex items-start gap-x-3 bg-[#F5ECE7] p-2 rounded-lg border border-[#C07A60]/10 -mx-2">
+            <li className="flex items-start gap-x-3 bg-[#F5ECE7] p-2 rounded-lg border border-[#A46751]/10 -mx-2">
                 <span className="text-xl shrink-0 leading-none">🎁</span>
                 <span><strong className="text-[#2D2926]">3 Style Validations</strong> <span className="text-xs text-text-secondary block">Test clothes before you buy</span></span>
             </li>
@@ -69,12 +69,12 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
 
   // Pack Plan Details
   const PackPlan = () => (
-    <div className="relative rounded-3xl p-8 ring-1 ring-white/10 bg-[#2D2926] text-white shadow-2xl xl:p-10 transform lg:scale-105 z-10 border-t-4 border-[#C07A60]">
-        <div className="absolute top-0 right-0 bg-[#C07A60] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl uppercase tracking-wider z-20">
+    <div className="relative rounded-3xl p-8 ring-1 ring-white/10 bg-[#2D2926] text-white shadow-2xl xl:p-10 transform lg:scale-105 z-10 border-t-4 border-[#A46751]">
+        <div className="absolute top-0 right-0 bg-[#A46751] text-white text-xs font-bold px-3 py-1 rounded-bl-lg rounded-tr-2xl uppercase tracking-wider z-20">
             Best Value
         </div>
         <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden mb-6 shadow-sm border border-white/10 bg-white/5">
-            <img src="/pricing_unlimited_vip.jpg" alt="Style Pack Premium" className="w-full h-full object-cover" />
+            <img src="/pricing_unlimited_vip.webp" alt="Style Pack Premium" className="w-full h-full object-cover" loading="lazy" />
         </div>
         <h3 className="text-lg font-serif font-semibold leading-8 text-white">Style Pack</h3>
         <p className="mt-4 text-sm leading-6 text-gray-300">Share with family or test different photos.</p>
@@ -85,26 +85,26 @@ export default function PricingContent({ onCheckout, isModal = false }: PricingC
         
         <button 
             onClick={() => onCheckout('pack')}
-            className="mt-6 block w-full rounded-full bg-[#C07A60] px-3 py-2.5 text-center text-sm font-bold text-white shadow-md hover:bg-[#884C35] hover:shadow-[0_8px_20px_rgba(192,122,96,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C07A60] animate-pulse transition-all transform hover:-translate-y-0.5 active:translate-y-0 font-sans"
+            className="mt-6 block w-full rounded-full bg-[#A46751] px-3 py-2.5 text-center text-sm font-bold text-white shadow-md hover:bg-[#884C35] hover:shadow-[0_8px_20px_rgba(192,122,96,0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#A46751] animate-pulse transition-all transform hover:-translate-y-0.5 active:translate-y-0 font-sans"
         >
             Get 3 Credits (${isDiscounted ? '1.65' : '3.30'}/each)
         </button>
 
         <ul role="list" className="mt-8 space-y-3 text-sm leading-6 text-gray-300">
             <li className="flex items-start gap-x-3">
-                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#A46751] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>3 Full Analyses</strong> <span className="text-gray-400 text-xs block sm:inline">(3 Credits)</span></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#A46751] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Shareable</strong></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#A46751] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Test Different Photos</strong></span>
             </li>
             <li className="flex items-start gap-x-3">
-                <span className="text-[#C07A60] text-lg mt-0.5 shrink-0">★</span>
+                <span className="text-[#A46751] text-lg mt-0.5 shrink-0">★</span>
                 <span><strong>Huge Savings</strong></span>
             </li>
             <li className="flex items-start gap-x-3 bg-white/5 p-2 rounded-lg border border-white/5 -mx-2 mt-4">

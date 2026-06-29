@@ -39,7 +39,7 @@ export default function PageComponent({
          <section className="relative w-full pt-24 pb-20 md:pt-36 md:pb-32 px-6 lg:px-20 overflow-hidden">
             <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#D4A5A5]/20 rounded-full blur-3xl"></div>
-                <div className="absolute top-1/2 right-0 w-80 h-80 bg-[#C07A60]/10 rounded-full blur-3xl"></div>
+                <div className="absolute top-1/2 right-0 w-80 h-80 bg-[#A46751]/10 rounded-full blur-3xl"></div>
             </div>
 
             <div className="relative z-10 max-w-[1440px] mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -57,7 +57,7 @@ export default function PageComponent({
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start w-full pt-2">
                         <Link
                             href={getLinkHref(locale, 'analysis')}
-                            className="inline-flex items-center justify-center rounded-full bg-[#C07A60] px-8 py-4 text-base font-semibold text-white scale-95 active:scale-90 hover:scale-100 transition-all duration-300 hover:shadow-[0_10px_20px_rgba(192,122,96,0.2)] w-full sm:w-auto font-sans"
+                            className="inline-flex items-center justify-center rounded-full bg-[#A46751] px-8 py-4 text-base font-semibold text-white scale-95 active:scale-90 hover:scale-100 transition-all duration-300 hover:shadow-[0_10px_20px_rgba(192,122,96,0.2)] w-full sm:w-auto font-sans"
                         >
                             {colorLabText.Landing.uploadBtn}
                         </Link>
@@ -98,10 +98,13 @@ export default function PageComponent({
                 
                 {/* Hero Image */}
                 <div className="relative w-full aspect-[4/5] md:aspect-auto md:h-[600px] rounded-xl overflow-hidden glass-card soft-shadow">
-                    <img 
-                        src="/hero_photo.jpg" 
+                    <Image 
+                        src="/seasonal_color_analysis.webp" 
                         alt="AI Color Analysis Quiz - Seasonal Palette Results" 
-                        className="w-full h-full object-cover" 
+                        className="w-full h-full object-cover"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
+                        priority
                     />
                 </div>
             </div>
@@ -196,7 +199,7 @@ export default function PageComponent({
                 <div className="mt-12 text-center">
                     <Link 
                         href={getLinkHref(locale, 'analysis')}
-                        className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-[#C07A60] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#884c35] scale-95 hover:scale-100 transition-all shadow-lg hover:shadow-[0_10px_20px_rgba(192,122,96,0.3)] font-sans"
+                        className="inline-flex items-center gap-2 px-10 py-4 rounded-full bg-[#A46751] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#884c35] scale-95 hover:scale-100 transition-all shadow-lg hover:shadow-[0_10px_20px_rgba(192,122,96,0.3)] font-sans"
                     >
                         Don&apos;t know your season? Take the AI Quiz
                     </Link>
@@ -212,8 +215,9 @@ export default function PageComponent({
                         <div className="relative w-full h-full rounded-full overflow-hidden">
                             <Image 
                                 alt="Color Swatches" 
-                                src="/swatches_photo.jpg"
+                                src="/swatches_photo.webp"
                                 fill
+                                sizes="(max-width: 768px) 100vw, 33vw"
                                 className="object-cover"
                             />
                         </div>
@@ -229,7 +233,7 @@ export default function PageComponent({
                     </p>
                     <div className="flex flex-wrap gap-3 justify-center md:justify-start mt-2">
                         <span className="px-5 py-2 rounded-full bg-[#D4A5A5]/20 text-[#1e1b18] font-sans text-xs font-semibold tracking-wider uppercase">Dusty Rose</span>
-                        <span className="px-5 py-2 rounded-full bg-[#C07A60]/20 text-[#1e1b18] font-sans text-xs font-semibold tracking-wider uppercase">Terracotta</span>
+                        <span className="px-5 py-2 rounded-full bg-[#A46751]/20 text-[#1e1b18] font-sans text-xs font-semibold tracking-wider uppercase">Terracotta</span>
                         <span className="px-5 py-2 rounded-full bg-[#f5ece7] text-[#1e1b18] font-sans text-xs font-semibold tracking-wider uppercase">Warm Oat</span>
                     </div>
                 </div>
@@ -251,8 +255,8 @@ export default function PageComponent({
                <div className="grid grid-cols-1 md:grid-cols-3 gap-10 items-start">
                     {/* Step 1 */}
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50">
-                        <div className="absolute -top-6 w-12 h-12 bg-[#C07A60] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">1</div>
-                        <div className="mt-6 mb-4 text-[#C07A60]">
+                        <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">1</div>
+                        <div className="mt-6 mb-4 text-[#A46751]">
                              <span className="material-symbols-outlined text-5xl">photo_camera</span>
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step1}</h3>
@@ -260,8 +264,8 @@ export default function PageComponent({
                     </div>
                     {/* Step 2 */}
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50 md:mt-8">
-                        <div className="absolute -top-6 w-12 h-12 bg-[#C07A60] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">2</div>
-                        <div className="mt-6 mb-4 text-[#C07A60]">
+                        <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">2</div>
+                        <div className="mt-6 mb-4 text-[#A46751]">
                              <span className="material-symbols-outlined text-5xl">auto_awesome</span>
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step2}</h3>
@@ -269,8 +273,8 @@ export default function PageComponent({
                     </div>
                     {/* Step 3 */}
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50 md:mt-16">
-                        <div className="absolute -top-6 w-12 h-12 bg-[#C07A60] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">3</div>
-                        <div className="mt-6 mb-4 text-[#C07A60]">
+                        <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">3</div>
+                        <div className="mt-6 mb-4 text-[#A46751]">
                              <span className="material-symbols-outlined text-5xl">palette</span>
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step3}</h3>
@@ -287,7 +291,7 @@ export default function PageComponent({
                 <p className="text-sm md:text-base text-[#53433e] font-sans max-w-sm opacity-90">Join thousands who have transformed their wardrobe with AURA AI.</p>
                 <Link 
                     href={getLinkHref(locale, 'analysis')}
-                    className="bg-[#C07A60] text-white px-8 py-4 rounded-full font-sans text-base font-bold scale-95 active:scale-90 transition-transform hover:shadow-[0_10px_20px_rgba(192,122,96,0.2)] mt-2"
+                    className="bg-[#A46751] text-white px-8 py-4 rounded-full font-sans text-base font-bold scale-95 active:scale-90 transition-transform hover:shadow-[0_10px_20px_rgba(192,122,96,0.2)] mt-2"
                 >
                     Start Your Analysis
                 </Link>

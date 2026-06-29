@@ -2,7 +2,6 @@
 import Link from "next/link";
 import {getLinkHref} from "~/configs/buildLink";
 import {useCommonContext} from "~/context/common-context";
-import {GoogleAnalytics} from "@next/third-parties/google";
 
 export default function Footer({
                                  locale,
@@ -71,7 +70,7 @@ export default function Footer({
                 <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="150" height="47" />
               </a>
               <a href="https://theresanaiforthat.com/ai/ai-color-analysis-quiz/?ref=featured&v=7972629" target="_blank" rel="nofollow" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" />
+                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" height="51" />
               </a>
             </div>
           </div>
@@ -98,13 +97,13 @@ export default function Footer({
                   </li>
                 </ul>
               </div>
-              <div className="mt-10 md:mt-0">
+            <div className="mt-10 md:mt-0">
                 <div className="text-sm font-semibold leading-6 text-white">© {new Date().getFullYear()}</div>
-                <ul role="list" className="mt-6 space-y-4">
-                  <span className="text-sm leading-6 text-gray-500">
+                <div className="mt-6">
+                  <p className="text-sm leading-6 text-gray-400">
                     Color Analysis Quiz. All rights reserved.
-                  </span>
-                </ul>
+                  </p>
+                </div>
               </div>
             </div>
             <div className="md:grid md:grid-cols-2 md:gap-8">
@@ -165,16 +164,6 @@ export default function Footer({
           </div>
         </div>
       </div>
-      <>
-        {
-          process.env.NEXT_PUBLIC_GOOGLE_TAG_ID ?
-            <>
-              <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_TAG_ID}/>
-            </>
-            :
-            null
-        }
-      </>
     </footer>
   )
 }
