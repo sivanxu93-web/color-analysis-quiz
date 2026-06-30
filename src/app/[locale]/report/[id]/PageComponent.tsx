@@ -972,40 +972,42 @@ export default function PageComponent({
                     Our analysis places you in one of the 12 key seasons. Here is how your profile compares across the matrix.
                 </p>
                 
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4">
-                    {[
-                        { name: "Light Spring", color: "#F3E5AB" },
-                        { name: "True Spring", color: "#FAD6A5" },
-                        { name: "Bright Spring", color: "#E2C275" },
-                        { name: "Light Summer", color: "#E6E6FA" },
-                        { name: "True Summer", color: "#B0C4DE" },
-                        { name: "Soft Summer", color: "#95B8D1" },
-                        { name: "Soft Autumn", color: "#D2B48C" },
-                        { name: "True Autumn", color: "#CD853F" },
-                        { name: "Deep Autumn", color: "#8B4513" },
-                        { name: "Deep Winter", color: "#1A1A1A" },
-                        { name: "True Winter", color: "#000080" },
-                        { name: "Bright Winter", color: "#FF00FF" }
-                    ].map((seasonItem) => {
-                        const isCurrent = rawSeason?.toLowerCase().includes(seasonItem.name.toLowerCase());
-                        
-                        return (
-                            <div 
-                                key={seasonItem.name} 
-                                className={`glass-card p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${
-                                    isCurrent 
-                                        ? 'border-2 border-[#A46751] ring-4 ring-[#A46751]/10 scale-105 bg-white/80 shadow-[0_8px_24px_rgba(192,122,96,0.15)] z-10' 
-                                        : 'opacity-55 hover:opacity-80 bg-white/30 border-white/30'
-                                }`}
-                            >
-                                <div className="w-10 h-10 rounded-full mb-2.5 shadow-inner border border-white" style={{ backgroundColor: seasonItem.color }} />
-                                <span className={`font-sans text-xs font-semibold tracking-wider ${isCurrent ? 'text-[#884c35] font-bold' : 'text-[#53433e]'}`}>
-                                    {seasonItem.name}
-                                </span>
-                            </div>
-                        );
-                    })}
-                </div>
+                <BlurLock label="Unlock Seasonal Matrix">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto pt-4">
+                        {[
+                            { name: "Light Spring", color: "#F3E5AB" },
+                            { name: "True Spring", color: "#FAD6A5" },
+                            { name: "Bright Spring", color: "#E2C275" },
+                            { name: "Light Summer", color: "#E6E6FA" },
+                            { name: "True Summer", color: "#B0C4DE" },
+                            { name: "Soft Summer", color: "#95B8D1" },
+                            { name: "Soft Autumn", color: "#D2B48C" },
+                            { name: "True Autumn", color: "#CD853F" },
+                            { name: "Deep Autumn", color: "#8B4513" },
+                            { name: "Deep Winter", color: "#1A1A1A" },
+                            { name: "True Winter", color: "#000080" },
+                            { name: "Bright Winter", color: "#FF00FF" }
+                        ].map((seasonItem) => {
+                            const isCurrent = !isLocked && rawSeason?.toLowerCase().includes(seasonItem.name.toLowerCase());
+                            
+                            return (
+                                <div 
+                                    key={seasonItem.name} 
+                                    className={`glass-card p-4 rounded-2xl flex flex-col items-center justify-center transition-all ${
+                                        isCurrent 
+                                            ? 'border-2 border-[#A46751] ring-4 ring-[#A46751]/10 scale-105 bg-white/80 shadow-[0_8px_24px_rgba(192,122,96,0.15)] z-10' 
+                                            : 'opacity-55 hover:opacity-80 bg-white/30 border-white/30'
+                                    }`}
+                                >
+                                    <div className="w-10 h-10 rounded-full mb-2.5 shadow-inner border border-white" style={{ backgroundColor: seasonItem.color }} />
+                                    <span className={`font-sans text-xs font-semibold tracking-wider ${isCurrent ? 'text-[#884c35] font-bold' : 'text-[#53433e]'}`}>
+                                        {seasonItem.name}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </BlurLock>
             </div>
 
             {/* 2. Visual Proof */}
