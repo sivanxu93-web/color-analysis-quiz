@@ -247,6 +247,8 @@ export const getColorLabText = async () => {
         section2Body: t('Landing.seoContent.section2Body'),
         section3Title: t('Landing.seoContent.section3Title'),
         section3Body: t('Landing.seoContent.section3Body'),
+        section4Title: t('Landing.seoContent.section4Title'),
+        section4Body: t('Landing.seoContent.section4Body'),
       }
     },
     Analysis: {

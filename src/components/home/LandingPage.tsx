@@ -7,7 +7,8 @@ import { useCommonContext } from '~/context/common-context';
 import { useState, useEffect } from 'react';
 import { SEO_EXAMPLES } from '~/libs/examples';
 import Image from 'next/image';
-import ReactMarkdown from 'react-markdown';
+
+
 
 export default function PageComponent({
   locale,
@@ -36,7 +37,7 @@ export default function PageComponent({
       <main className="flex min-h-screen flex-col items-center bg-[#fff8f5] text-[#1e1b18] font-sans antialiased overflow-x-hidden">
          
          {/* Hero Section */}
-         <section className="relative w-full pt-24 pb-20 md:pt-36 md:pb-32 px-6 lg:px-20 overflow-hidden">
+         <section className="relative w-full pt-12 pb-20 md:pt-20 md:pb-32 px-6 lg:px-20 overflow-hidden">
             <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
                 <div className="absolute -top-24 -left-24 w-96 h-96 bg-[#D4A5A5]/20 rounded-full blur-3xl"></div>
                 <div className="absolute top-1/2 right-0 w-80 h-80 bg-[#A46751]/10 rounded-full blur-3xl"></div>
@@ -48,7 +49,7 @@ export default function PageComponent({
                         ✨ #1 AI Color Analysis Tool
                     </span>
                     <h1 className="font-serif text-4xl md:text-6xl lg:text-7xl font-bold text-[#1e1b18] leading-[1.15] tracking-tighter">
-                       Your True Colors,<br/>Revealed by AI.
+                       Your True Colors,<br/>Revealed by AI Color Analysis.
                     </h1>
                     <p className="text-base md:text-lg text-[#53433e] leading-relaxed max-w-lg mx-auto md:mx-0 font-sans opacity-95">
                        {colorLabText.Landing.description}
@@ -99,7 +100,7 @@ export default function PageComponent({
                 {/* Hero Image */}
                 <div className="relative w-full aspect-[4/5] md:aspect-auto md:h-[600px] rounded-xl overflow-hidden glass-card soft-shadow">
                     <Image 
-                        src="/seasonal_color_analysis.webp" 
+                        src="/hero_photo.webp" 
                         alt="AI Color Analysis Quiz - Seasonal Palette Results" 
                         className="w-full h-full object-cover"
                         fill
@@ -114,7 +115,7 @@ export default function PageComponent({
          <section className="w-full py-20 bg-[#fbf2ed]/50 px-6 lg:px-20">
             <div className="max-w-[1440px] mx-auto">
                 <div className="text-center mb-16">
-                    <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1e1b18] mb-4">The Science of Style</h2>
+                    <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1e1b18] mb-4">The Science of Seasonal Color Analysis</h2>
                     <p className="text-sm md:text-base text-[#53433e] max-w-2xl mx-auto font-sans opacity-80">Our advanced AI analyzes your unique undertones to curate a wardrobe that illuminates your natural beauty.</p>
                 </div>
                 
@@ -158,7 +159,7 @@ export default function PageComponent({
             <div className="max-w-[1440px] mx-auto">
                 <div className="text-center mb-16">
                     <span className="text-[#884c35] font-bold tracking-widest uppercase text-xs font-sans">The 12-Season Matrix</span>
-                    <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#1e1b18] mt-4 mb-4">Discover Your Perfect Palette</h2>
+                    <h2 className="text-3xl md:text-4xl font-serif font-bold text-[#1e1b18] mt-4 mb-4">Discover Your 12-Season Color Palette</h2>
                     <p className="text-[#53433e] text-sm md:text-base max-w-2xl mx-auto font-sans opacity-80">Explore all 12 professional color seasons. Click any palette to see real analysis examples, best colors, and expert styling guides.</p>
                 </div>
                 
@@ -227,7 +228,7 @@ export default function PageComponent({
                     <div className="absolute bottom-10 -right-10 w-32 h-32 rounded-full bg-[#D4A5A5]/20 backdrop-blur-md"></div>
                 </div>
                 <div className="w-full md:w-1/2 flex flex-col gap-6 text-center md:text-left">
-                    <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#1e1b18] font-bold">Curated For You</h2>
+                    <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl text-[#1e1b18] font-bold">Personalized Style & Colors Curated For You</h2>
                     <p className="text-base md:text-lg text-[#53433e] leading-relaxed font-sans opacity-95">
                         Your personal palette is more than just a list of colors. It&apos;s a cohesive system designed to harmonize with your natural features, simplifying shopping and elevating your daily style.
                     </p>
@@ -287,7 +288,7 @@ export default function PageComponent({
          {/* CTA Section */}
          <section className="py-20 w-full bg-[#efe6e2]/50 text-center px-6 lg:px-20">
             <div className="max-w-xl mx-auto flex flex-col gap-6 items-center">
-                <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1e1b18]">Ready to find your palette?</h2>
+                <h2 className="font-serif text-3xl md:text-4xl font-bold text-[#1e1b18]">Ready to Find Your Seasonal Color Palette?</h2>
                 <p className="text-sm md:text-base text-[#53433e] font-sans max-w-sm opacity-90">Join thousands who have transformed their wardrobe with AURA AI.</p>
                 <Link 
                     href={getLinkHref(locale, 'analysis')}
@@ -308,18 +309,25 @@ export default function PageComponent({
                 <div className="prose prose-lg mx-auto text-text-secondary max-w-none">
                     <div className="mb-10">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section1Title}</h3>
-                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section1Body}</ReactMarkdown>
+                        <SimpleMarkdown className="markdown-body" text={colorLabText.Landing.seoContent?.section1Body} />
                     </div>
                     
                     <div className="mb-10">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section2Title}</h3>
-                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section2Body}</ReactMarkdown>
+                        <SimpleMarkdown className="markdown-body" text={colorLabText.Landing.seoContent?.section2Body} />
                     </div>
 
-                    <div>
+                    <div className="mb-10">
                         <h3 className="text-xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section3Title}</h3>
-                        <ReactMarkdown className="markdown-body">{colorLabText.Landing.seoContent?.section3Body}</ReactMarkdown>
+                        <SimpleMarkdown className="markdown-body" text={colorLabText.Landing.seoContent?.section3Body} />
                     </div>
+
+                    {colorLabText.Landing.seoContent?.section4Title && (
+                        <div>
+                            <h3 className="text-xl font-bold text-gray-800 mb-4">{colorLabText.Landing.seoContent?.section4Title}</h3>
+                            <SimpleMarkdown className="markdown-body" text={colorLabText.Landing.seoContent?.section4Body} />
+                        </div>
+                    )}
                 </div>
             </div>
          </section>
@@ -385,5 +393,43 @@ export default function PageComponent({
     </>
   )
 }
+
+function SimpleMarkdown({ text, className }: { text: string; className?: string }) {
+  if (!text) return null;
+  const paragraphs = text.split('\n');
+  return (
+    <div className={className}>
+      {paragraphs.map((p, index) => {
+        if (!p.trim()) return null;
+        const parts: React.ReactNode[] = [];
+        let lastIndex = 0;
+        const regex = /(\*\*.*?\*\*|\*.*?\*)/g;
+        let match;
+        while ((match = regex.exec(p)) !== null) {
+          const matchIndex = match.index;
+          const matchText = match[0];
+          if (matchIndex > lastIndex) {
+            parts.push(p.slice(lastIndex, matchIndex));
+          }
+          if (matchText.startsWith('**') && matchText.endsWith('**')) {
+            parts.push(<strong key={matchIndex}>{matchText.slice(2, -2)}</strong>);
+          } else if (matchText.startsWith('*') && matchText.endsWith('*')) {
+            parts.push(<em key={matchIndex}>{matchText.slice(1, -1)}</em>);
+          }
+          lastIndex = regex.lastIndex;
+        }
+        if (lastIndex < p.length) {
+          parts.push(p.slice(lastIndex));
+        }
+        return (
+          <p key={index} className="mb-4 text-[#53433e] leading-relaxed">
+            {parts.length > 0 ? parts : p}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 
       
