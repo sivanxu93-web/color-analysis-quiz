@@ -23,6 +23,19 @@ const nextConfig = {
         }
         return config;
     },
+    async headers() {
+        return [
+            {
+                source: '/:path*\\.(svg|jpg|jpeg|png|webp|ico|woff2)',
+                headers: [
+                    {
+                        key: 'Cache-Control',
+                        value: 'public, max-age=31536000, must-revalidate',
+                    }
+                ]
+            }
+        ];
+    },
     async redirects() {
         return [
             {source: '/en', destination: '/', permanent: true},
