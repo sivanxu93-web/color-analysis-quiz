@@ -72,6 +72,9 @@ export default function Footer({
               <a href="https://theresanaiforthat.com/ai/ai-color-analysis-quiz/?ref=featured&v=7972629" target="_blank" rel="nofollow" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
                 <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" height="51" loading="lazy" decoding="async" />
               </a>
+              <a href="https://turbo0.com/item/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" width="150" height="54" loading="lazy" decoding="async" className="h-[54px] w-auto" />
+              </a>
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
