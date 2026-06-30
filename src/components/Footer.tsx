@@ -75,6 +75,9 @@ export default function Footer({
               <a href="https://turbo0.com/item/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
                 <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" width="150" height="54" loading="lazy" decoding="async" className="h-[54px] w-auto" />
               </a>
+              <a href="https://www.toolpilot.ai/products/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://www.toolpilot.ai/cdn/shop/files/toolpilot-badge-w.png" alt="Featured on ToolPilot" width="150" height="51" loading="lazy" decoding="async" className="h-[51px] w-auto" />
+              </a>
             </div>
           </div>
           <div className="mt-2 grid grid-cols-2 gap-8 xl:col-span-2 xl:mt-0">
