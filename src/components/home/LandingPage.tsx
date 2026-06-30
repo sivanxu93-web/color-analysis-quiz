@@ -10,6 +10,55 @@ import Image from 'next/image';
 
 
 
+const BookIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+  </svg>
+);
+
+const GalleryIcon = () => (
+  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 00-2 2z" />
+  </svg>
+);
+
+const ApparelIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 4L7.5 6.5L3.5 8L4.5 11.5L7 11V20H17V11L19.5 11.5L20.5 8L16.5 6.5L15 4H9Z M12 4V7" />
+  </svg>
+);
+
+const PaletteIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a9 9 0 000 18c4.97 0 9-4.03 9-9 0-3.33-1.8-6.22-4.5-7.79M12 3c-1.2 0-2.4 1.35-2.4 3s1.2 3 2.4 3 2.4-1.35 2.4-3-1.2-3-2.4-3zM19 12a2 2 0 11-4 0 2 2 0 014 0zM14 17a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+  </svg>
+);
+
+const MemoryIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
+  </svg>
+);
+
+const CameraIcon = () => (
+  <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+    <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+  </svg>
+);
+
+const SparklesIcon = () => (
+  <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 21l-.813-5.096L3 15l5.187-.813L9 9l.813 5.187L15 15l-5.187.813zM19.07 7.07a1 1 0 11-1.414-1.414 1 1 0 011.414 1.414zm-12-3a1 1 0 11-1.414-1.414 1 1 0 011.414 1.414zm12 12a1 1 0 11-1.414-1.414 1 1 0 011.414 1.414z" />
+  </svg>
+);
+
+const PaletteLargeIcon = () => (
+  <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="1.5">
+    <path strokeLinecap="round" strokeLinejoin="round" d="M9.53 16.122a3 3 0 00-5.78 1.128 2.25 2.25 0 01-2.4 2.245 4.5 4.5 0 008.4-2.245c0-.399-.078-.78-.22-1.128zm0 0a15.998 15.998 0 003.388-1.62m-5.072 2.748a15.996 15.996 0 006.292-1.892m0 0c.937-.512 1.832-1.134 2.667-1.85a4.5 4.5 0 00-6.108-6.606c-.716.835-1.338 1.73-1.85 2.668m4.93 5.788l4.49 4.489m0 0a1.5 1.5 0 01-2.122 2.122l-4.49-4.49m7.722-11.662a9 9 0 00-10.97 10.97M15 10.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zm4.5 4.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
+  </svg>
+);
+
 export default function PageComponent({
   locale,
   colorLabText,
@@ -71,11 +120,11 @@ export default function PageComponent({
                     </div>
 
                     <div className="mt-4 flex flex-wrap justify-center md:justify-start gap-3">
-                        <Link href={getLinkHref(locale, 'blog')} className="inline-flex items-center gap-1 px-4 py-2 bg-[#D4A5A5]/15 rounded-full text-xs font-bold text-[#7b5455] hover:bg-[#D4A5A5]/25 transition-all font-sans">
-                            <span className="material-symbols-outlined text-sm">menu_book</span> Style Blog
+                        <Link href={getLinkHref(locale, 'blog')} className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#D4A5A5]/15 rounded-full text-xs font-bold text-[#7b5455] hover:bg-[#D4A5A5]/25 transition-all font-sans">
+                            <BookIcon /> Style Blog
                         </Link>
-                        <Link href={getLinkHref(locale, 'examples')} className="inline-flex items-center gap-1 px-4 py-2 bg-[#f5ece7] rounded-full text-xs font-bold text-[#53433e] hover:bg-[#e9e1dc] transition-all font-sans">
-                            <span className="material-symbols-outlined text-sm">collections</span> 12-Season Gallery
+                        <Link href={getLinkHref(locale, 'examples')} className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#f5ece7] rounded-full text-xs font-bold text-[#53433e] hover:bg-[#e9e1dc] transition-all font-sans">
+                            <GalleryIcon /> 12-Season Gallery
                         </Link>
                     </div>
                     
@@ -123,7 +172,7 @@ export default function PageComponent({
                     {/* Card 1 */}
                     <div className="glass-card soft-shadow rounded-2xl p-8 flex flex-col gap-4 items-start bg-white/40">
                         <div className="w-12 h-12 rounded-full bg-[#fdcbcb] text-[#795354] flex items-center justify-center mb-2">
-                            <span className="material-symbols-outlined text-2xl">apparel</span>
+                            <ApparelIcon />
                         </div>
                         <h3 className="font-sans text-lg md:text-xl font-bold text-[#1e1b18]">Virtual Draping</h3>
                         <p className="text-sm text-[#53433e] leading-relaxed">
@@ -133,7 +182,7 @@ export default function PageComponent({
                     {/* Card 2 */}
                     <div className="glass-card soft-shadow rounded-2xl p-8 flex flex-col gap-4 items-start bg-white/40 mt-0 md:mt-8">
                         <div className="w-12 h-12 rounded-full bg-[#fdcbcb] text-[#795354] flex items-center justify-center mb-2">
-                            <span className="material-symbols-outlined text-2xl">palette</span>
+                            <PaletteIcon />
                         </div>
                         <h3 className="font-sans text-lg md:text-xl font-bold text-[#1e1b18]">Seasonal Palettes</h3>
                         <p className="text-sm text-[#53433e] leading-relaxed">
@@ -143,7 +192,7 @@ export default function PageComponent({
                     {/* Card 3 */}
                     <div className="glass-card soft-shadow rounded-2xl p-8 flex flex-col gap-4 items-start bg-white/40 mt-0 md:mt-16">
                         <div className="w-12 h-12 rounded-full bg-[#fdcbcb] text-[#795354] flex items-center justify-center mb-2">
-                            <span className="material-symbols-outlined text-2xl">memory</span>
+                            <MemoryIcon />
                         </div>
                         <h3 className="font-sans text-lg md:text-xl font-bold text-[#1e1b18]">Precision Analysis</h3>
                         <p className="text-sm text-[#53433e] leading-relaxed">
@@ -258,7 +307,7 @@ export default function PageComponent({
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50">
                         <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">1</div>
                         <div className="mt-6 mb-4 text-[#A46751]">
-                             <span className="material-symbols-outlined text-5xl">photo_camera</span>
+                             <CameraIcon />
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step1}</h3>
                         <p className="text-[#53433e] font-sans text-sm leading-relaxed">{colorLabText.Landing.step1Desc}</p>
@@ -267,7 +316,7 @@ export default function PageComponent({
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50 md:mt-8">
                         <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">2</div>
                         <div className="mt-6 mb-4 text-[#A46751]">
-                             <span className="material-symbols-outlined text-5xl">auto_awesome</span>
+                             <SparklesIcon />
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step2}</h3>
                         <p className="text-[#53433e] font-sans text-sm leading-relaxed">{colorLabText.Landing.step2Desc}</p>
@@ -276,7 +325,7 @@ export default function PageComponent({
                     <div className="relative flex flex-col items-center text-center p-8 bg-white/45 backdrop-blur-md rounded-[2.5rem] glass-card soft-shadow border border-white/50 md:mt-16">
                         <div className="absolute -top-6 w-12 h-12 bg-[#A46751] text-white text-base font-bold flex items-center justify-center rounded-full shadow-lg font-sans">3</div>
                         <div className="mt-6 mb-4 text-[#A46751]">
-                             <span className="material-symbols-outlined text-5xl">palette</span>
+                             <PaletteLargeIcon />
                          </div>
                         <h3 className="text-lg font-serif font-bold mb-2 text-[#1e1b18]">{colorLabText.Landing.step3}</h3>
                         <p className="text-[#53433e] font-sans text-sm leading-relaxed">{colorLabText.Landing.step3Desc}</p>

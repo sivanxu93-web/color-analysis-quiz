@@ -67,10 +67,10 @@ export default function Footer({
             </div>
             <div className="mt-4 flex flex-col gap-3">
               <a href="https://findly.tools/color-analysis-quiz?utm_source=color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="150" height="47" />
+                <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="150" height="47" loading="lazy" decoding="async" />
               </a>
               <a href="https://theresanaiforthat.com/ai/ai-color-analysis-quiz/?ref=featured&v=7972629" target="_blank" rel="nofollow" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" height="51" />
+                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" height="51" loading="lazy" decoding="async" />
               </a>
             </div>
           </div>

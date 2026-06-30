@@ -9,6 +9,7 @@ import { useCommonContext } from '~/context/common-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PricingModal from '~/components/PricingModal';
 import ColorFan from '~/components/ColorFan';
+import Script from 'next/script';
 
 export default function PageComponent({
   locale,
@@ -757,6 +758,16 @@ export default function PageComponent({
   if (status === 'processing' || (!displayReport && !isDemo)) {
       return (
         <>
+          <Script id="material-symbols-loader" strategy="afterInteractive">
+              {`
+                (function() {
+                  var link = document.createElement('link');
+                  link.rel = 'stylesheet';
+                  link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+                  document.head.appendChild(link);
+                })();
+              `}
+          </Script>
           <Header locale={locale} page={'report'} />
           <div className="flex min-h-screen flex-col items-center justify-center bg-[#FFFBF7] p-4">
              <div className="relative w-full max-w-lg aspect-square flex flex-col items-center justify-center">
@@ -832,6 +843,16 @@ export default function PageComponent({
 
   return (
     <>
+      <Script id="material-symbols-loader" strategy="afterInteractive">
+          {`
+            (function() {
+              var link = document.createElement('link');
+              link.rel = 'stylesheet';
+              link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+              document.head.appendChild(link);
+            })();
+          `}
+      </Script>
       <Header locale={locale} page={'report'} />
       <PricingModal locale={locale} page={'report'} />
 

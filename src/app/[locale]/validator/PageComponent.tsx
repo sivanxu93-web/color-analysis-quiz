@@ -5,6 +5,7 @@ import Header from '~/components/Header';
 import Footer from '~/components/Footer';
 import { useCommonContext } from '~/context/common-context';
 import { useRouter } from 'next/navigation';
+import Script from 'next/script';
 import { getLinkHref } from '~/configs/buildLink';
 import imageCompression from 'browser-image-compression';
 
@@ -324,6 +325,16 @@ export default function ValidatorPageComponent({
 
     return (
         <>
+            <Script id="material-symbols-loader" strategy="afterInteractive">
+                {`
+                  (function() {
+                    var link = document.createElement('link');
+                    link.rel = 'stylesheet';
+                    link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+                    document.head.appendChild(link);
+                  })();
+                `}
+            </Script>
             <Header locale={locale} page={'validator'} />
             <main className="min-h-screen bg-[#fff8f5] py-12 px-4 sm:px-6">
                 <div className="max-w-4xl mx-auto">

@@ -7,6 +7,7 @@ import { getLinkHref } from '~/configs/buildLink';
 import { useCommonContext } from '~/context/common-context';
 import BaseModal from '~/components/BaseModal';
 import { sendGAEvent } from '@next/third-parties/google';
+import Script from 'next/script';
 
 // Helper for image compression and HEIC conversion
 const compressImage = async (file: File): Promise<{ blob: Blob, width: number, height: number }> => {
@@ -315,6 +316,16 @@ export default function PageComponent({
     };
   return (
     <>
+      <Script id="material-symbols-loader" strategy="afterInteractive">
+        {`
+          (function() {
+            var link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap';
+            document.head.appendChild(link);
+          })();
+        `}
+      </Script>
       <Header locale={locale} page={'analysis'} />
       <main className="flex min-h-screen flex-col items-center py-12 md:py-20 px-4 bg-[#fff8f5] relative">
         <style dangerouslySetInnerHTML={{ __html: `
