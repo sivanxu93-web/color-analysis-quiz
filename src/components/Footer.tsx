@@ -65,21 +65,21 @@ export default function Footer({
                     support@coloranalysisquiz.app
                 </a>
             </div>
-            <div className="mt-4 flex flex-col gap-3">
-              <a href="https://findly.tools/color-analysis-quiz?utm_source=color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="150" height="47" loading="lazy" decoding="async" />
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <a href="https://findly.tools/color-analysis-quiz?utm_source=color-analysis-quiz" target="_blank" rel="nofollow noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://findly.tools/badges/findly-tools-badge-light.svg" alt="Featured on Findly.tools" width="102" height="32" loading="lazy" decoding="async" className="h-[32px] w-auto" />
               </a>
-              <a href="https://theresanaiforthat.com/ai/ai-color-analysis-quiz/?ref=featured&v=7972629" target="_blank" rel="nofollow" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="150" height="51" loading="lazy" decoding="async" />
+              <a href="https://theresanaiforthat.com/ai/ai-color-analysis-quiz/?ref=featured&v=7972629" target="_blank" rel="nofollow noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://media.theresanaiforthat.com/featured-on-taaft.png?width=600" alt="Featured on TheresAnAIForThat" width="94" height="32" loading="lazy" decoding="async" className="h-[32px] w-auto" />
               </a>
-              <a href="https://turbo0.com/item/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" width="150" height="54" loading="lazy" decoding="async" className="h-[54px] w-auto" />
+              <a href="https://turbo0.com/item/color-analysis-quiz" target="_blank" rel="nofollow noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://img.turbo0.com/badge-listed-light.svg" alt="Listed on Turbo0" width="89" height="32" loading="lazy" decoding="async" className="h-[32px] w-auto" />
               </a>
-              <a href="https://www.toolpilot.ai/products/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://www.toolpilot.ai/cdn/shop/files/toolpilot-badge-w.png" alt="Featured on ToolPilot" width="150" height="51" loading="lazy" decoding="async" className="h-[51px] w-auto" />
+              <a href="https://www.toolpilot.ai/products/color-analysis-quiz" target="_blank" rel="nofollow noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://www.toolpilot.ai/cdn/shop/files/toolpilot-badge-w.png" alt="Featured on ToolPilot" width="94" height="32" loading="lazy" decoding="async" className="h-[32px] w-auto" />
               </a>
-              <a href="https://www.tooluck.org/item/color-analysis-quiz" target="_blank" rel="noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
-                <img src="https://www.tooluck.org/badges/tooluck-badge-light.svg" alt="Featured on Tooluck.org" width="210" height="55" loading="lazy" decoding="async" className="h-[55px] w-auto" />
+              <a href="https://www.tooluck.org/item/color-analysis-quiz" target="_blank" rel="nofollow noopener noreferrer" className="inline-block opacity-70 hover:opacity-100 transition-opacity">
+                <img src="https://www.tooluck.org/badges/tooluck-badge-light.svg" alt="Featured on Tooluck.org" width="122" height="32" loading="lazy" decoding="async" className="h-[32px] w-auto" />
               </a>
             </div>
           </div>
