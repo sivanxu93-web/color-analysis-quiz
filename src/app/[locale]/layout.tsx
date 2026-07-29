@@ -90,10 +90,7 @@ export default async function LocaleLayout({
 
   return (
     <html lang={locale} className={`${montserrat.variable} ${playfair.variable}`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      </head>
+      <head />
       <body suppressHydrationWarning={true} className="flex flex-col min-h-screen bg-[#fff8f5] text-[#2D2926]">
         <Script src="https://accounts.google.com/gsi/client" strategy="lazyOnload" />
         <NextAuthProvider>

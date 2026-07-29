@@ -20,7 +20,8 @@ export default function PageComponent({
   sessionId,
   drapingImages: initialDrapingImages,
   rating,
-  isOwner = false
+  isOwner = false,
+  seoText
 }: {
   locale: string;
   report: any; 
@@ -870,7 +871,7 @@ export default function PageComponent({
                     {dHair && <a href="#hair" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Hair</a>}
                     <a href="#styling" className="text-sm font-bold text-[#53433e] hover:text-[#A46751] transition-colors uppercase tracking-widest whitespace-nowrap font-sans">Styling</a>
                 </div>
-                {!isLocked && (
+                {!isLocked && !seoText && (
                     <button 
                         onClick={handleDownloadPDF}
                         disabled={isDownloadingPdf}
@@ -1557,6 +1558,13 @@ export default function PageComponent({
                         </div>
                     )}
                 </div>
+                )}
+
+                {/* SEO Text Content for Example Pages */}
+                {seoText && (
+                    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-gray-100">
+                        {seoText}
+                    </div>
                 )}
 
                 {/* CTA */}

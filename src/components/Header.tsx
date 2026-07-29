@@ -8,11 +8,13 @@ import { Menu, Transition } from '@headlessui/react'
 import Link from "next/link";
 import { languages } from "~/i18n/config";
 import { useCommonContext } from '~/context/common-context'
-import LoadingModal from "./LoadingModal";
-import GeneratingModal from "~/components/GeneratingModal";
+import dynamic from 'next/dynamic';
 import LoginButton from './LoginButton';
-import LoginModal from './LoginModal';
-import LogoutModal from "./LogoutModal";
+
+const LoadingModal = dynamic(() => import('./LoadingModal'), { ssr: false });
+const GeneratingModal = dynamic(() => import('~/components/GeneratingModal'), { ssr: false });
+const LoginModal = dynamic(() => import('./LoginModal'), { ssr: false });
+const LogoutModal = dynamic(() => import('./LogoutModal'), { ssr: false });
 import { getLinkHref } from "~/configs/buildLink";
 import { usePathname } from 'next/navigation';
 
