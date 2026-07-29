@@ -222,7 +222,7 @@ export default function PageComponent({
                             <div className="relative w-full h-full rounded-[1.5rem] overflow-hidden">
                                 <Image 
                                     src={item.imageUrl} 
-                                    alt={`${item.season} Palette`} 
+                                    alt={`${item.season} Color Analysis Palette Example - find your season`} 
                                     fill 
                                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw" 
                                     className="object-cover group-hover:scale-110 transition-transform duration-700" 

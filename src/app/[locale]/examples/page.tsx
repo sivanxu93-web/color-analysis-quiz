@@ -68,7 +68,7 @@ function ExampleCard({ item, locale }: { item: ExampleItem, locale: string }) {
       className="group block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all border border-[#E8E1D9] hover:-translate-y-1"
     >
       <div className="aspect-[4/5] relative overflow-hidden bg-gray-100">
-          <img src={item.imageUrl} alt={`${item.season} Example`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+          <img src={item.imageUrl} alt={`${item.season} Color Analysis Example - ${item.headline}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60 group-hover:opacity-40 transition-opacity"></div>
           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <h3 className="text-xl font-serif font-bold leading-tight">

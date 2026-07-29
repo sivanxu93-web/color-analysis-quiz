@@ -6,8 +6,8 @@ import { getSeoAlternates } from '~/libs/seo';
 
 export async function generateMetadata({ params: { locale = '' } }: { params: { locale: string } }): Promise<Metadata> {
   return {
-    title: 'Style Validator | Check Your Clothing Colors',
-    description: 'Upload a clothing item to see if it matches your seasonal color profile.',
+    title: 'Color Test for Clothes & Style Validator | Color Analysis Quiz',
+    description: 'Take a free online color test for clothes. Upload a photo of any garment to see if it matches your seasonal color palette profile instantly.',
     alternates: getSeoAlternates('/validator', locale),
   }
 }
