@@ -932,10 +932,10 @@ export default function PageComponent({
                     <div className="inline-block px-4 py-1.5 border border-[#A46751]/30 text-[#884c35] text-[10px] font-bold uppercase tracking-[0.2em] w-max rounded-full bg-[#A46751]/5 mx-auto md:mx-0">
                         Personal Analysis
                     </div>
-                    <h2 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#1e1b18] font-bold leading-[1.15]">
+                    <h1 className="font-serif text-4xl md:text-5xl lg:text-6xl text-[#1e1b18] font-bold leading-[1.15]">
                         You are a<br/>
                         <span className="text-[#884c35] italic font-semibold">{dSeason}</span>
-                    </h2>
+                    </h1>
                     
                     <p className="text-[#53433e] text-base md:text-lg leading-relaxed max-w-md mx-auto md:mx-0 font-sans opacity-95">
                         &quot;{isLocked ? 'Unlock your full color profile to reveal your customized seasonal undertones and power wardrobe colors.' : (dHeadline || 'Discover your true colors.')}&quot;
